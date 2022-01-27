@@ -4,8 +4,7 @@
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.0-blue.svg)](https://www.symcon.de/produkt/)
 [![Licence](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-IP-Symcon Modulbibliothek für die Visualisierung von Entsorgungsterminen.
-Die Bibliothek nutzt verschieden Online-Dienste um bevorstehende Entsorgungstermine (Entsorgungskalender) in IPS zu integrieren.
+IP-Symcon Modulbibliothek für die Einbindung und Verwaltung des drahtlosen HD-Heimüberwachungs- und Alarmsystem von Blink.
 
 Folgende Module beinhaltet diese Bibliothek:
 
@@ -19,7 +18,7 @@ Konfigurators für alle im Netzwerk befindlichen Bilnk Geräte.
 Mit diesem Modul können alle aktivierten Kameras im Netzwerk gesteuert werden.
 
 - __Blink Home Device__ ([Dokumentation](Blink%20Home%20Device))  
-Modul welches ein Endgerät (Kamera, Türklingel o.Ä.)repräsentiert.
+Modul welches ein Endgerät (Kamera, Türklingel o.Ä.) repräsentiert.
 
 ## Historie
 
