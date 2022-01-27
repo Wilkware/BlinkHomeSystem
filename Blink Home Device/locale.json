@@ -1,0 +1,42 @@
+{
+    "translations": {
+        "de": {
+            "\nBlink Home Device\n ": "\nBlink Home Gerät\n ",
+            "With this module you can make device-specific settings or read out information.": "Mit diesem Modul können Sie gerätespezifische Einstellungen vornehmen bzw. Informationen auslesen.",
+            "Device information ...": "Geräteinformationen ...",
+            "Device type:": "Gerätetyp:",
+            "Device model:": "Gerätemodell:",
+            "Device ID:": "Geräte-ID:",
+            "Network ID:": "Netwerk-ID:",
+            "Camera": "Kamera",
+            "Siren": "Sirene",
+            "Doorbell": "Türklingeln",
+            "Doorbell button": "Klinkelknopf",
+            "Chime": "Glocke",
+            "Images ...": "Bilder ...",
+            "Create a media variable for snapshots!": "Erstellen einer Medienvariablen für Momentausnahmen!",
+            "Update interval:": "Aktualisierungsintervall:",
+            "minutes": "Minuten",
+            "Use In-Memory Cache!": "Benutze In-Memory Cache!",
+            "Time control ...": "Zeitsteuerung ...",
+            "Schedule:": "Zeitplan:",
+            "The schedule for updating the snapshots can be created via the button below!": "Der Zeitplan für die Aktualisierung der Momentaufnahmen kann über die Schaltfläche unten erstellt werden!",
+            "With the help of the button you can create a weekly programme.\nIt is created below the instance. It can then be set to your own needs.": "Mit Hilfe der Schaltfläche können Sie ein Wochenprogramm erstellen.\nEs wird unterhalb der Instanz angelegt. Es kann dann auf die eigenen Bedürfnisse eingestellt werden.",
+            "Create a variable to trigger a snapshot of the current view of the camera!": "Anlegen einer Variabel zur Auslösung einer Momentaufnahme der aktuellen Ansicht der Kamera!",
+            "Create a timestamp on each snapshot!": "Erstellen eines Zeitstempels auf jeder Momentaufnahme!",
+            "Top margin:": "Seitenrand Oben:",
+            "Left margin:": "Seitenrand Links:",
+            "Font size:": "Schriftgröße:",
+            "Font color:": "Schriftfarbe:",
+            "Path to the TrueType font:": "Pfad zu der TrueType-Schriftart:",
+            "Add Schedule": "Zeitplan hinzufügen",
+            "Schedule snapshot": "Zeitplan Snapshot",
+            "Motion detection": "Bewegungserkennung",
+            "Snapshot": "Snapshot",
+            "Advanced settings ...": "Erweiterte Einstellungen ...",
+            "Taking a ...": "Momentaufnahme machen ...",
+            "Source code, donation and licence ...": "Quellcode, Spende und Lizenz ...",
+            "The software is free of charge for non-commercial use, I would appreciate a donation if you like the module.": "Die Software ist für die nicht kommzerielle Nutzung kostenlos, über eine Spende bei Gefallen des Moduls würde ich mich sehr freuen."
+         }
+    }
+}

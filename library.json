@@ -1,0 +1,12 @@
+{
+    "id": "{EE71140D-C02C-AB00-F456-D934270CC4A5}",
+    "name": "Blink Home System",
+    "author": "Wilkware (@Pitti)",
+    "url": "https://wilkware.de",
+    "compatibility": {
+        "version": "6.0"
+    },
+    "version": "1.0",
+    "build": 20220110,
+    "date": 1641812400
+}

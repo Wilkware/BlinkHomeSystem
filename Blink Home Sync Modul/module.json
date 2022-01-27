@@ -1,0 +1,16 @@
+{
+    "id": "{3E3F3E1C-899C-2E17-E95E-6803DB5E95FE}",
+    "name": "Blink Home Sync Module",
+    "type": 3,
+    "vendor": "Amazon",
+    "aliases": [],
+    "parentRequirements": [
+        "{83027B09-C481-91E7-6D24-BF49AA871452}"
+    ],
+    "childRequirements": [],
+    "implemented": [
+        "{7DD36C8D-6581-25FE-9FEA-98024108BED6}"
+    ],
+    "prefix": "BHS",
+    "url": "https://wilkware.de/ip-symcon-module/blink/"
+}
