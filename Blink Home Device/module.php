@@ -217,10 +217,11 @@ class BlinkHomeDevice extends IPSModule
             $this->SendDebug(__FUNCTION__, 'Command still active!');
             return;
         }
-        $device = $this->ReadPropertyString('DeviceID');
         $network = $this->ReadPropertyString('NetworkID');
+        $device = $this->ReadPropertyString('DeviceID');
+        $type = $this->ReadPropertyString('DeviceType');
         // Parameter
-        $param = ['DeviceID' => $device, 'NetworkID' => $network];
+        $param = ['NetworkID' => $network, 'DeviceID' => $device, 'DeviceType' => $network];
         // Request
         $response = $this->RequestDataFromParent('thumbnail', $param);
         if ($response === '[]') {

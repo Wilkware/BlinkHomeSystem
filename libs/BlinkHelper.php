@@ -328,10 +328,14 @@ trait BlinkHelper
      *      A command object.  This call is asynchronous and is monitored by the Command Status API call using the returned Command Id.
      *
      */
-    private function doThumbnail(string $token, string $region, string $network, string $device)
+    private function doThumbnail(string $token, string $region, string $account, string $network, string $device, string $type)
     {
         // prepeare url
-        $url = "https://rest-$region.immedia-semi.com/network/$network/camera/$device/thumbnail";
+        if ( $type == "owls" ) {
+            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/owls/$device/thumbnail";
+        } else {
+            $url = "https://rest-$region.immedia-semi.com/network/$network/camera/$device/thumbnail";
+        }
         // prepeare header
         $headers = [
             'token-auth: ' . $token,
