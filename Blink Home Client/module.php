@@ -156,8 +156,8 @@ class BlinkHomeClient extends IPSModule
                     break;
                 case 'thumbnail':
                     $params = (array) $data['Params'];
-                    if (isset($params['NetworkID']) && isset($params['DeviceID'])) {
-                        $result = $this->doThumbnail($token, $region, $params['NetworkID'], $params['DeviceID']);
+                    if (isset($params['NetworkID']) && isset($params['DeviceID']) && isset($params['DeviceType'])) {
+                        $result = $this->doThumbnail($token, $region, $account, $params['NetworkID'], $params['DeviceID'], $params['DeviceType']);
                     }
                     break;
                 case 'motion':
