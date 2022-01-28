@@ -17,6 +17,7 @@ class BlinkHomeConfigurator extends IPSModule
         'sync_modules' => 'Sync Modul',
         'sirens'       => 'Sirens',
         'doorbells'    => 'Doorbell',
+        'owls'         => 'Mini Camera',
     ];
 
     // Blink Device Models (up to now)
@@ -26,6 +27,7 @@ class BlinkHomeConfigurator extends IPSModule
         'mini'     => 'Blink Mini',
         'white'    => 'Blink Indoor',
         'catalina' => 'Blink Outdoor',
+        'owl'      => 'Blink Mini',
     ];
 
     // ModulID (Blink Home Device)
@@ -133,6 +135,11 @@ class BlinkHomeConfigurator extends IPSModule
         if (isset($devises['cameras'])) {
             foreach ($devises['cameras'] as $dev) {
                 $data[] = ['guid' => self::BLINK_DEVICE_GUID, 'id'=> $dev['id'], 'name' => $dev['name'], 'type' => 'cameras', 'model' => $dev['type'], 'status' => $dev['status'], 'battery' => $dev['battery'], 'serial' => $dev['serial'], 'firmware' => $dev['fw_version'], 'network' => $dev['network_id']];
+            }
+        }
+        if (isset($devises['owls'])) {
+            foreach ($devises['owls'] as $dev) {
+                $data[] = ['guid' => self::BLINK_DEVICE_GUID, 'id'=> $dev['id'], 'name' => $dev['name'], 'type' => 'owls', 'model' => $dev['type'], 'status' => $dev['status'], 'battery' => 'usb', 'serial' => $dev['serial'], 'firmware' => $dev['fw_version'], 'network' => $dev['network_id']];
             }
         }
         $this->SendDebug(__FUNCTION__, $response);

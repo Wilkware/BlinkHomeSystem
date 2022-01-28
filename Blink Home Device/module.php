@@ -19,8 +19,8 @@ class BlinkHomeDevice extends IPSModule
     private const BLINK_SCHEDULE_SNAPSHOT_ON = 2;
     private const BLINK_SCHEDULE_SNAPSHOT_IDENT = 'circuit_snapshot';
     private const BLINK_SCHEDULE_SNAPSHOT_SWITCH = [
-        self::BLINK_SCHEDULE_SNAPSHOT_OFF => ['Inaktive', 0xFF0000, "IPS_RequestAction(\$_IPS['TARGET'], 'schedule_snapshot, \$_IPS['ACTION']);"],
-        self::BLINK_SCHEDULE_SNAPSHOT_ON  => ['Aktive', 0x00FF00, "IPS_RequestAction(\$_IPS['TARGET'], 'schedule_snapshot, \$_IPS['ACTION']);"],
+        self::BLINK_SCHEDULE_SNAPSHOT_OFF => ['Inaktive', 0xFF0000, "IPS_RequestAction(\$_IPS['TARGET'], 'schedule_snapshot', \$_IPS['ACTION']);"],
+        self::BLINK_SCHEDULE_SNAPSHOT_ON  => ['Aktive', 0x00FF00, "IPS_RequestAction(\$_IPS['TARGET'], 'schedule_snapshot', \$_IPS['ACTION']);"],
     ];
 
     // Command Call Interval

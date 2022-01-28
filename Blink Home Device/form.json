@@ -22,13 +22,14 @@
                                 {"label": "Camera", "value": "cameras"},
                                 {"label": "Sync Modul", "value": "sync_modules"},
                                 {"label": "Sirens", "value": "sirens"},
-                                {"label": "Doorbell", "value": "doorbells"}
+                                {"label": "Doorbell", "value": "doorbells"},
+                                {"label": "Mini Camera", "value": "owls"}
                             ]
                         },
                         {"type": "Select", "name": "DeviceModel", "caption": "Device model:", "width": "250px", "enabled": false,
                             "options": [
                                 {"label": "Please select ...", "value": "null"},
-                                {"label": "Blink Mini", "value": "mini"},
+                                {"label": "Blink Mini", "value": "owl"},
                                 {"label": "Blink Indoor", "value": "white"},
                                 {"label": "Blink Outdoor", "value": "catalina"}
                             ]
