@@ -221,7 +221,7 @@ class BlinkHomeDevice extends IPSModule
         $device = $this->ReadPropertyString('DeviceID');
         $type = $this->ReadPropertyString('DeviceType');
         // Parameter
-        $param = ['NetworkID' => $network, 'DeviceID' => $device, 'DeviceType' => $network];
+        $param = ['NetworkID' => $network, 'DeviceID' => $device, 'DeviceType' => $type];
         // Request
         $response = $this->RequestDataFromParent('thumbnail', $param);
         if ($response === '[]') {
@@ -231,9 +231,13 @@ class BlinkHomeDevice extends IPSModule
         // Command
         $command = json_decode($response, true);
         $this->SendDebug(__FUNCTION__, $command);
-        $this->WriteAttributeString('CommandID', $command['id']);
-        // Start Trigger
-        $this->SetTimerInterval('TimerCommand', self::BLINK_COMMAND_TIMER_INTERVAL);
+        if (isset($command['id'])) {
+            $this->WriteAttributeString('CommandID', $command['id']);
+            // Start Trigger
+            $this->SetTimerInterval('TimerCommand', self::BLINK_COMMAND_TIMER_INTERVAL);
+        } else {
+            $this->LogMessage($command['message'], KL_ERROR);
+        }
     }
 
     /**
