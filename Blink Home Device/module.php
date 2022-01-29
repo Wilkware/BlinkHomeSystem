@@ -58,7 +58,7 @@ class BlinkHomeDevice extends IPSModule
         $this->RegisterPropertyBoolean('UpdateImage', false);
 
         // Register update timer
-        $this->RegisterTimer('TimerSnapshot', 0, 'IPS_RequestAction(' . $this->InstanceID . ', "thumbnail", "");');
+        $this->RegisterTimer('TimerSnapshot', 0, 'IPS_RequestAction(' . $this->InstanceID . ', "snapshot", "");');
         $this->RegisterTimer('TimerCommand', 0, 'IPS_RequestAction(' . $this->InstanceID . ', "command", "");');
     }
 
@@ -131,6 +131,12 @@ class BlinkHomeDevice extends IPSModule
             // Timer solo or over schedule?
             if ($schedule == 0) {
                 $this->SetTimerInterval('TimerSnapshot', 60 * 1000 * $interval);
+            } else {
+                $activeID = $this->GetWeeklyScheduleInfo($schedule, time(), true);
+                $this->SendDebug(__FUNCTION__, $activeID);
+                if ($activeID['ActionID'] == self::BLINK_SCHEDULE_SNAPSHOT_ON) {
+                    $this->SetTimerInterval('TimerSnapshot', 60 * 1000 * $interval);
+                }
             }
         } else {
             // Timer Reset
