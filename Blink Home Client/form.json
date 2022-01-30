@@ -14,7 +14,7 @@
             "items": [
                 {"type": "RowLayout",
                     "items": [
-                        {"type": "ValidationTextBox", "name": "AccountUser", "caption": "Blink Account eMail:", "validate": "^([a-z0-9\\+_\\-]+)(\\.[a-z0-9\\+_\\-]+)*@([a-z0-9\\-]+\\.)+[a-z]{2,6}$", "width": "250px"},
+                        {"type": "ValidationTextBox", "name": "AccountUser", "caption": "Blink Account eMail:", "validate": "^\\S+@\\S+\\.\\S+$", "width": "250px"},
                         {"type": "PasswordTextBox", "name": "AccountPassword", "caption": "Blink Account Password:", "validate": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*?[@$!%*#?&,;+_.=~^(){}\\[\\]|:])[A-Za-z\\d@$!%*#?&,;+_.=~^(){}\\[\\]|:]{8,}$", "width": "250px"}
                     ]
                 },
