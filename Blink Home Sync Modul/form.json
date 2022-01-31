@@ -51,7 +51,13 @@
                         {"type": "Button", "name": "Disarm", "caption": "Disarm", "onClick": "BHS_Disarm($id);"}
                     ]
                 },
-                {"type": "Label", "label": "NOTE: Activating or deactivating may take some time.", "italic": true, "color": 16711680}
+                {"type": "Label", "label": "NOTE: Activating or deactivating may take some time.", "italic": true, "color": 16711680},
+                {"type": "RowLayout",
+                    "items": [
+                        {"type": "SelectEvent", "name": "RecordingSchedule", "caption": "Schedule:", "width": "450px"},
+                        {"type": "Label", "name": "LabelSchedule",  "caption": "The schedule for start and stop the motion detection\ncan be created via the button below!"}
+                    ]
+                }
             ]
         },
         {
@@ -63,12 +69,14 @@
         }
     ],
     "actions": [
+        {"type": "Label", "caption": "With the help of the button you can create a weekly programme.\nIt is created below the instance. It can then be set to your own needs." },
+        {"type": "Button", "caption": "Add Schedule", "onClick": "IPS_RequestAction($id,'create_schedule',$id);"},
         {"type": "Label", "caption": "Use the buttons to obtain information about the network or module ..."},
         {
             "type": "RowLayout",
             "items": [
-                {"type": "Button", "name": "Network", "caption": "Network", "onClick": "BHS_Network($id);"},
-                {"type": "Button", "name": "SyncModul", "caption": "Sync Module", "onClick": "BHS_SyncModule($id);"}
+                {"type": "Button", "name": "Network", "caption": "Network", "onClick": "IPS_RequestAction($id,'network',$id);"},
+                {"type": "Button", "name": "SyncModul", "caption": "Sync Module", "onClick": "IPS_RequestAction($id,'sync_module',$id);"}
             ]
         },
         {"type": "Label",  "caption": "\n" },

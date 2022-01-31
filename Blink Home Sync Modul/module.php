@@ -10,7 +10,17 @@ class BlinkHomeSyncModule extends IPSModule
 {
     // Helper Traits
     use DebugHelper;
+    use EventHelper;
     use VariableHelper;
+
+    // Schedule constant
+    private const BLINK_SCHEDULE_RECORDING_OFF = 1;
+    private const BLINK_SCHEDULE_RECORDING_ON = 2;
+    private const BLINK_SCHEDULE_RECORDING_IDENT = 'circuit_recording';
+    private const BLINK_SCHEDULE_RECORDING_SWITCH = [
+        self::BLINK_SCHEDULE_RECORDING_OFF => ['Inaktive', 0xFF0000, "IPS_RequestAction(\$_IPS['TARGET'], 'schedule_recording', \$_IPS['ACTION']);"],
+        self::BLINK_SCHEDULE_RECORDING_ON  => ['Aktive', 0x00FF00, "IPS_RequestAction(\$_IPS['TARGET'], 'schedule_recording', \$_IPS['ACTION']);"],
+    ];
 
     /**
      * Overrides the internal IPS_Create($id) function
@@ -19,14 +29,16 @@ class BlinkHomeSyncModule extends IPSModule
     {
         //Never delete this line!
         parent::Create();
-
+        // Connect to client
         $this->ConnectParent('{AF126D6D-83D1-44C2-6F61-96A4BB7A0E62}');
-
+        // Device
         $this->RegisterPropertyString('DeviceID', '');
         $this->RegisterPropertyString('NetworkID', '');
         $this->RegisterPropertyString('DeviceType', 'null');
         $this->RegisterPropertyString('DeviceModel', 'null');
         $this->RegisterPropertyBoolean('CheckRecording', false);
+        // Schedule
+        $this->RegisterPropertyInteger('RecordingSchedule', 0);
     }
 
     /**
@@ -65,12 +77,24 @@ class BlinkHomeSyncModule extends IPSModule
         // Debug output
         $this->SendDebug(__FUNCTION__, $ident . ' => ' . $value);
         switch ($ident) {
+            case 'create_schedule':
+                $this->CreateScheduleRecording();
+                break;
+            case 'schedule_recording':
+                $this->ScheduleRecording($value);
+                break;
             case 'recording':
                 if ($value) {
                     $this->Arm();
                 } else {
                     $this->Disarm();
                 }
+                break;
+            case 'network':
+                $this->Network();
+                break;
+            case 'sync_module':
+                $this->SyncModule();
                 break;
             default:
                 break;
@@ -128,10 +152,8 @@ class BlinkHomeSyncModule extends IPSModule
 
     /**
      * Display Network Information
-     *
-     * BHS_Network();
      */
-    public function Network()
+    private function Network()
     {
         // Debug
         $this->SendDebug(__FUNCTION__, 'Obtain network information.');
@@ -167,16 +189,12 @@ class BlinkHomeSyncModule extends IPSModule
         } else {
             echo $this->Translate('Call was not successfull!');
         }
-        // Return
-        return;
     }
 
     /**
      * Display Sync Module Information
-     *
-     * BHS_SyncModule();
      */
-    public function SyncModule()
+    private function SyncModule()
     {
         // Debug
         $this->SendDebug(__FUNCTION__, 'Obtain sync module information.');
@@ -220,8 +238,45 @@ class BlinkHomeSyncModule extends IPSModule
         } else {
             echo $this->Translate('Call was not successfull!');
         }
-        // Return
-        return;
+    }
+
+    /**
+     * Weekly Schedule event
+     *
+     * @param integer $value Action value (ON=2, OFF=1)
+     */
+    private function ScheduleRecording(int $value)
+    {
+        $schedule = $this->ReadPropertyInteger('RecordingSchedule');
+        $this->SendDebug(__FUNCTION__, 'Value: ' . $value . ',Schedule: ' . $schedule);
+        if ($schedule == 0) {
+            $this->SendDebug(__FUNCTION__, 'Schedule not linked!');
+            // nothing todo
+            return;
+        }
+        // Is Activate OFF
+        if ($value == self::BLINK_SCHEDULE_RECORDING_OFF) {
+            $this->SendDebug(__FUNCTION__, 'OFF: Disarm recording!');
+            // Stop Recording
+            $this->Disarm();
+        }
+        if ($value == self::BLINK_SCHEDULE_RECORDING_ON) {
+            $this->SendDebug(__FUNCTION__, 'ON: Arm recording!');
+            // Start Recording
+            $this->Arm();
+        }
+    }
+
+    /**
+     * Create week schedule for snapshots
+     *
+     */
+    private function CreateScheduleRecording()
+    {
+        $eid = $this->CreateWeeklySchedule($this->InstanceID, $this->Translate('Schedule recording'), self::BLINK_SCHEDULE_RECORDING_IDENT, self::BLINK_SCHEDULE_RECORDING_SWITCH, -1);
+        if ($eid !== false) {
+            $this->UpdateFormField('RecordingSchedule', 'value', $eid);
+        }
     }
 
     /**

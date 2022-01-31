@@ -50,6 +50,8 @@ class BlinkHomeDevice extends IPSModule
         $this->RegisterPropertyInteger('OverlayLeft', 10);
         $this->RegisterPropertyInteger('OverlaySize', 10);
         $this->RegisterPropertyInteger('OverlayColor', 16777215); // Weiß
+        $this->RegisterPropertyInteger('OverlayBackground', -1); // Transparent
+        $this->RegisterPropertyString('OverlayFormat', 'd.m.Y H:i:s'); // Weiß
         $this->RegisterPropertyString('OverlayFont', '/usr/share/fonts/truetype/lato/Lato-Bold.ttf');
         // Schedule
         $this->RegisterPropertyInteger('ImageInterval', 0);
@@ -311,14 +313,30 @@ class BlinkHomeDevice extends IPSModule
         if ($overlay) {
             // Parameter
             $size = $this->ReadPropertyInteger('OverlaySize');
-            $top = $this->ReadPropertyInteger('OverlayTop') + $size;
+            $top = $this->ReadPropertyInteger('OverlayTop');
             $left = $this->ReadPropertyInteger('OverlayLeft');
             $rgb = $this->Int2RGB($this->ReadPropertyInteger('OverlayColor'));
+            $bg = $this->ReadPropertyInteger('OverlayBackground');
             $font = $this->ReadPropertyString('OverlayFont');
+            $format = $this->ReadPropertyString('OverlayFormat');
+            // Text (Timestamp)
+            $text = date($format, time());
             // GdImage
             $pic = imagecreatefromstring($response);
             $col = imagecolorallocate($pic, $rgb[0], $rgb[1], $rgb[2]);
-            imagettftext($pic, $size, 0, $left, $top, $col, $font, date('d.m.Y H:i:s', time()));
+            // Background
+            if ($bg != -1) {
+                $rgb = $this->Int2RGB($bg);
+                $bgc = imagecolorallocate($pic, $rgb[0], $rgb[1], $rgb[2]);
+                // BG Box
+                $box = imagettfbbox($size, 0, $font, $text);
+                $right = $box[4] - $box[6] + $left;
+                $bottom = $box[3] - $box[5] + $top;
+                // Add text background
+                imagefilledrectangle($pic, $left, $top, $right, $bottom, $bgc);
+            }
+            // Write Text
+            imagettftext($pic, $size, 0, $left, $top + $size, $col, $font, $text);
             // Let's start output buffering.
             ob_start();
             // This will normally output the image, but because of ob_start(), it won't.

@@ -65,6 +65,12 @@
                 },
                 {"type": "RowLayout",
                     "items": [
+                        {"type": "ValidationTextBox", "name": "OverlayFormat", "caption": "Time format:", "width": "221px"},
+                        {"type": "SelectColor", "name": "OverlayBackground", "caption": "Background color:", "allowTransparent": true, "width": "221px"}
+                    ]
+                },
+                {"type": "RowLayout",
+                    "items": [
                         {"type": "ValidationTextBox", "name": "OverlayFont", "caption": "Path to the TrueType font:", "width": "450px"}
                     ]
                 }

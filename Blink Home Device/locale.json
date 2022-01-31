@@ -29,6 +29,8 @@
             "Left margin:": "Seitenrand Links:",
             "Font size:": "Schriftgröße:",
             "Font color:": "Schriftfarbe:",
+            "Background color:": "Hintergrundfarbe:",
+            "Time Format:": "Zeitformat:",
             "Path to the TrueType font:": "Pfad zu der TrueType-Schriftart:",
             "Add Schedule": "Zeitplan hinzufügen",
             "Schedule snapshot": "Zeitplan Snapshot",
