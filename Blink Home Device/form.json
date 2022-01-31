@@ -31,7 +31,8 @@
                                 {"label": "Please select ...", "value": "null"},
                                 {"label": "Blink Mini", "value": "owl"},
                                 {"label": "Blink Indoor", "value": "white"},
-                                {"label": "Blink Outdoor", "value": "catalina"}
+                                {"label": "Blink Outdoor", "value": "catalina"},
+                                {"label": "Blink XT2", "value": "xt2"}
                             ]
                         }
                     ]
