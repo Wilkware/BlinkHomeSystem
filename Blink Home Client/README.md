@@ -93,7 +93,7 @@ Es ist keine weitere Steuerung oder gesonderte Darstellung integriert.
 void BHS_Login(int $InstanzID);
 ```
 
-Versucht den Client mit den Account-Daten an den Blink-Servern anzumelden. 
+Versucht den Client mit den Account-Daten an den Blink-Servern anzumelden.  
 Die Funktion liefert '0' im Fehlerfall, '1' im Erfolgsfall und '2' im Verifizierungsfall.
 
 ```php

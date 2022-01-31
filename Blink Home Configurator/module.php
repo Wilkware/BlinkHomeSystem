@@ -28,6 +28,7 @@ class BlinkHomeConfigurator extends IPSModule
         'white'    => 'Blink Indoor',
         'catalina' => 'Blink Outdoor',
         'owl'      => 'Blink Mini',
+        'xt2'      => 'Blink XT2',
     ];
 
     // ModulID (Blink Home Device)
