@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.0-blue.svg)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.0.20220110-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.1.20220130-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://github.com/Wilkware/IPSymconBlink/workflows/Check%20Style/badge.svg)](https://github.com/Wilkware/IPSymconBlink/actions)
 
@@ -59,6 +59,7 @@ Name           | Beschreibung
 -------------- | ------------------
 STARTEN        | Schalter für direktes scharf Stellen der Aufnahme
 STOPPEN        | Schalter zum direkten Stoppen von Aufnahmen
+Zeitplan       | Zeitplan zum Starten und Stoppen von Aufnahmen
 
 > Erweiterte Einstellungen  ...
 
@@ -68,10 +69,11 @@ Variable zum Umschalten der Aufzeichnung erstellen? | Schaltvariable für's Webf
 
 Aktionsbereich:
 
-Aktion           | Beschreibung
--------------- | ------------------
-NETZWERK       | Ausgabe der Netwerkinformationen.
-SYNC MODUL     | Ausgabe der Modulinformationen.
+Aktion              | Beschreibung
+------------------- | ------------------
+ZEITPLAN HINZUFÜGEN | Es wird ein Wochenplan mit 2 Zuständen (Aktiv & Inaktiv) angelegt und in den Einstellung hinterlegt.
+NETZWERK            | Ausgabe der Netwerkinformationen.
+SYNC MODUL          | Ausgabe der Modulinformationen.
 
 ### 5. Statusvariablen und Profile
 
@@ -109,50 +111,12 @@ Schaltet alle im Netwerk befindlichen Kameras unscharf.
 
 __Beispiel__: `BHS_Disarm(12345);`
 
-```php
-    void BHS_Network(integer $InstanzID);
-```
-
-Liest die eingestellten Netzwerkinformationen aus.
-Die Funktion liefert als Rückgabewert einen (sprintf) formatierten String.
-
-__Beispiel__: `BHS_Network(12345);`
-
-> Name: My Blink Network  
-> Zeitzome: Europe/Berlin  
-> Sommerzeit: AN  
-> Aufzeichnung: AUS  
-> Lokale Speicherung: AUS  
-> Erzeugt am: Sa, 27.Nov, 13:45  
-> Aktualisiert am: So, 23.Jan, 21:12  
-
-```php
-    void BHS_SyncModule(integer $InstanzID);
-```
-
-Liest die eingestellten Modulinformationen aus.
-Die Funktion liefert als Rückgabewert einen (sprintf) formatierten String.
-
-__Beispiel__: `BHJS_SyncModule(12345);`
-
-> Name: My Blink Sync Module  
-> Status: online  
-> Seriennummer: G8T1LP00045200NN  
-> Firmware: 4.4.2  
-> Typ: sm2  
-> Subtyp: vinnie  
-> Wifi Stärke: 1  
-> Netzwerk ID: 1234567  
-> Eingebunden: JA  
-> Temperaturalarm: JA  
-> Lokaler Speicher: NEIN  
-> Lokaler Speicher kombatible: JA  
-> Lokaler Speicherstatus: unavailable  
-> Letzte Aktivität: Mi, 26.Jan, 16:02  
-> Erzeugt am: Sa, 27.Nov, 13:46  
-> Aktualisiert am: Mo, 24.Jan, 22:16  
-
 ### 8. Versionshistorie
+
+v1.1.20220130
+
+* _NEU_: Zeitplan für Aufnahmenaktivierung hinzugefügt
+* _FIX_: Funktionen Network() und SyncModul() nur für internen Gebrauch verändert
 
 v1.0.20220110
 

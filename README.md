@@ -22,7 +22,8 @@ Modul welches ein Endgerät (Kamera, Türklingel o.Ä.) repräsentiert.
 
 ## Historie
 
-- 2022-01-10: Initialversion
+- 2022-01-30: v1.1 Bugfixing, Blink Mini Support, Aufnahmeaktivierung über Zeitplan, Erweitertes Overlay
+- 2022-01-10: v1.0 Initialversion
 
 ## Entwickler
 

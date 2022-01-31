@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.0-blue.svg)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.0.20220110-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.1.20220130-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://github.com/Wilkware/IPSymconBlink/workflows/Check%20Style/badge.svg)](https://github.com/Wilkware/IPSymconBlink/actions)
 
@@ -118,6 +118,12 @@ Gibt im angemeldeten Zusatnd die Benachrichtigungsoptionen aus.
 Die Funktion liefert '1' im Erfolgsfall, sonst '0'.
 
 ### 8. Versionshistorie
+
+v1.1.20220130
+
+* _NEU_: Blink Mini Support
+* _FIX_: Mail Validation Pattern angepasst
+* _FIX_: Kennwort Validation Pattern angepasst
 
 v1.0.20220110
 
