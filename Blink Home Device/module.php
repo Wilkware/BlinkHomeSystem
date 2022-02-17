@@ -108,6 +108,7 @@ class BlinkHomeDevice extends IPSModule
         parent::ApplyChanges();
 
         $device = $this->ReadPropertyString('DeviceID');
+        $model = $this->ReadPropertyString('DeviceModel');
         $image = $this->ReadPropertyBoolean('ImageVariable');
         $interval = $this->ReadPropertyInteger('ImageInterval');
         $cache = $this->ReadPropertyBoolean('ImageMemory');
@@ -118,9 +119,11 @@ class BlinkHomeDevice extends IPSModule
             [1, '►', '', 0xFF8000],
         ];
         $this->RegisterProfile(vtInteger, 'BHS.Update', 'Script', '', '', 0, 0, 0, 0, $profile);
-        // Motion detection
-        $this->MaintainVariable('motion_detection', $this->Translate('Motion detection'), vtBoolean, '~Switch', 1, true);
-        $this->EnableAction('motion_detection');
+        // Motion detection (not for Blink Mini)
+        if ($model != 'null' && $model != 'owl') {
+            $this->MaintainVariable('motion_detection', $this->Translate('Motion detection'), vtBoolean, '~Switch', 1, true);
+            $this->EnableAction('motion_detection');
+        }
         // Update variable
         $this->MaintainVariable('snapshot', $this->Translate('Snapshot'), vtInteger, 'BHS.Update', 2, $variable & $image);
         if ($variable & $image) {
@@ -333,7 +336,7 @@ class BlinkHomeDevice extends IPSModule
                 $right = $box[4] - $box[6] + $left;
                 $bottom = $box[3] - $box[5] + $top;
                 // Add text background
-                imagefilledrectangle($pic, $left, $top, $right, $bottom, $bgc);
+                imagefilledrectangle($pic, $left, $top - 1, $right, $bottom, $bgc);
             }
             // Write Text
             imagettftext($pic, $size, 0, $left, $top + $size, $col, $font, $text);

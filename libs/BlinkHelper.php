@@ -96,9 +96,9 @@ trait BlinkHelper
     private static $BLINK_WEAKNESS = 2;
     // App constants
     private static $UNIQUE_UID = '056952C3-95C6-3B98-E400-D597B6141F74';
-    private static $APP_VERSION = '6.6.1 (12346)'; //'6.2.7 (10212)';
-    private static $CLIENT_NAME = 'IPSymconBlinkModul';
-    private static $CLIENT_TYPE = 'ios';
+    private static $APP_VERSION = '6.7.0 (12379)';      // '6.6.1 (12346)', '6.2.7 (10212)'
+    private static $CLIENT_NAME = 'IPSymconBlinkModul'; // BlinkApp
+    private static $CLIENT_TYPE = 'ios';                // "android"
 
     /**
      * Client Login to Blink Account on Blink Servers
@@ -123,7 +123,8 @@ trait BlinkHelper
         ];
         // prepeare body (Login v5)
         $body = [
-            'app_version'       => self::$UNIQUE_UID,
+            //  'app-build'         => 'IOS_12379',
+            'app_version'       => self::$APP_VERSION,
             'client_name'       => self::$CLIENT_NAME,
             'client_type'       => self::$CLIENT_TYPE,
             'device_identifier' => 'ips ' . self::$UNIQUE_UID,
