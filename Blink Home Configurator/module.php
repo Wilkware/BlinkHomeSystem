@@ -31,6 +31,8 @@ class BlinkHomeConfigurator extends IPSModule
         'xt2'      => 'Blink XT2',
     ];
 
+    // ModulID (Blink Home Client)
+    private const BLINK_CLIENT_GUID = '{AF126D6D-83D1-44C2-6F61-96A4BB7A0E62}';
     // ModulID (Blink Home Device)
     private const BLINK_MODULE_GUID = '{3E3F3E1C-899C-2E17-E95E-6803DB5E95FE}';
     // ModulID (Blink Home Device)
@@ -43,8 +45,8 @@ class BlinkHomeConfigurator extends IPSModule
     {
         //Never delete this line!
         parent::Create();
-        // Required Parent (Blink Home Cloud)
-        $this->ConnectParent('{AF126D6D-83D1-44C2-6F61-96A4BB7A0E62}');
+        // Required Parent (Blink Home Client)
+        $this->ConnectParent(self::BLINK_CLIENT_GUID);
         // Properties
         $this->RegisterPropertyInteger('TargetCategory', 0);
     }
@@ -87,30 +89,80 @@ class BlinkHomeConfigurator extends IPSModule
         // Save location
         $location = $this->GetPathOfCategory($this->ReadPropertyInteger('TargetCategory'));
 
-        // Blink devices
+        // All connected devices
+        $connected = [];
+        // Get all the DEVICE instances that are connected to the configurators I/O
+        foreach (IPS_GetInstanceListByModuleID(self::BLINK_DEVICE_GUID) as $instance) {
+            if (IPS_GetInstance($instance)['ConnectionID'] === IPS_GetInstance($this->InstanceID)['ConnectionID']) {
+                $connected[IPS_GetProperty($instance, 'DeviceID')][] = $instance;
+            }
+        }
+        // Get all the MODUL instances that are connected to the configurators I/O
+        foreach (IPS_GetInstanceListByModuleID(self::BLINK_MODULE_GUID) as $instance) {
+            if (IPS_GetInstance($instance)['ConnectionID'] === IPS_GetInstance($this->InstanceID)['ConnectionID']) {
+                $connected[IPS_GetProperty($instance, 'DeviceID')][] = $instance;
+            }
+        }
+        $this->SendDebug(__FUNCTION__, $connected);
+
+        // All discovered devices
         $devices = $this->DiscoveryBlinkDevices();
 
+        // Collect all values
+        $values = [];
+
         // Build configuration list values
-        if (!empty($devices)) {
-            foreach ($devices as $device) {
-                $values[] = [
-                    'instanceID'    => $this->GetBlinkHomeInstance($device['id']),
-                    'id'            => $device['id'],
-                    'name'          => $device['name'],
-                    'type'          => $this->Translate(self::BLINK_DEVICE_TYPE[$device['type']]),
-                    'model'         => $this->Translate(self::BLINK_DEVICE_MODEL[$device['model']]),
-                    'battery'       => $device['battery'],
-                    'firmware'      => $device['firmware'],
-                    'network'       => $device['network'],
-                    'create'        => [
-                        [
-                            'moduleID'      => $device['guid'],
-                            'configuration' => ['DeviceID' => strval($device['id']), 'NetworkID' => strval($device['network']), 'DeviceType' => $device['type'], 'DeviceModel' => $device['model']],
-                            'location'      => $location,
-                        ],
+        foreach ($devices as $device) {
+            $value = [
+                'id'            => $device['id'],
+                'type'          => $this->Translate(self::BLINK_DEVICE_TYPE[$device['type']]),
+                'model'         => $this->Translate(self::BLINK_DEVICE_MODEL[$device['model']]),
+                'battery'       => $device['battery'],
+                'firmware'      => $device['firmware'],
+                'network'       => $device['network'],
+                'create'        => [
+                    [
+                        'moduleID'      => $device['guid'],
+                        'configuration' => ['DeviceID' => strval($device['id']), 'NetworkID' => strval($device['network']), 'DeviceType' => $device['type'], 'DeviceModel' => $device['model']],
+                        'location'      => $location,
                     ],
+                ],
+            ];
+            if (isset($connected[$device['id']])) {
+                $value['name'] = IPS_GetName($connected[$device['id']][0]);
+                $value['instanceID'] = $connected[$device['id']][0];
+            }
+            else {
+                $value['name'] = $device['name'];
+                $value['instanceID'] = 0;
+            }
+            $values[] = $value;
+        }
+
+        foreach ($connected as $device => $instances) {
+            foreach ($instances as $index => $instance) {
+                // The first entry for each found device was already added as valid value
+                if ($index === 0) {
+                    foreach ($devices as $d) {
+                        if($d['id'] === $device) continue 2;
+                    }
+                }
+                // However, if an address is not a found address or an address has multiple instances, they are erroneous
+                $values[] = [
+                    'id'            => $device,
+                    'name'          => IPS_GetName($instance),
+                    'type'          => $this->Translate(self::BLINK_DEVICE_TYPE[IPS_GetProperty($instance, 'DeviceType')]),
+                    'model'         => $this->Translate(self::BLINK_DEVICE_MODEL[IPS_GetProperty($instance, 'DeviceModel')]),
+                    'battery'       => ' - ',
+                    'firmware'      => ' - ',
+                    'network'       => IPS_GetProperty($instance, 'NetworkID'),
+                    'instanceID'    => $instance,
                 ];
             }
+        }
+
+        // Set available values
+        if (!empty($values)) {
             $form['actions'][0]['values'] = $values;
         }
 
