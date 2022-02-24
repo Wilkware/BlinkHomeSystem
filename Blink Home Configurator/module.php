@@ -131,8 +131,7 @@ class BlinkHomeConfigurator extends IPSModule
             if (isset($connected[$device['id']])) {
                 $value['name'] = IPS_GetName($connected[$device['id']][0]);
                 $value['instanceID'] = $connected[$device['id']][0];
-            }
-            else {
+            } else {
                 $value['name'] = $device['name'];
                 $value['instanceID'] = 0;
             }
@@ -144,7 +143,9 @@ class BlinkHomeConfigurator extends IPSModule
                 // The first entry for each found device was already added as valid value
                 if ($index === 0) {
                     foreach ($devices as $d) {
-                        if($d['id'] === $device) continue 2;
+                        if ($d['id'] === $device) {
+                            continue 2;
+                        }
                     }
                 }
                 // However, if an address is not a found address or an address has multiple instances, they are erroneous
