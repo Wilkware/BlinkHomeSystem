@@ -30,8 +30,11 @@
                             "options": [
                                 {"label": "Please select ...", "value": "null"},
                                 {"label": "Blink Mini", "value": "owl"},
+                                {"label": "Blink Mini", "value": "mini"},
                                 {"label": "Blink Indoor", "value": "white"},
                                 {"label": "Blink Outdoor", "value": "catalina"},
+                                {"label": "Blink Doorbell", "value": "lotus"},
+                                {"label": "Blink XT1", "value": "xt"},
                                 {"label": "Blink XT2", "value": "xt2"}
                             ]
                         }
