@@ -6,6 +6,7 @@
             "Target Category:": "Zielkategorie:",
             "Devices:": "Geräte:",
             "DeviceID": "GeräteID",
+            "<unknown>":"<unbekannt>",
             "Name": "Name",
             "Battery": "Batterie",
             "Status": "Status",

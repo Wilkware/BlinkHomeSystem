@@ -95,10 +95,11 @@ trait BlinkHelper
     private static $BLINK_SUCCESS = 1;
     private static $BLINK_WEAKNESS = 2;
     // App constants
-    private static $UNIQUE_UID = '056952C3-95C6-3B98-E400-D597B6141F74';
-    private static $APP_VERSION = '6.7.0 (12379)';      // '6.6.1 (12346)', '6.2.7 (10212)'
+    // private static $UNIQUE_UID = '056952C3-95C6-3B98-E400-D597B6141F74';
+    private static $APP_VERSION = '6.12.0';             // '6.7.0 (12379)', '6.6.1 (12346)', '6.2.7 (10212)'
     private static $CLIENT_NAME = 'IPSymconBlinkModul'; // BlinkApp
     private static $CLIENT_TYPE = 'ios';                // "android"
+    private static $DEVICE_ID = 'IP-Symcon Modul';
 
     /**
      * Client Login to Blink Account on Blink Servers
@@ -113,7 +114,7 @@ trait BlinkHelper
      *      password - Account password
      *      unique_id - (optional) UUID generated and identifying the client.
      */
-    private function doLogin($email, $password)
+    private function doLogin($email, $password, $uuid)
     {
         // prepeare url
         $url = 'https://rest-prod.immedia-semi.com/api/v5/account/login';
@@ -123,13 +124,13 @@ trait BlinkHelper
         ];
         // prepeare body (Login v5)
         $body = [
-            //  'app-build'         => 'IOS_12379',
-            'app_version'       => self::$APP_VERSION,
+            // 'app-build'         => 'IOS_12379',
+            // 'app_version'       => self::$APP_VERSION,
             'client_name'       => self::$CLIENT_NAME,
             'client_type'       => self::$CLIENT_TYPE,
-            'device_identifier' => 'ips ' . self::$UNIQUE_UID,
+            'device_identifier' => self::$DEVICE_ID,
             'reauth'            => 'true',
-            'unique_id'         => self::$UNIQUE_UID,
+            'unique_id'         => $uuid,
             'password'          => $password,
             'email'             => $email,
         ];
@@ -307,7 +308,10 @@ trait BlinkHelper
     private function doImage(string $token, string $region, string $path)
     {
         // prepeare url
-        $url = "https://rest-$region.immedia-semi.com" . $path . '.jpg';
+        $url = "https://rest-$region.immedia-semi.com" . $path;
+        if (strpos($url, '.jpg') == false) {
+            $url = $url . '.jpg';
+        }
         // prepeare header
         $headers = [
             'content-type: image/jpeg',

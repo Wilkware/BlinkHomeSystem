@@ -13,22 +13,27 @@ class BlinkHomeConfigurator extends IPSModule
 
     // Blink Device Models (up to now)
     private const BLINK_DEVICE_TYPE = [
-        'cameras'      => 'Camera',
-        'sync_modules' => 'Sync Modul',
-        'sirens'       => 'Sirens',
-        'doorbells'    => 'Doorbell',
-        'owls'         => 'Mini Camera',
+        'null'              => '<unknown>',
+        'cameras'           => 'Camera',
+        'sync_modules'      => 'Sync Modul',
+        'sirens'            => 'Sirens',
+        'doorbells'         => 'Doorbell',
+        'doorbell_buttons'  => 'Doorbell',
+        'owls'              => 'Mini Camera',
     ];
 
     // Blink Device Models (up to now)
     private const BLINK_DEVICE_MODEL = [
-        'sm1'      => 'Blink Sync Module 1',
-        'sm2'      => 'Blink Sync Module 2',
-        'mini'     => 'Blink Mini',
-        'white'    => 'Blink Indoor',
-        'catalina' => 'Blink Outdoor',
-        'owl'      => 'Blink Mini',
-        'xt2'      => 'Blink XT2',
+        'null'         => '<unknown>',
+        'sm1'          => 'Blink Sync Module 1',
+        'sm2'          => 'Blink Sync Module 2',
+        'mini'         => 'Blink Mini',
+        'white'        => 'Blink Indoor',
+        'catalina'     => 'Blink Outdoor',
+        'owl'          => 'Blink Mini',
+        'xt'           => 'Blink XT1',
+        'xt2'          => 'Blink XT2',
+        'lotus'        => 'Blink Doorbell',
     ];
 
     // ModulID (Blink Home Client)
@@ -89,7 +94,7 @@ class BlinkHomeConfigurator extends IPSModule
         // Save location
         $location = $this->GetPathOfCategory($this->ReadPropertyInteger('TargetCategory'));
 
-        // All connected devices
+        // All connected blink devices and blink modules
         $connected = [];
         // Get all the DEVICE instances that are connected to the configurators I/O
         foreach (IPS_GetInstanceListByModuleID(self::BLINK_DEVICE_GUID) as $instance) {
@@ -105,7 +110,7 @@ class BlinkHomeConfigurator extends IPSModule
         }
         $this->SendDebug(__FUNCTION__, $connected);
 
-        // All discovered devices
+        // All discovered devices/modules
         $devices = $this->DiscoveryBlinkDevices();
 
         // Collect all values
@@ -131,6 +136,8 @@ class BlinkHomeConfigurator extends IPSModule
             if (isset($connected[$device['id']])) {
                 $value['name'] = IPS_GetName($connected[$device['id']][0]);
                 $value['instanceID'] = $connected[$device['id']][0];
+                // remove it from the list
+                unset($connected[$device['id']][0]);
             } else {
                 $value['name'] = $device['name'];
                 $value['instanceID'] = 0;
@@ -140,23 +147,15 @@ class BlinkHomeConfigurator extends IPSModule
 
         foreach ($connected as $device => $instances) {
             foreach ($instances as $index => $instance) {
-                // The first entry for each found device was already added as valid value
-                if ($index === 0) {
-                    foreach ($devices as $d) {
-                        if ($d['id'] === $device) {
-                            continue 2;
-                        }
-                    }
-                }
-                // However, if an address is not a found address or an address has multiple instances, they are erroneous
+                // However, if an device is not a discovered device or an device has multiple instances, they are incorrect
                 $values[] = [
-                    'id'            => $device,
+                    'id'            => empty($device) ? $this->Translate('<unknown>') : $device,
                     'name'          => IPS_GetName($instance),
                     'type'          => $this->Translate(self::BLINK_DEVICE_TYPE[IPS_GetProperty($instance, 'DeviceType')]),
                     'model'         => $this->Translate(self::BLINK_DEVICE_MODEL[IPS_GetProperty($instance, 'DeviceModel')]),
                     'battery'       => ' - ',
                     'firmware'      => ' - ',
-                    'network'       => IPS_GetProperty($instance, 'NetworkID'),
+                    'network'       => empty(IPS_GetProperty($instance, 'NetworkID')) ? $this->Translate('<unknown>') : IPS_GetProperty($instance, 'NetworkID'),
                     'instanceID'    => $instance,
                 ];
             }
@@ -194,6 +193,11 @@ class BlinkHomeConfigurator extends IPSModule
         if (isset($devises['owls'])) {
             foreach ($devises['owls'] as $dev) {
                 $data[] = ['guid' => self::BLINK_DEVICE_GUID, 'id'=> $dev['id'], 'name' => $dev['name'], 'type' => 'owls', 'model' => $dev['type'], 'status' => $dev['status'], 'battery' => 'usb', 'serial' => $dev['serial'], 'firmware' => $dev['fw_version'], 'network' => $dev['network_id']];
+            }
+        }
+        if (isset($devises['doorbells'])) {
+            foreach ($devises['doorbells'] as $dev) {
+                $data[] = ['guid' => self::BLINK_DEVICE_GUID, 'id'=> $dev['id'], 'name' => $dev['name'], 'type' => 'doorbells', 'model' => $dev['type'], 'status' => $dev['status'], 'battery' => $dev['battery'], 'serial' => $dev['serial'], 'firmware' => $dev['fw_version'], 'network' => $dev['network_id']];
             }
         }
         $this->SendDebug(__FUNCTION__, $response);

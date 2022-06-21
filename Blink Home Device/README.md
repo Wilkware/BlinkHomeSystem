@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.0-blue.svg)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.2.20220214-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.3.20220620-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://github.com/Wilkware/IPSymconBlink/workflows/Check%20Style/badge.svg)](https://github.com/Wilkware/IPSymconBlink/actions)
 
@@ -36,13 +36,13 @@ Es ist derzeit noch nicht absehbar, welchen Funktionsumfang das Modul endgültig
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
-* Unter "Instanz hinzufügen" ist das *'Blink Home Device'*-Modul unter dem Hersteller _'Amazon'_ aufgeführt.
-* Über den *'Blink Home Configurator'* kann eine einfache Installation vorgenommen werden.  
+* Unter "Instanz hinzufügen" ist das _'Blink Home Device'_-Modul unter dem Hersteller _'Amazon'_ aufgeführt.
+* Über den _'Blink Home Configurator'_ kann eine einfache Installation vorgenommen werden.  
 Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)
 
 __Konfigurationsseite__:
 
-Einstellungsbereich:
+_Einstellungsbereich:_
 
 > Geräteinformationen ...
 
@@ -79,7 +79,7 @@ Name           | Beschreibung
 -------------- | ------------------
 Anlegen einer Variabel zur Auslösung einer Momentaufnahme der aktuellen Ansicht der Kamera! | Variable für's Webfront zum Auslösen einer Aufnahme
 
-Aktionsbereich:
+_Aktionsbereich:_
 
 Aktion              | Beschreibung
 ------------------- | ------------------
@@ -116,6 +116,11 @@ Man kann die Statusvariablen direkt im WF verlinken.
 Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 
 ### 8. Versionshistorie
+
+v1.3.20220620
+
+* _FIX_: Bildverarbeitung überarbeitet
+* _FIX_: Logging verbessert
 
 v1.2.20220214
 

@@ -175,6 +175,9 @@ class BlinkHomeDevice extends IPSModule
             case 'command':
                 $this->Command();
                 break;
+            case 'reset_command':
+                $this->WriteAttributeString('CommandID', '');
+                break;
             default:
                 break;
         }
@@ -247,7 +250,7 @@ class BlinkHomeDevice extends IPSModule
             // Start Trigger
             $this->SetTimerInterval('TimerCommand', self::BLINK_COMMAND_TIMER_INTERVAL);
         } else {
-            $this->LogMessage($command['message'], KL_ERROR);
+            $this->LogMessage('[' . IPS_GetName($this->InstanceID) . '] ' . $command['message'], KL_ERROR);
         }
     }
 
@@ -300,7 +303,7 @@ class BlinkHomeDevice extends IPSModule
         // get image
         $param = ['Path' => $path];
         // Request
-        $response = $this->RequestDataFromParent('image', $param);
+        $response = utf8_decode($this->RequestDataFromParent('image', $param));
         if ($response === '[]') {
             $this->SendDebug(__FUNCTION__, 'No Image for Path!');
             return;
@@ -390,7 +393,7 @@ class BlinkHomeDevice extends IPSModule
             if ($command['status'] == 0) {
                 $this->Image();
             } else {
-                $this->LogMessage($command['status_msg'], KL_WARNING);
+                $this->LogMessage('[' . IPS_GetName($this->InstanceID) . '] ' . $command['status_msg'], KL_WARNING);
             }
         } else {
             $this->SetTimerInterval('TimerCommand', self::BLINK_COMMAND_TIMER_INTERVAL);

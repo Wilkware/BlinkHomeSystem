@@ -26,6 +26,8 @@ class BlinkHomeClient extends IPSModule
         $this->RegisterAttributeString('ClientID', '');
         // The auth token is provided in the response to a successful login.
         $this->RegisterAttributeString('AuthToken', '');
+        // The unique id of the client
+        $this->RegisterAttributeString('UniqueID', $this->UUIDv4());
         // Verify Client
         $this->RegisterAttributeBoolean('Verify', false);
         // Region where your Blink system is registered (default: prod).
@@ -120,6 +122,7 @@ class BlinkHomeClient extends IPSModule
         $this->SendDebug(__FUNCTION__, $json);
         $data = json_decode($json, true);
         $result = '[]';
+        $encode = false;
         // Verify
         $verify = $this->ReadAttributeBoolean('Verify');
         if (!$verify) {
@@ -152,6 +155,7 @@ class BlinkHomeClient extends IPSModule
                     $params = (array) $data['Params'];
                     if (isset($params['Path'])) {
                         $result = $this->doImage($token, $region, $params['Path']);
+                        $encode = true;
                     }
                     break;
                 case 'thumbnail':
@@ -182,6 +186,10 @@ class BlinkHomeClient extends IPSModule
         if ($result === false) {
             $result = '[]';
         }
+        // binary data
+        if ($encode == true) {
+            $result = utf8_encode($result);
+        }
         // Return
         return $result;
     }
@@ -196,6 +204,7 @@ class BlinkHomeClient extends IPSModule
         $ret = self::$BLINK_FAILURE;
         $user = $this->ReadPropertyString('AccountUser');
         $password = $this->ReadPropertyString('AccountPassword');
+        $uuid = $this->ReadAttributeString('UniqueID');
         // Safty check
         if (empty($user)) {
             $this->SetStatus(201);
@@ -208,19 +217,29 @@ class BlinkHomeClient extends IPSModule
             return $ret;
         }
         // API call
-        $response = $this->doLogin($user, $password);
+        $response = $this->doLogin($user, $password, $uuid);
         // Result?
         if ($response !== false) {
             $params = json_decode($response, true);
             $this->SendDebug(__FUNCTION__, $params);
-            // AccountID
-            $this->WriteAttributeString('AccountID', $params['account']['account_id']);
-            // ClientID
-            $this->WriteAttributeString('ClientID', $params['account']['client_id']);
-            // AuthToken
-            $this->WriteAttributeString('AuthToken', $params['auth']['token']);
-            // AccountTier
-            $this->WriteAttributeString('Region', $params['account']['tier']);
+            if (isset($params['account']['account_id'], $params['account']['client_id'], $params['auth']['token'], $params['account']['tier'])) {
+                // AccountID
+                $this->WriteAttributeString('AccountID', $params['account']['account_id']);
+                // ClientID
+                $this->WriteAttributeString('ClientID', $params['account']['client_id']);
+                // AuthToken
+                $this->WriteAttributeString('AuthToken', $params['auth']['token']);
+                // AccountTier
+                $this->WriteAttributeString('Region', $params['account']['tier']);
+            } else {
+                $this->SetStatus(104);
+                if (isset($params['message'])) {
+                    echo $params['message'];
+                } else {
+                    echo $this->Translate('Login not possible!');
+                }
+                return $ret;
+            }
             // Verification?
             $verify = !($params['account']['client_verification_required']);
             $this->WriteAttributeBoolean('Verify', $verify);
@@ -292,8 +311,8 @@ class BlinkHomeClient extends IPSModule
         $token = $this->ReadAttributeString('AuthToken');
         $region = $this->ReadAttributeString('Region');
         // Safty check
-        if (empty($token) || empty($account) || empty($client)) {
-            $this->SendDebug(__FUNCTION__, 'Token: ' . $token . ', AccountID: ' . $account . ', ClientID: ' . $client);
+        if (empty($token) || empty($account) || empty($client) || empty($region)) {
+            $this->SendDebug(__FUNCTION__, 'Token: ' . $token . ', AccountID: ' . $account . ', ClientID: ' . $client . ', Region: ' . $region);
             echo $this->Translate('Logout not possible!');
             return $ret;
         }
@@ -391,5 +410,31 @@ class BlinkHomeClient extends IPSModule
         if ($return != self::$BLINK_SUCCESS) {
             $this->LogMessage($buf, KL_ERROR);
         }
+    }
+
+    /**
+     * Generates a valid v4 UUID in the form of 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx' (where y is 8, 9, A, or B)
+     */
+    private function UUIDv4()
+    {
+        return sprintf(
+            '%04X%04X-%04X-%04X-%04X-%04X%04X%04X',
+        // 32 bits for "time_low"
+        mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+        // 16 bits for "time_mid"
+        mt_rand(0, 0xffff),
+        // 16 bits for "time_hi_and_version",
+        // four most significant bits holds version number 4
+        mt_rand(0, 0x0fff) | 0x4000,
+        // 16 bits, 8 bits for "clk_seq_hi_res",
+        // 8 bits for "clk_seq_low",
+        // two most significant bits holds zero and one for variant DCE1.1
+        mt_rand(0, 0x3fff) | 0x8000,
+        // 48 bits for "node"
+        mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff)
+        );
     }
 }

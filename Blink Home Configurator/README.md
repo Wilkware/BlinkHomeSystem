@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.0-blue.svg)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.2.20220214-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.3.20220620-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://github.com/Wilkware/IPSymconBlink/workflows/Check%20Style/badge.svg)](https://github.com/Wilkware/IPSymconBlink/actions)
 
@@ -23,7 +23,7 @@ IP-Symcon Modul für die Verwaltung alle im Netzwerk befindlichen Bilnk Geräte.
 
 Mit Hilfe des Konfigurations-Moduls kann man schnell und einfach die im Netwerk registrierten Geräte auswählen und die dazugehörigen Modul-Instanzen verwalten bzw. anlegen.
 
-Derzeit unterstützt der Konfigurator Kameras und Sync Module.
+Derzeit unterstützt der Konfigurator Kameras, Türklingeln und Sync Module.
 
 Wenn jemand noch weitere im Einsatz hat, bitte einfach bei mir melden!
 
@@ -73,6 +73,12 @@ Es ist keine weitere Steuerung oder gesonderte Darstellung integriert.
 Das Modul bietet keine direkten Funktionsaufrufe.
 
 ### 8. Versionshistorie
+
+v1.3.20220620
+
+* _NEU_: Blink Doorbell Support
+* _NEU_: Weitere Modellbezeichnungungen aufgenommen
+* _FIX_: Instanzmanagement nochmal verbessert
 
 v1.2.20220214
 

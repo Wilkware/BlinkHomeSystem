@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.0-blue.svg)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.2.20220214-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.3.20220620-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://github.com/Wilkware/IPSymconBlink/workflows/Check%20Style/badge.svg)](https://github.com/Wilkware/IPSymconBlink/actions)
 
@@ -26,16 +26,19 @@ Dies erfolgt auf Basis der inoffizielle dokumentierten [Client-API](https://gith
 
 Derzeit unterstützt das Modul folgende Funktionalität:  
 
-* *Login*, *Verify* (2FA) und *Logout*
-* Zeitliche und manuelle Erstellung von *Snapshots*
-* Aktivieren und Deaktivieren von *Motion Detection* (Bewegungserkennung)
-* *Arm* (Scharf) und *Disarm>* (Unscharf) stellen der Aufzeichnung bei Bewegungserkennung
-* Auslesen von gerätespezifischen Informationen (*Homescreen*)
+* _Login_, _Verify_ (2FA) und _Logout_
+* Zeitliche und manuelle Erstellung von _Snapshots_
+* Aktivieren und Deaktivieren von _Motion Detection_ (Bewegungserkennung)
+* _Arm_ (Scharf) und _Disarm_ (Unscharf) stellen der Aufzeichnung bei Bewegungserkennung
+* Auslesen von gerätespezifischen Informationen (_Homescreen_)
 
 Folgende Geräte wurden getestet:
 
-* Blink Outddor (schwarze Kamera)
 * Blink Sync Modul 2
+* Blink Outdoor (schwarze Kamera)
+* Blink Indoor (weiße Kamera)
+* Blink Mini
+* Blink Doorbell
 
 Wenn jemand noch andere Geräte im Einsatz hat, bitte einfach bei mir melden!
 
@@ -51,7 +54,7 @@ Wenn jemand noch andere Geräte im Einsatz hat, bitte einfach bei mir melden!
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
-* Unter "Instanz hinzufügen" ist das *'Blink Home Client'*-Modul unter dem Hersteller _'Amazon'_ aufgeführt.
+* Unter "Instanz hinzufügen" ist das _'Blink Home Client'_-Modul unter dem Hersteller _'Amazon'_ aufgeführt.
 
 __Konfigurationsseite__:
 
@@ -118,6 +121,12 @@ Gibt im angemeldeten Zusatnd die Benachrichtigungsoptionen aus.
 Die Funktion liefert '1' im Erfolgsfall, sonst '0'.
 
 ### 8. Versionshistorie
+
+v1.3.20220620
+
+* _NEU_: Login überarbeitet, jeder Client hat jetzt eigene UUID
+* _NEU_: Verarbeitung von Binärdaten (Bilder) für spätere IPS Versionen vorbereitet
+* _FIX_: Fehlerhafter Login wird jetzt abgefangen
 
 v1.2.20220214
 
