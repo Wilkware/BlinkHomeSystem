@@ -340,7 +340,7 @@ trait BlinkHelper
         if ($type == 'owls') {
             $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/owls/$device/thumbnail";
         } elseif ($type == 'doorbells') {
-            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/doorbells/$device/thumbnail";
+            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/lotus/$device/thumbnail";
         } else {
             $url = "https://rest-$region.immedia-semi.com/network/$network/camera/$device/thumbnail";
         }
