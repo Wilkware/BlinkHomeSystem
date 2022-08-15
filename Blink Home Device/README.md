@@ -117,8 +117,14 @@ Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 
 ### 8. Versionshistorie
 
+v1.4.20220815
+
+* _FIX_: Anpassungen für Blink Doorbells
+* _FIX_: Logging verbessert
+
 v1.3.20220620
 
+* _NEU_: Unterstütztung für Blink Doorbells
 * _FIX_: Bildverarbeitung überarbeitet
 * _FIX_: Logging verbessert
 

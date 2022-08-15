@@ -238,8 +238,9 @@ class BlinkHomeDevice extends IPSModule
         $param = ['NetworkID' => $network, 'DeviceID' => $device, 'DeviceType' => $type];
         // Request
         $response = $this->RequestDataFromParent('thumbnail', $param);
+        $this->SendDebug(__FUNCTION__, $response);
         if ($response === '[]') {
-            $this->SendDebug(__FUNCTION__, 'No command info');
+            $this->LogMessage('[' . IPS_GetName($this->InstanceID) . '] ' . 'No command info for thumbnail', KL_ERROR);
             return;
         }
         // Command

@@ -22,6 +22,8 @@ Modul welches ein Endgerät (Kamera, Türklingel o.Ä.) repräsentiert.
 
 ## Historie
 
+- 2022-08-15: v1.4 API für Blink Doorbells angeasst
+- 2022-06-20: v1.3 Anpassungen für Blink Doorbells, Login überarbeitet, Erweitertes Logging, Konfigurator verbessert
 - 2022-02-14: v1.2 Anpassungen für Blink Mini, Kennwortvalidierung und Overlay, Korrektur Typo
 - 2022-01-30: v1.1 Bugfixing, Blink Mini Support, Aufnahmeaktivierung über Zeitplan, Erweitertes Overlay
 - 2022-01-10: v1.0 Initialversion

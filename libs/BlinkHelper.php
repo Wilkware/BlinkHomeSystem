@@ -335,12 +335,11 @@ trait BlinkHelper
      */
     private function doThumbnail(string $token, string $region, string $account, string $network, string $device, string $type)
     {
-        //$this->LogMessage('Region: ' . $region . ', Account: ' . $account . ', Network: ' . $network . ', Device: ' . $device . ', Type: ' . $type);
         // prepeare url
         if ($type == 'owls') {
             $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/owls/$device/thumbnail";
         } elseif ($type == 'doorbells') {
-            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/lotus/$device/thumbnail";
+            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/doorbells/$device/thumbnail";
         } else {
             $url = "https://rest-$region.immedia-semi.com/network/$network/camera/$device/thumbnail";
         }
