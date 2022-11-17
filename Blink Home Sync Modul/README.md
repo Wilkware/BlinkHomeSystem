@@ -10,21 +10,21 @@ IP-Symcon Modul für die Steuerung aller aktiven Kameras im gleichen Netzwerk.
 
 ## Inhaltverzeichnis
 
-1. [Funktionsumfang](#1-funktionsumfang)
-2. [Voraussetzungen](#2-voraussetzungen)
-3. [Installation](#3-installation)
-4. [Einrichten der Instanzen in IP-Symcon](#4-einrichten-der-instanzen-in-ip-symcon)
-5. [Statusvariablen und Profile](#5-statusvariablen-und-profile)
-6. [WebFront](#6-webfront)
-7. [PHP-Befehlsreferenz](#7-php-befehlsreferenz)
-8. [Versionshistorie](#8-versionshistorie)
+1. [Funktionsumfang](#user-content-1-funktionsumfang)
+2. [Voraussetzungen](#user-content-2-voraussetzungen)
+3. [Installation](#user-content-3-installation)
+4. [Einrichten der Instanzen in IP-Symcon](#user-content-4-einrichten-der-instanzen-in-ip-symcon)
+5. [Statusvariablen und Profile](#user-content-5-statusvariablen-und-profile)
+6. [WebFront](#user-content-6-webfront)
+7. [PHP-Befehlsreferenz](#user-content-7-php-befehlsreferenz)
+8. [Versionshistorie](#user-content-8-versionshistorie)
 
 ### 1. Funktionsumfang
 
 Derzeit kann über das Modul nur die Aufzeichnung von Bewegungsereignissen für alle aktivierten Kameras im Netzwerk gesteuert werden.
 Es ist derzeit noch nicht absehbar, welchen Funktionsumfang das Modul endgültig umfasst.
 
-### 2. Vorraussetzungen
+### 2. Voraussetzungen
 
 * IP-Symcon ab Version 6.0
 
@@ -36,8 +36,8 @@ Es ist derzeit noch nicht absehbar, welchen Funktionsumfang das Modul endgültig
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
-* Unter "Instanz hinzufügen" ist das *'Blink Home Sync Modul'*-Modul unter dem Hersteller _'Amazon'_ aufgeführt.
-* Über den *'Blink Home Configurator'* kann eine einfache Installation vorgenommen werden  
+* Unter "Instanz hinzufügen" ist das _'Blink Home Sync Modul'_-Modul unter dem Hersteller _'Amazon'_ aufgeführt.
+* Über den _'Blink Home Configurator'_ kann eine einfache Installation vorgenommen werden  
 Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)
 
 __Konfigurationsseite__:
