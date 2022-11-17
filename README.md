@@ -8,11 +8,11 @@ IP-Symcon Modulbibliothek für die Einbindung und Verwaltung des drahtlosen HD-H
 
 Folgende Module beinhaltet diese Bibliothek:
 
-- __Blink Home Client__ ([Dokumentation](Blink%20Home%20Client))  
-Dieses Modul bildet die zentrale Kommunikation mit den Blink Servern ab.
-
 - __Blink Home Configurator__ ([Dokumentation](Blink%20Home%20Configurator))  
 Konfigurators für alle im Netzwerk befindlichen Bilnk Geräte.
+
+- __Blink Home Client__ ([Dokumentation](Blink%20Home%20Client))  
+Dieses Modul bildet die zentrale Kommunikation mit den Blink Servern ab.
 
 - __Blink Home Sync Modul__ ([Dokumentation](Blink%20Home%20Sync%20Modul))  
 Mit diesem Modul können alle aktivierten Kameras im Netzwerk gesteuert werden.
