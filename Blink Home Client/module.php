@@ -11,6 +11,29 @@ class BlinkHomeClient extends IPSModule
     // Helper Traits
     use BlinkHelper;
     use DebugHelper;
+    use EventHelper;
+    use FormatHelper;
+
+    // Echo maps
+    private const BLINK_MAP_NOTIFICATIONS = [
+        ['low_battery', 'Low battery', 5],
+        ['camera_offline', 'Camera offline', 5],
+        ['camera_usage', 'Camera usage', 5],
+        ['scheduling', 'Scheduling (On/Off)', 5],
+        ['motion', 'Motion', 5],
+        ['sync_module_offline', 'Sync module offline', 5],
+        ['temperature', 'High temperature', 5],
+        ['doorbell', 'Doorbell', 5],
+        ['wifi', 'Wifi', 5],
+        ['lfr', 'Lost frame received', 5],
+        ['bandwidth', 'Bandwidth', 5],
+        ['battery_dead', 'Battery dead', 5],
+        ['local_storage', 'Local storage', 5],
+        ['accessory_connected', 'Accessory connected', 5],
+        ['accessory_disconnected', 'Accessory disconnected', 5],
+        ['accessory_low_battery', 'Accessory low battery', 5],
+        ['general', 'System offline', 5],
+    ];
 
     /**
      * Overrides the internal IPSModule::Create($id) function
@@ -151,6 +174,18 @@ class BlinkHomeClient extends IPSModule
                         $result = $this->doDisarm($token, $region, $account, $params['NetworkID']);
                     }
                     break;
+                case 'network':
+                    $params = (array) $data['Params'];
+                    if (isset($params['NetworkID'])) {
+                        $result = $this->doNetwork($token, $region, $params['NetworkID']);
+                    }
+                    break;
+                case 'local_storage_status':
+                    $params = (array) $data['Params'];
+                    if (isset($params['NetworkID']) && isset($params['DeviceID'])) {
+                        $result = $this->doLocalStorageStatus($token, $region, $account, $params['NetworkID'], $params['DeviceID']);
+                    }
+                    break;
                 case 'image':
                     $params = (array) $data['Params'];
                     if (isset($params['Path'])) {
@@ -166,8 +201,8 @@ class BlinkHomeClient extends IPSModule
                     break;
                 case 'motion':
                     $params = (array) $data['Params'];
-                    if (isset($params['NetworkID']) && isset($params['DeviceID']) && isset($params['Detection'])) {
-                        $result = $this->doMotion($token, $region, $params['NetworkID'], $params['DeviceID'], $params['Detection']);
+                    if (isset($params['NetworkID']) && isset($params['DeviceID']) && isset($params['DeviceType']) && isset($params['Detection'])) {
+                        $result = $this->doMotion($token, $region, $account, $params['NetworkID'], $params['DeviceID'], $params['DeviceType'], $params['Detection']);
                     }
                     break;
                 case 'command':
@@ -176,9 +211,41 @@ class BlinkHomeClient extends IPSModule
                         $result = $this->doCommand($token, $region, $params['NetworkID'], $params['CommandID']);
                     }
                     break;
-                default:
-                    $this->SendDebug(__FUNCTION__, 'Invalid Command: ' . $data['Endpoint']);
+                case 'liveview':
+                    $params = (array) $data['Params'];
+                    if (isset($params['NetworkID']) && isset($params['DeviceID']) && isset($params['DeviceType'])) {
+                        $result = $this->doLive($token, $region, $account, $params['NetworkID'], $params['DeviceID'], $params['DeviceType']);
+                    }
                     break;
+                case 'events':
+                    $params = (array) $data['Params'];
+                    if (isset($params['Timestamp']) && isset($params['Page'])) {
+                        $result = $this->doEvents($token, $region, $account, $params['Timestamp'], $params['Page']);
+                    }
+                    break;
+                case 'manifest':
+                    $params = (array) $data['Params'];
+                    if (isset($params['NetworkID']) && isset($params['DeviceID'])) {
+                        $result = $this->doManifest($token, $region, $account, $params['NetworkID'], $params['DeviceID']);
+                    }
+                    break;
+                case 'clip':
+                    $params = (array) $data['Params'];
+                    if (isset($params['NetworkID']) && isset($params['DeviceID']) && isset($params['ManifestID']) && isset($params['ClipID'])) {
+                        $result = $this->doClip($token, $region, $account, $params['NetworkID'], $params['DeviceID'], $params['ManifestID'], $params['ClipID']);
+                        $encode = true;
+                    }
+                    break;
+                case 'video':
+                    $params = (array) $data['Params'];
+                    if (isset($params['MediaID'])) {
+                        $result = $this->doVideo($token, $region, $params['MediaID']);
+                        $encode = true;
+                    }
+                    break;
+                default:
+                $this->SendDebug(__FUNCTION__, 'Invalid Command: ' . $data['Endpoint']);
+                break;
             }
         }
         $this->SendDebug(__FUNCTION__, $result);
@@ -363,28 +430,7 @@ class BlinkHomeClient extends IPSModule
             $params = json_decode($response, true);
             $this->SendDebug(__FUNCTION__, $params);
             // Prepeare Info
-            $format = $this->Translate("Low battery: %s\nCamera offline: %s\nCamera usage: %s\nScheduling (On/Off): %s\nMotion: %s\nSync module offline: %s\nHigh temperature: %s\nDoorbell: %s\nWifi: %s\nLost frame received: %s\nBandwidth: %s\nBattery dead: %s\nLocal storage: %s\nAccessory connected: %s\nAccessory disconnected: %s\nAccessory low battery: %s\nGeneral: %s");
-            $info = sprintf(
-                $format,
-                $params['notifications']['low_battery'] ? $this->Translate('ON') : $this->Translate('OFF'),
-                $params['notifications']['camera_offline'] ? $this->Translate('ON') : $this->Translate('OFF'),
-                $params['notifications']['camera_usage'] ? $this->Translate('ON') : $this->Translate('OFF'),
-                $params['notifications']['scheduling'] ? $this->Translate('ON') : $this->Translate('OFF'),
-                $params['notifications']['motion'] ? $this->Translate('ON') : $this->Translate('OFF'),
-                $params['notifications']['sync_module_offline'] ? $this->Translate('ON') : $this->Translate('OFF'),
-                $params['notifications']['temperature'] ? $this->Translate('ON') : $this->Translate('OFF'),
-                $params['notifications']['doorbell'] ? $this->Translate('ON') : $this->Translate('OFF'),
-                $params['notifications']['wifi'] ? $this->Translate('ON') : $this->Translate('OFF'),
-                $params['notifications']['lfr'] ? $this->Translate('ON') : $this->Translate('OFF'),
-                $params['notifications']['bandwidth'] ? $this->Translate('ON') : $this->Translate('OFF'),
-                $params['notifications']['battery_dead'] ? $this->Translate('ON') : $this->Translate('OFF'),
-                $params['notifications']['local_storage'] ? $this->Translate('ON') : $this->Translate('OFF'),
-                $params['notifications']['accessory_connected'] ? $this->Translate('ON') : $this->Translate('OFF'),
-                $params['notifications']['accessory_disconnected'] ? $this->Translate('ON') : $this->Translate('OFF'),
-                $params['notifications']['accessory_low_battery'] ? $this->Translate('ON') : $this->Translate('OFF'),
-                $params['notifications']['general'] ? $this->Translate('ON') : $this->Translate('OFF')
-            );
-            echo $info;
+            echo $this->PrettyPrint(self::BLINK_MAP_NOTIFICATIONS, $params['notifications']);
             $ret = self::$BLINK_SUCCESS;
         } else {
             echo $this->Translate('Call was not successfull!');

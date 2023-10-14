@@ -22,6 +22,7 @@ Modul welches ein Endgerät (Kamera, Türklingel o.Ä.) repräsentiert.
 
 ## Historie
 
+- 2023-10-13: v1.5 Bewegungserkennung für Blink Mini, Herunterladen von Video-Clips (Cloud % Lokaler USB Speicher)
 - 2022-08-15: v1.4 API für Blink Doorbells angeasst
 - 2022-06-20: v1.3 Anpassungen für Blink Doorbells, Login überarbeitet, Erweitertes Logging, Konfigurator verbessert
 - 2022-02-14: v1.2 Anpassungen für Blink Mini, Kennwortvalidierung und Overlay, Korrektur Typo

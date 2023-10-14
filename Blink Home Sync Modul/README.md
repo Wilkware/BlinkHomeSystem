@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.0-blue.svg)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.1.20220130-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.5.202310130-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://github.com/Wilkware/IPSymconBlink/workflows/Check%20Style/badge.svg)](https://github.com/Wilkware/IPSymconBlink/actions)
 
@@ -81,13 +81,20 @@ Die Statusvariablen werden automatisch angelegt. Das Löschen einzelner kann zu 
 
 #### Statusvariablen
 
-Ident         | Name          | Typ     | Profil    | Beschreibung
-------------- | ------------- | ------- | --------- | -------------------
- recording    | Aufzeichnung  | boolean | ~Switch   | An/Aus-Schalter für Aufzeichnungen
+Ident               | Name                  | Typ     | Profil          | Beschreibung
+------------------- | --------------------- | ------- | --------------- | -------------------
+circuit_snapshot    | Zeitplan Aufnahmen    | event   |                 | Wochenplan für Bewegungsmeldungen
+recording           | Aufzeichnung          | boolean | ~Switch         | An/Aus-Schalter für Aufzeichnungen
+alert               | Alarm                 | boolean | ~Switch         | An/Aus-Schalter für Alarmmeldungen
+download            | Herunterladen         | integer | BHS.Download    | Variable zum Herunterladen von Videoclips
 
 #### Profile
 
-Es werden keine zusätzlichen Profile benötigt.
+Folgendes Profil wird angelegt:
+
+Name           | Typ       | Beschreibung
+-------------- | --------- | ----------------
+BHS.Download   | Integer   | Download Profil (1: '►')
 
 ### 6. WebFront
 
@@ -112,6 +119,22 @@ Schaltet alle im Netwerk befindlichen Kameras unscharf.
 __Beispiel__: `BHS_Disarm(12345);`
 
 ### 8. Versionshistorie
+
+v1.5.20231013
+
+* _NEU_: Konfigurationsformular komplett überarbeitet
+* _NEU_: Syncronisierung des Aufnahmestatus
+* _NEU_: Support für Alarmmeldungen über Amazon Alexa
+* _NEU_: Ausführen eines Skriptes bei Alarmmeldung
+* _NEU_: Herunterladen von Bewegungsaufzeichnungen (Cloud & Lokal)
+* _NEU_: Speicherung von Video-Clips als Medien-Objekt (mp4)
+* _NEU_: Support für lokale USB Speicher
+* _FIX_: Übersetzungen ausgebaut bzw. vervollständigt
+* _FIX_: Blink API Layer erweitert, aktualisiert und dikumentiert
+* _FIX_: Debug- bzw. Fehlermeldungen erweitert
+* _FIX_: Style-Checks aktualisiert
+* _FIX_: Interne Bibliotheken überarbeitet und vereinheitlicht
+* _FIX_: Dokumentation überarbeitet
 
 v1.1.20220130
 

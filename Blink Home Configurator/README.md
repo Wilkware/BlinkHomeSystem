@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.0-blue.svg)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.3.20220620-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.5.20231013-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://github.com/Wilkware/IPSymconBlink/workflows/Check%20Style/badge.svg)](https://github.com/Wilkware/IPSymconBlink/actions)
 
@@ -73,6 +73,18 @@ Es ist keine weitere Steuerung oder gesonderte Darstellung integriert.
 Das Modul bietet keine direkten Funktionsaufrufe.
 
 ### 8. Versionshistorie
+
+v1.5.20231013
+
+* _FIX_: Übersetzungen ausgebaut bzw. vervollständigt
+* _FIX_: Blink API Layer erweitert, aktualisiert und neu dokumentiert
+* _FIX_: Style-Checks aktualisiert
+* _FIX_: Interne Bibliotheken überarbeitet und vereinheitlicht
+* _FIX_: Dokumentation überarbeitet
+
+v1.4.20220815
+
+* _FIX_: API für Blink Doorbells angeasst
 
 v1.3.20220620
 

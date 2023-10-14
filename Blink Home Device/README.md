@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.0-blue.svg)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.3.20220620-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.5.20221013-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://github.com/Wilkware/IPSymconBlink/workflows/Check%20Style/badge.svg)](https://github.com/Wilkware/IPSymconBlink/actions)
 
@@ -70,7 +70,7 @@ Pfad zu der TrueType-Schriftart                        | Angabe welcher Truetype
 
 Name                     | Beschreibung
 ------------------------ | ------------------
-Aktualisierungsintervall | Zeit zwischen 2 Aufnahemen (Standard 60 Minuten), geht auf die Lebensdauer der Batterie!
+Aktualisierungsintervall | Zeit zwischen 2 Aufnahmen (Standard 60 Minuten), 0 deaktiviert die Aufnahmen. ACHTUNG: zu kurzes Intervall geht auf die Lebensdauer der Batterie!
 Zeitplan                 | Zeitraum in dem Aufnahmen im angeegebenen Intervall erfolgen sollen.
 
 > Erweiterte Einstellungen  ...
@@ -85,6 +85,7 @@ Aktion              | Beschreibung
 ------------------- | ------------------
 ZEITPLAN HINZUFÜGEN | Es wird ein Wochenplan mit 2 Zuständen (Aktiv & Inaktiv) angelegt und in den Einstellung hinterlegt.
 SNAPSHOT            | Löst eine Momentaufnahme(Snapshot) aus.
+LIVEVIEW            | Entwicklungs- und Debuginformationen ...
 
 ### 5. Statusvariablen und Profile
 
@@ -95,9 +96,9 @@ Die Statusvariablen werden automatisch angelegt. Das Löschen einzelner kann zu 
 Ident               | Name               | Typ     | Profil     | Beschreibung
 ------------------- | ------------------ | ------- | ---------- | -------------------
 circuit_snapshot    | Zeitplan Snapshot  | event   |            | Wochenplan für Momentaufnahmen
-thumbnail           | Image              | media   |            | Medienobject zum Speichern der Aufnahme
+thumbnail           | Bild               | media   |            | Medienobject zum Speichern der Aufnahme
 motion_detection    | Bewegungserkennung | boolean | ~Switch    | Variable zum an- und ausschalten der Bewegungserkennung
-snapshot            | Snapshot           | integer | BHS.Update | Variable zum Auslösen einer Momentaufnahme
+snapshot            | Auslöser           | integer | BHS.Update | Variable zum Auslösen einer Momentaufnahme
 
 #### Profile
 
@@ -105,7 +106,7 @@ Folgendes Profil wird angelegt:
 
 Name           | Typ       | Beschreibung
 -------------- | --------- | ----------------
-BHS.Update     | Integer   | Snapshot Auslöser Profil (1: '►')
+BHS.Update     | Integer   | Auslöser Profil (1: '►')
 
 ### 6. WebFront
 
@@ -116,6 +117,15 @@ Man kann die Statusvariablen direkt im WF verlinken.
 Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 
 ### 8. Versionshistorie
+
+v1.5.20231013
+
+* _NEU_: Bewegungserkennung jetzt auch für Blink Mini verfügbar
+* _FIX_: Übersetzungen ausgebaut bzw. vervollständigt
+* _FIX_: Blink API Layer erweitert, aktualisiert und neu dokumentiert
+* _FIX_: Style-Checks aktualisiert
+* _FIX_: Interne Bibliotheken überarbeitet und vereinheitlicht
+* _FIX_: Dokumentation überarbeitet
 
 v1.4.20220815
 

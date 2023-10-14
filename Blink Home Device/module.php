@@ -11,8 +11,22 @@ class BlinkHomeDevice extends IPSModule
     // Helper Traits
     use DebugHelper;
     use EventHelper;
+    use FormatHelper;
     use ProfileHelper;
     use VariableHelper;
+
+    // Echo Maps
+    private const BLINK_MAP_LIVEVIEW = [
+        ['command_id', 'Command ID', 1],
+        ['join_available', 'Join available', 0],
+        ['join_state', 'Join state', 3],
+        ['server', 'Server', 3],
+        ['duration', 'Duration', 1],
+        ['extended_duration', 'Extended duration', 1],
+        ['continue_interval', 'Continue interval', 1],
+        ['continue_warning', 'Continue warning', 1],
+        ['polling_interval', 'Polling interval', 1],
+    ];
 
     // Schedule constant
     private const BLINK_SCHEDULE_SNAPSHOT_OFF = 1;
@@ -58,7 +72,6 @@ class BlinkHomeDevice extends IPSModule
         $this->RegisterPropertyInteger('ImageSchedule', 0);
         // Variable
         $this->RegisterPropertyBoolean('UpdateImage', false);
-
         // Register update timer
         $this->RegisterTimer('TimerSnapshot', 0, 'IPS_RequestAction(' . $this->InstanceID . ', "snapshot", "");');
         $this->RegisterTimer('TimerCommand', 0, 'IPS_RequestAction(' . $this->InstanceID . ', "command", "");');
@@ -112,34 +125,34 @@ class BlinkHomeDevice extends IPSModule
         $image = $this->ReadPropertyBoolean('ImageVariable');
         $interval = $this->ReadPropertyInteger('ImageInterval');
         $cache = $this->ReadPropertyBoolean('ImageMemory');
-        $variable = $this->ReadPropertyBoolean('UpdateImage');
+        $update = $this->ReadPropertyBoolean('UpdateImage');
         $schedule = $this->ReadPropertyInteger('ImageSchedule');
         // Register Profile
         $profile = [
             [1, '►', '', 0xFF8000],
         ];
         $this->RegisterProfile(vtInteger, 'BHS.Update', 'Script', '', '', 0, 0, 0, 0, $profile);
-        // Motion detection (not for Blink Mini)
-        if ($model != 'null' && $model != 'owl') {
+        // Motion detection
+        if ($model != 'null') {
             $this->MaintainVariable('motion_detection', $this->Translate('Motion detection'), vtBoolean, '~Switch', 1, true);
             $this->EnableAction('motion_detection');
         }
-        // Update variable
-        $this->MaintainVariable('snapshot', $this->Translate('Snapshot'), vtInteger, 'BHS.Update', 2, $variable & $image);
-        if ($variable & $image) {
+        // Update image
+        $this->MaintainVariable('snapshot', $this->Translate('Snapshot'), vtInteger, 'BHS.Update', 2, $update & $image);
+        if ($update & $image) {
             $this->SetValueInteger('snapshot', 1);
             $this->EnableAction('snapshot');
         }
         // Media Object
         if ($image) {
-            $this->CreateMediaImage('thumbnail', 'Image', $device, 'jpg', $cache);
+            $this->CreateMediaImage('thumbnail', $this->Translate('Image'), $device, 'jpg', $cache);
             // Timer solo or over schedule?
             if ($schedule == 0) {
                 $this->SetTimerInterval('TimerSnapshot', 60 * 1000 * $interval);
             } else {
-                $activeID = $this->GetWeeklyScheduleInfo($schedule, time(), true);
-                $this->SendDebug(__FUNCTION__, $activeID);
-                if ($activeID['ActionID'] == self::BLINK_SCHEDULE_SNAPSHOT_ON) {
+                $wsi = $this->GetWeeklyScheduleInfo($schedule, time(), true);
+                $this->SendDebug(__FUNCTION__, $wsi);
+                if ($wsi['ActionID'] == self::BLINK_SCHEDULE_SNAPSHOT_ON) {
                     $this->SetTimerInterval('TimerSnapshot', 60 * 1000 * $interval);
                 }
             }
@@ -171,6 +184,9 @@ class BlinkHomeDevice extends IPSModule
                 break;
             case 'snapshot':
                 $this->Thumbnail();
+                break;
+            case 'liveview':
+                $this->LiveView();
                 break;
             case 'command':
                 $this->Command();
@@ -262,9 +278,9 @@ class BlinkHomeDevice extends IPSModule
     {
         $device = $this->ReadPropertyString('DeviceID');
         $network = $this->ReadPropertyString('NetworkID');
-        $detection = $value ? 'enable' : 'disable';
+        $type = $this->ReadPropertyString('DeviceType');
         // Parameter
-        $param = ['NetworkID' => $network, 'DeviceID' => $device, 'Detection' => $detection];
+        $param = ['NetworkID' => $network, 'DeviceID' => $device, 'DeviceType' => $type, 'Detection' => $value];
         // Request
         $response = $this->RequestDataFromParent('motion', $param);
         if ($response === '[]') {
@@ -365,6 +381,27 @@ class BlinkHomeDevice extends IPSModule
     }
 
     /**
+     * Get Live Video URL from server
+     */
+    private function LiveView()
+    {
+        $network = $this->ReadPropertyString('NetworkID');
+        $device = $this->ReadPropertyString('DeviceID');
+        $type = $this->ReadPropertyString('DeviceType');
+        // Parameter
+        $param = ['NetworkID' => $network, 'DeviceID' => $device, 'DeviceType' => $type];
+        // Request
+        $response = $this->RequestDataFromParent('liveview', $param);
+        $this->SendDebug(__FUNCTION__, $response);
+        if ($response === '[]') {
+            $this->SendDebug(__FUNCTION__, 'Error occurred for liveview');
+        }
+        else {
+            echo $this->PrettyPrint(self::BLINK_MAP_LIVEVIEW, $response);
+        }
+    }
+
+    /**
      * Command status polling
      */
     private function Command()
@@ -394,7 +431,7 @@ class BlinkHomeDevice extends IPSModule
             if ($command['status'] == 0) {
                 $this->Image();
             } else {
-                $this->LogMessage('[' . IPS_GetName($this->InstanceID) . '] ' . $command['status_msg'], KL_WARNING);
+                $this->LogMessage('[' . IPS_GetName($this->InstanceID) . '] ' . $command['status_msg'] . ': ' . $command['status'], KL_WARNING);
             }
         } else {
             $this->SetTimerInterval('TimerCommand', self::BLINK_COMMAND_TIMER_INTERVAL);
