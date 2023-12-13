@@ -96,8 +96,8 @@ trait BlinkHelper
     private static $BLINK_WEAKNESS = 2;
     // App constants
     // private static $UNIQUE_UID = '056952C3-95C6-3B98-E400-D597B6141F74';
-    private static $APP_VERSION = '6.29.0';             //  '6.29.0 (2308151343)'
-    private static $APP_BUILD = 'IOS_2308151343';
+    private static $APP_VERSION = '6.30.2';             //  '6.30.2 (2310051512)'
+    private static $APP_BUILD = 'IOS_2310051512';
     private static $CLIENT_NAME = 'IPSymconBlinkModul';
     private static $CLIENT_TYPE = 'ios';                // "android"
     private static $DEVICE_ID = 'IP-Symcon Modul';

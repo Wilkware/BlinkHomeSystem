@@ -177,7 +177,7 @@ class BlinkHomeSyncModule extends IPSModule
         // Sync Timer
         $syncUpdate = $this->ReadPropertyInteger('UpdateInterval');
         $this->SetTimerInterval('TimerSyncUpdate', 60 * 1000 * $syncUpdate);
-}
+    }
 
     /**
      * RequestAction.
@@ -312,7 +312,7 @@ class BlinkHomeSyncModule extends IPSModule
      */
     private function Download(int $mode)
     {
-        switch($mode) {
+        switch ($mode) {
             case 0:
                 $this->Events(false);
                 break;
@@ -323,7 +323,7 @@ class BlinkHomeSyncModule extends IPSModule
                 $this->Events(false);
                 $this->Clips(false);
                 break;
-            }
+        }
     }
 
     /**
@@ -364,7 +364,7 @@ class BlinkHomeSyncModule extends IPSModule
                 $medias = $this->ReadMediaWithAttributes($store, $limit, $clips);
                 $param['ManifestID'] = $data['manifest_id'];
                 foreach ($clips as $clip) {
-                    if(array_search($clip['id'], $medias) != 0) continue; // still saved
+                    if (array_search($clip['id'], $medias) != 0) continue; // still saved
                     $param['ClipID'] = $clip['id'];
                     // Request
                     $response = utf8_decode($this->RequestDataFromParent('clip', $param));
@@ -377,7 +377,7 @@ class BlinkHomeSyncModule extends IPSModule
                 return false;
             }
         } else {
-            if($value) {
+            if ($value) {
                 echo $this->Translate('Call was not successfull!');
             } else {
                 $this->SendDebug(__FUNCTION__, 'No Clip Information!');
@@ -421,7 +421,7 @@ class BlinkHomeSyncModule extends IPSModule
                 // Exists and how much medias
                 $medias = $this->ReadMediaWithAttributes($store, $limit, $videos);
                 foreach ($videos as $video) {
-                    if(array_search($video['id'], $medias) != 0) continue; // still saved
+                    if (array_search($video['id'], $medias) != 0) continue; // still saved
                     $param['MediaID'] = $video['media'];
                     // Request
                     $response = utf8_decode($this->RequestDataFromParent('video', $param));
@@ -434,7 +434,7 @@ class BlinkHomeSyncModule extends IPSModule
                 return false;
             }
         } else {
-            if($value) {
+            if ($value) {
                 echo $this->Translate('Call was not successfull!');
             } else {
                 $this->SendDebug(__FUNCTION__, 'No Event Information!');
@@ -463,18 +463,18 @@ class BlinkHomeSyncModule extends IPSModule
             $this->SendDebug(__FUNCTION__, $params);
             if (isset($params['network'])) {
                 // Print
-                if($value) {
+                if ($value) {
                     echo $this->PrettyPrint(self::BLINK_MAP_NETWORK, $params['network']);
                 } else {
                     $armed = $this->GetValue('recording');
                     // only if different
-                    if($params['network']['armed'] != $armed) {
+                    if ($params['network']['armed'] != $armed) {
                         $this->SetValueBoolean('recording', !$armed);
                     }
                 }
             }
         } else {
-            if($value) {
+            if ($value) {
                 echo $this->Translate('Call was not successfull!');
             } else {
                 $this->SendDebug(__FUNCTION__, 'No Network Information!');
@@ -509,7 +509,7 @@ class BlinkHomeSyncModule extends IPSModule
                 }
             }
         } else {
-            if($value) {
+            if ($value) {
                 echo $this->Translate('Call was not successfull!');
             } else {
                 $this->SendDebug(__FUNCTION__, 'No Sync Module Information!');
@@ -534,7 +534,7 @@ class BlinkHomeSyncModule extends IPSModule
         if ($response !== false) {
             echo $this->PrettyPrint(self::BLINK_MAP_STORAGE, $response);
         } else {
-            if($value) {
+            if ($value) {
                 echo $this->Translate('Call was not successfull!');
             } else {
                 $this->SendDebug(__FUNCTION__, 'No Local Storage Status Information!');
@@ -603,14 +603,14 @@ class BlinkHomeSyncModule extends IPSModule
                 if ($info !== false) { // JSON is valid
                     $medias[$child] = 0;
                     foreach ($source as $entry) {
-                        if($info['id'] == $entry['id']) {
+                        if ($info['id'] == $entry['id']) {
                             $medias[$child] = $info['id'];
                             break;
                         }
                     }
                 }
                 $number++;
-                if($number == $limit)break;
+                if ($number == $limit)break;
             }
         }
         return $medias;
@@ -632,14 +632,14 @@ class BlinkHomeSyncModule extends IPSModule
     {
         $ident = 'media_' . $source['id'];
         $name = date('YmdHis_', strtotime($source['created_at']));
-        if(isset($source['camera_name'])) {
+        if (isset($source['camera_name'])) {
             $name .= $source['camera_name'];
         } else {
             $name .= $source['device_name'];
         }
 
-        foreach($medias as $mediaID => $sourceID) {
-            if($sourceID === 0) {
+        foreach ($medias as $mediaID => $sourceID) {
+            if ($sourceID === 0) {
                 IPS_SetMediaContent($mediaID, base64_encode($response));
                 IPS_SendMediaEvent($mediaID);
                 IPS_SetIdent($mediaID, $ident);
@@ -649,12 +649,12 @@ class BlinkHomeSyncModule extends IPSModule
                 return true;
             }
         }
-        if(count($medias) != $limit) {
+        if (count($medias) != $limit) {
             $mediaID = IPS_CreateMedia(1);
             IPS_SetParent($mediaID, $store);
             IPS_SetIdent($mediaID, $ident);
             IPS_SetMediaCached($mediaID, true);
-            if(!$cache) {
+            if (!$cache) {
                 IPS_SetMediaFile($mediaID, 'media' . DIRECTORY_SEPARATOR . $mediaID . '.mp4', false);  // Video-Datei
             }
             IPS_SetMediaContent($mediaID, base64_encode($response));
@@ -663,9 +663,9 @@ class BlinkHomeSyncModule extends IPSModule
             IPS_SetName($mediaID, $name);
             IPS_SetInfo($mediaID, json_encode($source));
             $medias[$mediaID] = $source['id'];
-           return true;
+            return true;
         }
-       return false;
+        return false;
     }
 
     /**
@@ -678,24 +678,25 @@ class BlinkHomeSyncModule extends IPSModule
     private function OrderData(array $arr, string $key = null, string $direction = 'ASC')
     {
         // Check "order by key"
-        if(!is_string($key) && !is_array($key)) {
+        if (!is_string($key) && !is_array($key)) {
             throw new InvalidArgumentException('Order() expects the first parameter to be a valid key or array');
         }
         // Build order-by clausel
         $props = [];
-        if(is_string($key)) {
+        if (is_string($key)) {
             $props[$key] = strtolower($direction) == 'asc' ? 1 : -1;
         }else {
             $i = count($key);
-            foreach($key as $k => $dir) {
+            foreach ($key as $k => $dir) {
                 $props[$k] = strtolower($dir) == 'asc' ? $i : -($i);
                 $i--;
             }
         }
         // Sort by passed keys
-        usort($arr, function ($a, $b) use ($props) {
-            foreach($props as $key => $val) {
-                if($a[$key] == $b[$key]) continue;
+        usort($arr, function ($a, $b) use ($props)
+        {
+            foreach ($props as $key => $val) {
+                if ($a[$key] == $b[$key]) continue;
                 return $a[$key] > $b[$key] ? $val : -($val);
             }
             return 0;

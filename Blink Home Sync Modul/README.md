@@ -123,14 +123,14 @@ __Beispiel__: `BHS_Disarm(12345);`
 v1.5.20231013
 
 * _NEU_: Konfigurationsformular komplett überarbeitet
-* _NEU_: Syncronisierung des Aufnahmestatus
+* _NEU_: Synchronisierung des Aufnahmestatus
 * _NEU_: Support für Alarmmeldungen über Amazon Alexa
 * _NEU_: Ausführen eines Skriptes bei Alarmmeldung
 * _NEU_: Herunterladen von Bewegungsaufzeichnungen (Cloud & Lokal)
 * _NEU_: Speicherung von Video-Clips als Medien-Objekt (mp4)
 * _NEU_: Support für lokale USB Speicher
 * _FIX_: Übersetzungen ausgebaut bzw. vervollständigt
-* _FIX_: Blink API Layer erweitert, aktualisiert und dikumentiert
+* _FIX_: Blink API Layer erweitert, aktualisiert und dokumentiert
 * _FIX_: Debug- bzw. Fehlermeldungen erweitert
 * _FIX_: Style-Checks aktualisiert
 * _FIX_: Interne Bibliotheken überarbeitet und vereinheitlicht

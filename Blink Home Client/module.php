@@ -244,8 +244,8 @@ class BlinkHomeClient extends IPSModule
                     }
                     break;
                 default:
-                $this->SendDebug(__FUNCTION__, 'Invalid Command: ' . $data['Endpoint']);
-                break;
+                    $this->SendDebug(__FUNCTION__, 'Invalid Command: ' . $data['Endpoint']);
+                    break;
             }
         }
         $this->SendDebug(__FUNCTION__, $result);
