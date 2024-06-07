@@ -1,10 +1,10 @@
 # Blink Home Client
 
-[![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Product](https://img.shields.io/badge/Symcon%20Version-6.0-blue.svg)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.5.20231013-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
-[![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-[![Actions](https://github.com/Wilkware/IPSymconBlink/workflows/Check%20Style/badge.svg)](https://github.com/Wilkware/IPSymconBlink/actions)
+[![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
+[![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.6.20240606-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
+[![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/style.yml?branch=main&label=CheckStyle&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
 IP-Symcon Modul für die zentrale Kommunikation mit den Blink Servern.
 
@@ -31,26 +31,27 @@ Derzeit unterstützt das Modul folgende Funktionalität:
 * Aktivieren und Deaktivieren von _Motion Detection_ (Bewegungserkennung)
 * _Arm_ (Scharf) und _Disarm_ (Unscharf) stellen der Aufzeichnung bei Bewegungserkennung
 * Auslesen von gerätespezifischen Informationen (_Homescreen_)
+* Download von Videos/Clips (Cloud & Lokal)
 
 Folgende Geräte wurden getestet:
 
-* Blink Sync Modul 2
-* Blink Outdoor (schwarze Kamera)
-* Blink Indoor (weiße Kamera)
-* Blink Mini
+* Blink Sync Modul 2 (1st Gen & 2nd Gen)
+* Blink Outdoor (3rd Gen)
+* Blink Indoor (1st Gen & 3rd Gen)
+* Blink Mini (1st Gen)
 * Blink Doorbell
 
 Wenn jemand noch andere Geräte im Einsatz hat, bitte einfach bei mir melden!
 
 ### 2. Voraussetzungen
 
-* IP-Symcon ab Version 6.0
+* IP-Symcon ab Version 6.4
 
 ### 3. Installation
 
 * Über den Module Store das 'Blink Home System'-Modul installieren.
 * Alternativ Über das Modul-Control folgende URL hinzufügen.  
-`https://github.com/Wilkware/IPSymconBlink` oder `git://github.com/Wilkware/IPSymconBlink.git`
+`https://github.com/Wilkware/BlinkHomeSystem` oder `git://github.com/Wilkware/BlinkHomeSystem.git`
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
@@ -121,6 +122,12 @@ Gibt im angemeldeten Zusatnd die Benachrichtigungsoptionen aus.
 Die Funktion liefert '1' im Erfolgsfall, sonst '0'.
 
 ### 8. Versionshistorie
+
+v1.6.20240606
+
+* _FIX_: Downloads von Videos verbessert
+* _FIX_: Interne Bibliotheken überarbeitet und vereinheitlicht
+* _FIX_: Dokumentation überarbeitet
 
 v1.5.20231013
 

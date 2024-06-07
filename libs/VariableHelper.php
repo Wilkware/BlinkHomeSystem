@@ -27,7 +27,7 @@ trait VariableHelper
      */
     protected function SetValueBoolean(string $ident, bool $value)
     {
-        $id = $this->GetIDForIdent($ident);
+        $id = @$this->GetIDForIdent($ident);
         if ($id !== false) {
             SetValueBoolean($id, $value);
         }
@@ -41,7 +41,7 @@ trait VariableHelper
      */
     protected function SetValueString(string $ident, string $value)
     {
-        $id = $this->GetIDForIdent($ident);
+        $id = @$this->GetIDForIdent($ident);
         if ($id !== false) {
             SetValueString($id, $value);
         }
@@ -55,9 +55,37 @@ trait VariableHelper
      */
     protected function SetValueInteger(string $ident, int $value)
     {
-        $id = $this->GetIDForIdent($ident);
+        $id = @$this->GetIDForIdent($ident);
         if ($id !== false) {
             SetValueInteger($id, $value);
+        }
+    }
+
+    /**
+     * Update a float value.
+     *
+     * @param string $ident Ident of the float variable
+     * @param float  $value Value of the float variable
+     */
+    protected function SetValueFloat(string $ident, float $value)
+    {
+        $id = @$this->GetIDForIdent($ident);
+        if ($id !== false) {
+            SetValueFloat($id, $value);
+        }
+    }
+
+    /**
+     * Sets the variable inactive.
+     *
+     * @param string $ident Ident of the integer variable
+     * @param bool   $value Enable or disable value the variable
+     */
+    private function SetVariableDisabled(string $ident, bool $value)
+    {
+        $id = @$this->GetIDForIdent($ident);
+        if ($id !== false) {
+            IPS_SetDisabled($id, $value);
         }
     }
 }

@@ -85,6 +85,10 @@
                                     "value": "white"
                                 },
                                 {
+                                    "label": "Blink Indoor",
+                                    "value": "catalina_indoor"
+                                },
+                                {
                                     "label": "Blink Outdoor",
                                     "value": "catalina"
                                 },
@@ -286,17 +290,30 @@
         },
         {
             "type": "Label",
-            "caption": "Development and debug information ..."
-        },
-        {
-            "type": "Button",
-            "caption": "Liveview",
-            "onClick": "IPS_RequestAction($id,'liveview',$id);",
-            "enabled": true
-        },
-        {
-            "type": "Label",
             "caption": "\n"
+        },
+        {
+            "type": "ExpansionPanel",
+            "caption": "Development and debug information ...",
+            "items": [
+                {
+                    "type": "RowLayout",
+                    "items": [
+                        {
+                            "type": "Button",
+                            "caption": "Liveview",
+                            "onClick": "IPS_RequestAction($id,'liveview',$id);",
+                            "enabled": true
+                        },
+                        {
+                            "type": "Button",
+                            "caption": "Reset",
+                            "onClick": "IPS_RequestAction($id,'reset_command',$id);",
+                            "enabled": true
+                        }
+                    ]
+                }
+            ]
         },
         {
             "type": "ExpansionPanel",

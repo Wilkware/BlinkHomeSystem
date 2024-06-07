@@ -65,6 +65,9 @@ trait FormatHelper
                             $ret .= $this->Translate($data[$entry[0]] ? 'ON' : 'OFF');
                             break;
                     }
+                    if (isset($entry[3])) {
+                        $ret .= $entry[3];
+                    }
                     $ret .= "\n";
                 } elseif ($associated) {
                     $ret .= $entry[1] . ': ' . $this->Translate($undefined) . "\n";

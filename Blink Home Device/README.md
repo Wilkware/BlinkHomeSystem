@@ -1,10 +1,10 @@
 # Blink Home Device
 
-[![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Product](https://img.shields.io/badge/Symcon%20Version-6.0-blue.svg)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.5.20221013-orange.svg)](https://github.com/Wilkware/IPSymconBlink)
-[![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-[![Actions](https://github.com/Wilkware/IPSymconBlink/workflows/Check%20Style/badge.svg)](https://github.com/Wilkware/IPSymconBlink/actions)
+[![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
+[![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.6.20240606-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
+[![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/style.yml?branch=main&label=CheckStyle&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
 Ermöglicht die Kommunikation mit einem Blink Endgerät, derzeit vornehmlich Kameras.
 
@@ -26,13 +26,13 @@ Es ist derzeit noch nicht absehbar, welchen Funktionsumfang das Modul endgültig
 
 ### 2. Voraussetzungen
 
-* IP-Symcon ab Version 6.0
+* IP-Symcon ab Version 6.4
 
 ### 3. Installation
 
 * Über den Module Store das 'Blink Home System'-Modul installieren.
 * Alternativ über das Module Control folgende URL hinzufügen  
-`https://github.com/Wilkware/IPSymconBlink` oder `git://github.com/Wilkware/IPSymconBlink.git`
+`https://github.com/Wilkware/BlinkHomeSystem` oder `git://github.com/Wilkware/BlinkHomeSystem.git`
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
@@ -86,6 +86,7 @@ Aktion              | Beschreibung
 ZEITPLAN HINZUFÜGEN | Es wird ein Wochenplan mit 2 Zuständen (Aktiv & Inaktiv) angelegt und in den Einstellung hinterlegt.
 SNAPSHOT            | Löst eine Momentaufnahme(Snapshot) aus.
 LIVEVIEW            | Entwicklungs- und Debuginformationen ...
+ZURÜCKSETZEN        | Reset des Kommando-Stacks um Kommunikation wieder zu synchronisieren.
 
 ### 5. Statusvariablen und Profile
 
@@ -117,6 +118,14 @@ Man kann die Statusvariablen direkt im WF verlinken.
 Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 
 ### 8. Versionshistorie
+
+v1.6.20240606
+
+* _NEU_: Support für Blink Indoor Kamera (3rd Gen)
+* _NEU_: Ausgabe ins Log wenn Kamera nicht mehr auf Kommandos reagiert (Zombies)
+* _NEU_: Neue Entwickleroption (Zurücksetzen) um Kommunikation mit Kameras wieder zu synchronisieren
+* _FIX_: Interne Bibliotheken überarbeitet und vereinheitlicht
+* _FIX_: Dokumentation überarbeitet
 
 v1.5.20231013
 

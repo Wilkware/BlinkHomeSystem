@@ -106,6 +106,7 @@ trait BlinkHelper
     //'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36';
     // Request constants
     private static $REQUEST_WAIT = 1000; // 1 Second
+    private static $REQUEST_RETRY = 5; // 5 trys by default
 
     /**
      * Client Login to Blink Account on Blink Servers
@@ -419,6 +420,7 @@ trait BlinkHelper
         } else {
             $url = "https://rest-$region.immedia-semi.com/network/$network/camera/$device/thumbnail";
         }
+
         // prepeare header
         $headers = [
             'content-type: application/json',
@@ -596,24 +598,30 @@ trait BlinkHelper
             'content-type: application/json',
             'token-auth: ' . $token,
         ];
-        // read request
-        $response = $this->doRequest($url, $headers, null, 'POST');
-        if ($response == false) {
-            return $response;
+
+        $retry = self::$REQUEST_RETRY;
+        while ($retry--) {
+            // read request
+            $response = $this->doRequest($url, $headers, null, 'POST');
+            if ($response == false) {
+                return $response;
+            }
+            // check result
+            $params = json_decode($response, true);
+            $this->SendDebug(__FUNCTION__, $params);
+            if (isset($params['id'])) {
+                $id = $params['id'];
+                // wait a little bit
+                IPS_Sleep(self::$REQUEST_WAIT);
+                // prepeare url
+                $url = $url . "/$id";
+                // return request
+                return $this->doRequest($url, $headers, null);
+            }
+            // wait a little bit
+            IPS_Sleep(self::$REQUEST_WAIT);
         }
-        // check result
-        $params = json_decode($response, true);
-        $this->SendDebug(__FUNCTION__, $params);
-        if (!isset($params['id'])) {
-            return $response;
-        }
-        $id = $params['id'];
-        // wait a little bit
-        IPS_Sleep(self::$REQUEST_WAIT);
-        // prepeare url
-        $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/sync_modules/$device/local_storage/manifest/request/$id";
-        // return request
-        return $this->doRequest($url, $headers, null);
+        return false;
     }
 
     /**
@@ -647,21 +655,27 @@ trait BlinkHelper
             'content-type: application/json',
             'token-auth: ' . $token,
         ];
-        // read request
-        $response = $this->doRequest($url, $headers, null, 'POST');
-        if ($response == false) {
-            return $response;
+
+        $retry = self::$REQUEST_RETRY;
+        while ($retry--) {
+            // read request
+            $response = $this->doRequest($url, $headers, null, 'POST');
+            if ($response == false) {
+                return $response;
+            }
+            // check result
+            $params = json_decode($response, true);
+            $this->SendDebug(__FUNCTION__, $params);
+            if (isset($params['id'])) {
+                // wait a little bit
+                IPS_Sleep(self::$REQUEST_WAIT);
+                // return request
+                return $this->doRequest($url, $headers, null);
+            }
+            // wait a little bit
+            IPS_Sleep(self::$REQUEST_WAIT);
         }
-        // check result
-        $params = json_decode($response, true);
-        $this->SendDebug(__FUNCTION__, $params);
-        if (!isset($params['id'])) {
-            return $response;
-        }
-        // wait a little bit
-        IPS_Sleep(self::$REQUEST_WAIT);
-        // return request
-        return $this->doRequest($url, $headers, null);
+        return false;
     }
 
     /**

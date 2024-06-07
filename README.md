@@ -1,8 +1,8 @@
 # Blink Home System
 
-[![Version](https://img.shields.io/badge/Symcon-PHP--Bibliothek-purple.svg)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Product](https://img.shields.io/badge/Symcon%20Version-6.0-blue.svg)](https://www.symcon.de/produkt/)
-[![Licence](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![Version](https://img.shields.io/badge/Symcon-PHP--Bibliothek-purple.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
+[![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
+[![Licence](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 IP-Symcon Modulbibliothek für die Einbindung und Verwaltung des drahtlosen HD-Heimüberwachungs- und Alarmsystem von Blink.
 
@@ -22,7 +22,8 @@ Modul welches ein Endgerät (Kamera, Türklingel o.Ä.) repräsentiert.
 
 ## Historie
 
-- 2023-10-13: v1.5 Bewegungserkennung für Blink Mini, Herunterladen von Video-Clips (Cloud % Lokaler USB Speicher)
+- 2024-06-06: v1.6 Support von Symcon v7 und neuer Blink Indoor Kamera, 6.4 Kombatibilität, Downloads optimiert, neue Entwicklungsoption
+- 2023-10-13: v1.5 Bewegungserkennung für Blink Mini, Herunterladen von Video-Clips (Cloud & Lokaler USB Speicher)
 - 2022-08-15: v1.4 API für Blink Doorbells angeasst
 - 2022-06-20: v1.3 Anpassungen für Blink Doorbells, Login überarbeitet, Erweitertes Logging, Konfigurator verbessert
 - 2022-02-14: v1.2 Anpassungen für Blink Mini, Kennwortvalidierung und Overlay, Korrektur Typo

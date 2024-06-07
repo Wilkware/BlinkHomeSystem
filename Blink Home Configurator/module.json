@@ -1,6 +1,7 @@
 {
     "id": "{4B8A0364-990A-663F-E9F3-E9BD08CCE3F0}",
     "name": "Blink Home Configurator",
+    "url": "https://wilkware.de/ip-symcon-module/blink/",
     "type": 4,
     "vendor": "Amazon",
     "aliases": [],
@@ -11,6 +12,5 @@
     "implemented": [
         "{7DD36C8D-6581-25FE-9FEA-98024108BED6}"
     ],
-    "prefix": "BHS",
-    "url": "https://wilkware.de/ip-symcon-module/blink/"
+    "prefix": "BHS"
 }

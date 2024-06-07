@@ -147,11 +147,11 @@ class BlinkHomeSyncModule extends IPSModule
         $profile = [
             [1, '►', '', 0xFF8000],
         ];
-        $this->RegisterProfile(vtInteger, 'BHS.Download', 'Download', '', '', 0, 0, 0, 0, $profile);
+        $this->RegisterProfileInteger('BHS.Download', 'Download', '', '', 0, 0, 0, $profile);
 
         // Recording variable
         $recording = $this->ReadPropertyBoolean('CheckRecording');
-        $this->MaintainVariable('recording', $this->Translate('Recording'), vtBoolean, '~Switch', 0, $recording);
+        $this->MaintainVariable('recording', $this->Translate('Recording'), VARIABLETYPE_BOOLEAN, '~Switch', 0, $recording);
         if ($recording) {
             //$this->SetValueBoolean('recording', false);
             $this->EnableAction('recording');
@@ -161,7 +161,7 @@ class BlinkHomeSyncModule extends IPSModule
         $store = $this->ReadPropertyInteger('StorageCategory');
         $limit = $this->ReadPropertyInteger('StorageLimit');
         $download = (IPS_CategoryExists($store)) & ($limit != 0);
-        $this->MaintainVariable('download', $this->Translate('Download'), vtInteger, 'BHS.Download', 2, $download);
+        $this->MaintainVariable('download', $this->Translate('Download'), VARIABLETYPE_INTEGER, 'BHS.Download', 2, $download);
         if ($download) {
             $this->SetValueInteger('download', 3);
             $this->EnableAction('download');
@@ -169,7 +169,7 @@ class BlinkHomeSyncModule extends IPSModule
 
         // Alert variable
         $alert = $this->ReadPropertyBoolean('CheckAlert');
-        $this->MaintainVariable('alert', $this->Translate('Alert'), vtBoolean, '~Alert', 1, $alert);
+        $this->MaintainVariable('alert', $this->Translate('Alert'), VARIABLETYPE_BOOLEAN, '~Alert', 1, $alert);
         if ($alert) {
             $this->EnableAction('alert');
         }

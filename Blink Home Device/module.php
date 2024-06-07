@@ -104,7 +104,7 @@ class BlinkHomeDevice extends IPSModule
         // Snapshots enabled?
         $snapshot = $this->ReadPropertyBoolean('ImageVariable');
 
-        // Button?
+        // Buttons?
         $form['actions'][3]['enabled'] = $snapshot;
 
         // Debug output
@@ -131,14 +131,14 @@ class BlinkHomeDevice extends IPSModule
         $profile = [
             [1, '►', '', 0xFF8000],
         ];
-        $this->RegisterProfile(vtInteger, 'BHS.Update', 'Script', '', '', 0, 0, 0, 0, $profile);
+        $this->RegisterProfileInteger('BHS.Update', 'Script', '', '', 0, 0, 0, $profile);
         // Motion detection
         if ($model != 'null') {
-            $this->MaintainVariable('motion_detection', $this->Translate('Motion detection'), vtBoolean, '~Switch', 1, true);
+            $this->MaintainVariable('motion_detection', $this->Translate('Motion detection'), VARIABLETYPE_BOOLEAN, '~Switch', 1, true);
             $this->EnableAction('motion_detection');
         }
         // Update image
-        $this->MaintainVariable('snapshot', $this->Translate('Snapshot'), vtInteger, 'BHS.Update', 2, $update & $image);
+        $this->MaintainVariable('snapshot', $this->Translate('Snapshot'), VARIABLETYPE_INTEGER, 'BHS.Update', 2, $update & $image);
         if ($update & $image) {
             $this->SetValueInteger('snapshot', 1);
             $this->EnableAction('snapshot');
@@ -244,6 +244,7 @@ class BlinkHomeDevice extends IPSModule
     {
         $command = $this->ReadAttributeString('CommandID');
         if ($command != '') {
+            $this->LogMessage('[' . IPS_GetName($this->InstanceID) . '] ' . ' Command still active!', KL_ERROR);
             $this->SendDebug(__FUNCTION__, 'Command still active!');
             return;
         }
@@ -413,6 +414,7 @@ class BlinkHomeDevice extends IPSModule
         $command = $this->ReadAttributeString('CommandID');
         // Safty check
         if ($command == '') {
+            $this->LogMessage('[' . IPS_GetName($this->InstanceID) . '] ' . ' Zombie Command!', KL_ERROR);
             $this->SendDebug(__FUNCTION__, 'Zombie Command!');
             return;
         }

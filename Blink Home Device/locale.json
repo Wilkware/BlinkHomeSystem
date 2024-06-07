@@ -1,6 +1,7 @@
 {
     "translations": {
         "de": {
+            "Blink Home Device": "Blink Home Gerät",
             "\nBlink Home Device\n ": "\nBlink Home Gerät\n ",
             "With this module you can make device-specific settings or read out information.": "Mit diesem Modul können Sie gerätespezifische Einstellungen vornehmen bzw. Informationen auslesen.",
             "Device information ...": "Geräteinformationen ...",
@@ -36,6 +37,7 @@
             "Schedule snapshot": "Zeitplan Snapshot",
             "Motion detection": "Bewegungserkennung",
             "Snapshot": "Auslöser",
+            "Reset": "Zurücksetzen",
             "Image": "Bild",
             "Advanced settings ...": "Erweiterte Einstellungen ...",
             "Taking a ...": "Momentaufnahme machen ...",

@@ -1,6 +1,7 @@
 {
     "translations": {
         "de": {
+            "Blink Home Configurator": "Blink Home Konfigurator",
             "\nBlink Home Configurator\n ": "\nBlink Home Konfigurator\n ",
             "Using this configurator, you can select from the list of currently found devices and create an instance for a new device or check an existing instance.": "Mit Hilfe dieser Konfigurators kann man aus der Liste der aktuell gefundenen Geräte auswählen und eine Instanz für ein neues Gerät erstellen oder eine vorhandene Instanz prüfen.",
             "Target Category:": "Zielkategorie:",

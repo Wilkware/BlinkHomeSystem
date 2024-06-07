@@ -24,16 +24,17 @@ class BlinkHomeConfigurator extends IPSModule
 
     // Blink Device Models (up to now)
     private const BLINK_DEVICE_MODEL = [
-        'null'         => '<unknown>',
-        'sm1'          => 'Blink Sync Module 1',
-        'sm2'          => 'Blink Sync Module 2',
-        'mini'         => 'Blink Mini',
-        'white'        => 'Blink Indoor',
-        'catalina'     => 'Blink Outdoor',
-        'owl'          => 'Blink Mini',
-        'xt'           => 'Blink XT1',
-        'xt2'          => 'Blink XT2',
-        'lotus'        => 'Blink Doorbell',
+        'null'              => '<unknown>',
+        'sm1'               => 'Blink Sync Module 1',
+        'sm2'               => 'Blink Sync Module 2',
+        'mini'              => 'Blink Mini',
+        'white'             => 'Blink Indoor',
+        'catalina_indoor'   => 'Blink Indoor',
+        'catalina'          => 'Blink Outdoor',
+        'owl'               => 'Blink Mini',
+        'xt'                => 'Blink XT1',
+        'xt2'               => 'Blink XT2',
+        'lotus'             => 'Blink Doorbell',
     ];
 
     // ModulID (Blink Home Client)
@@ -91,8 +92,14 @@ class BlinkHomeConfigurator extends IPSModule
             return json_encode($form);
         }
 
+        // Version check
+        $version = (float) IPS_GetKernelVersion();
         // Save location
         $location = $this->GetPathOfCategory($this->ReadPropertyInteger('TargetCategory'));
+        // Enable or disable "TargetCategory" for 6.x
+        if ($version < 7) {
+            $form['elements'][2]['visible'] = true;
+        }
 
         // All connected blink devices and blink modules
         $connected = [];
@@ -129,7 +136,7 @@ class BlinkHomeConfigurator extends IPSModule
                     [
                         'moduleID'      => $device['guid'],
                         'configuration' => ['DeviceID' => strval($device['id']), 'NetworkID' => strval($device['network']), 'DeviceType' => $device['type'], 'DeviceModel' => $device['model']],
-                        'location'      => $location,
+                        'location'      => ($version < 7) ? $location : [],
                     ],
                 ],
             ];
