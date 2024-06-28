@@ -1,0 +1,16 @@
+{
+    "id": "{1D064E05-B3D7-54C6-F37D-D0068AEF7B89}",
+    "name": "Blink Home Accessory",
+    "url": "https://wilkware.de/ip-symcon-module/blink/",
+    "type": 3,
+    "vendor": "Amazon",
+    "aliases": [],
+    "parentRequirements": [
+        "{83027B09-C481-91E7-6D24-BF49AA871452}"
+    ],
+    "childRequirements": [],
+    "implemented": [
+        "{7DD36C8D-6581-25FE-9FEA-98024108BED6}"
+    ],
+    "prefix": "BHS"
+}

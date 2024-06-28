@@ -15,6 +15,17 @@ class BlinkHomeDevice extends IPSModule
     use ProfileHelper;
     use VariableHelper;
 
+    // Profiles
+    private const BLINK_PROFILE_UPDATE = [
+        [1, '►', '', 0xFF8000],
+    ];
+    private const BLINK_PROFILE_BATTERY = [
+        [0, 'unknown', '', 0xFF00FF],
+        [1, 'critical', 'Battery-0', 0xFF0000],
+        [2, 'low', 'Battery-50', 0xFFFF00],
+        [3, 'ok', 'Battery-100', 0x00FF00],
+    ];
+
     // Echo Maps
     private const BLINK_MAP_LIVEVIEW = [
         ['command_id', 'Command ID', 1],
@@ -26,6 +37,13 @@ class BlinkHomeDevice extends IPSModule
         ['continue_interval', 'Continue interval', 1],
         ['continue_warning', 'Continue warning', 1],
         ['polling_interval', 'Polling interval', 1],
+    ];
+    private const BLINK_MAP_SIGNALS = [
+        ['power', 'Power supply', 3],
+        ['lfr', 'Sync signal strength', 1],
+        ['wifi', 'WiFi strength', 1],
+        ['temp', 'Temperature', 1],
+        ['battery', 'Battery', 1],
     ];
 
     // Schedule constant
@@ -72,6 +90,7 @@ class BlinkHomeDevice extends IPSModule
         $this->RegisterPropertyInteger('ImageSchedule', 0);
         // Variable
         $this->RegisterPropertyBoolean('UpdateImage', false);
+        $this->RegisterPropertyBoolean('UpdateBattery', false);
         // Register update timer
         $this->RegisterTimer('TimerSnapshot', 0, 'IPS_RequestAction(' . $this->InstanceID . ', "snapshot", "");');
         $this->RegisterTimer('TimerCommand', 0, 'IPS_RequestAction(' . $this->InstanceID . ', "command", "");');
@@ -104,6 +123,12 @@ class BlinkHomeDevice extends IPSModule
         // Snapshots enabled?
         $snapshot = $this->ReadPropertyBoolean('ImageVariable');
 
+        // Power supply is battery?
+        $model = $this->ReadPropertyString('DeviceModel');
+        if (!in_array($model, ['mini', 'owl', 'hack'])) {
+            $form['elements'][5]['items'][1]['visible'] = true;
+        }
+
         // Buttons?
         $form['actions'][3]['enabled'] = $snapshot;
 
@@ -126,12 +151,11 @@ class BlinkHomeDevice extends IPSModule
         $interval = $this->ReadPropertyInteger('ImageInterval');
         $cache = $this->ReadPropertyBoolean('ImageMemory');
         $update = $this->ReadPropertyBoolean('UpdateImage');
+        $battery = $this->ReadPropertyBoolean('UpdateBattery');
         $schedule = $this->ReadPropertyInteger('ImageSchedule');
         // Register Profile
-        $profile = [
-            [1, '►', '', 0xFF8000],
-        ];
-        $this->RegisterProfileInteger('BHS.Update', 'Script', '', '', 0, 0, 0, $profile);
+        $this->RegisterProfileInteger('BHS.Update', 'Script', '', '', 0, 0, 0, self::BLINK_PROFILE_UPDATE);
+        $this->RegisterProfileInteger('BHS.Battery', 'Battery', '', '', 0, 3, 1, self::BLINK_PROFILE_BATTERY);
         // Motion detection
         if ($model != 'null') {
             $this->MaintainVariable('motion_detection', $this->Translate('Motion detection'), VARIABLETYPE_BOOLEAN, '~Switch', 1, true);
@@ -143,6 +167,8 @@ class BlinkHomeDevice extends IPSModule
             $this->SetValueInteger('snapshot', 1);
             $this->EnableAction('snapshot');
         }
+        // Update battery
+        $this->MaintainVariable('battery', $this->Translate('Battery'), VARIABLETYPE_INTEGER, 'BHS.Battery', 3, $battery);
         // Media Object
         if ($image) {
             $this->CreateMediaImage('thumbnail', $this->Translate('Image'), $device, 'jpg', $cache);
@@ -187,6 +213,9 @@ class BlinkHomeDevice extends IPSModule
                 break;
             case 'liveview':
                 $this->LiveView();
+                break;
+            case 'signals':
+                $this->Signals();
                 break;
             case 'command':
                 $this->Command();
@@ -310,6 +339,16 @@ class BlinkHomeDevice extends IPSModule
             foreach ($devises[$type] as $dev) {
                 if ($dev['id'] == $device) {
                     $path = $dev['thumbnail'];
+                    // battery update
+                    if (!isset($dev['battery'])) {
+                        $this->SetValueInteger('battery', 4);
+                    }
+                    // if battery than signals
+                    if (isset($dev['signals'])) {
+                        if (isset($dev['signals']['battery'])) {
+                            $this->SetValueInteger('battery', $dev['signals']['battery']);
+                        }
+                    }
                     break;
                 }
             }
@@ -398,8 +437,53 @@ class BlinkHomeDevice extends IPSModule
             $this->SendDebug(__FUNCTION__, 'Error occurred for liveview');
         }
         else {
-            echo $this->PrettyPrint(self::BLINK_MAP_LIVEVIEW, $response);
+            // Echo message
+            $this->EchoMessage($this->PrettyPrint(self::BLINK_MAP_LIVEVIEW, $response));
         }
+    }
+
+    /**
+     * Get Signal information
+     */
+    private function Signals()
+    {
+        $response = $this->RequestDataFromParent('homescreen');
+        if ($response === '[]') {
+            $this->SendDebug(__FUNCTION__, 'No Result for HomeScreen!');
+            return;
+        }
+        $device = $this->ReadPropertyString('DeviceID');
+        $type = $this->ReadPropertyString('DeviceType');
+        // find device
+        $devises = json_decode($response, true);
+        $signals = [];
+        if (isset($devises[$type])) {
+            foreach ($devises[$type] as $dev) {
+                if ($dev['id'] == $device) {
+                    // battery or usb
+                    if (isset($dev['battery'])) {
+                        $signals['power'] = $this->Translate('Battery');
+                    } else {
+                        $signals['power'] = 'USB';
+                        $this->SetValueInteger('battery', 4);
+                    }
+                    // if battery than signals
+                    if (isset($dev['signals'])) {
+                        $signals = array_merge($signals, $dev['signals']);
+                        if (isset($signals['battery'])) {
+                            $this->SetValueInteger('battery', $signals['battery']);
+                        }
+                    }
+                    // temperature in celsius
+                    if (isset($signals['temp'])) {
+                        $signals['temp'] = round(($signals['temp'] - 32) / 9.0 * 5.0, 1) . '°C';
+                    }
+                    break;
+                }
+            }
+        }
+        // Echo message
+        $this->EchoMessage($this->PrettyPrint(self::BLINK_MAP_SIGNALS, $signals));
     }
 
     /**
@@ -510,5 +594,16 @@ class BlinkHomeDevice extends IPSModule
         $rgb[1] = ($num & 0x00FF00) >> 8;
         $rgb[2] = ($num & 0x0000FF);
         return $rgb;
+    }
+
+    /**
+     * Show message via popup
+     *
+     * @param string $caption echo message
+     */
+    private function EchoMessage(string $caption)
+    {
+        $this->UpdateFormField('EchoMessage', 'caption', $this->Translate($caption));
+        $this->UpdateFormField('EchoPopup', 'visible', true);
     }
 }

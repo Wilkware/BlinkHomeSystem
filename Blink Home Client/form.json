@@ -147,10 +147,6 @@
             ]
         },
         {
-            "type": "Label",
-            "caption": "\n"
-        },
-        {
             "type": "ExpansionPanel",
             "caption": "Source code, donation and licence ...",
             "items": [

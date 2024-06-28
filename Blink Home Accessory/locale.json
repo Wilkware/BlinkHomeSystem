@@ -1,0 +1,31 @@
+{
+    "translations": {
+        "de": {
+            "Blink Home Accessory": "Blink Home Zubehör",
+            "\nBlink Home Accessory\n ": "\nBlink Home Zubehör\n ",
+            "This module allows you to use and control specific accessory functions.": "Mit diesem Modul können Sie spezifische Funktionen des Zubehörs nutzen und steuern.",
+            "Accessorie information ...": "Zubehörinformationen ...",
+            "Device type:": "Gerätetyp:",
+            "Device model:": "Gerätemodell:",
+            "Device ID:": "Geräte-ID:",
+            "Network ID:": "Netwerk-ID:",
+            "Target ID:": "Ziel-ID:",
+            "Accessorie": "Zubehör",
+            "Power supply": "Stromversorgung",
+            "Battery": "Batterie",
+            "unknown": "Unbekannt",
+            "critical": "Niedrig",
+            "low": "Mittel",
+            "ok": "Gut",
+            "usb": "USB",
+            "On": "An",
+            "Off": "Aus",
+            "Switching the floodlight on or off ...": "An- oder Ausschalten des Flutlichtes ...",
+            "Light switch": "Lichtschalter",
+            "Advanced settings ...": "Erweiterte Einstellungen ...",
+            "Development and debug information ...": "Entwicklungs- und Debuginformationen ...",
+            "Source code, donation and licence ...": "Quellcode, Spende und Lizenz ...",
+            "The software is free of charge for non-commercial use, I would appreciate a donation if you like the module.": "Die Software ist für die nicht kommerzielle Nutzung kostenlos, über eine Spende bei Gefallen des Moduls würde ich mich sehr freuen."
+        }
+    }
+}

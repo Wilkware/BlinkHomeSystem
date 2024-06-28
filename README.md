@@ -20,8 +20,12 @@ Mit diesem Modul können alle aktivierten Kameras im Netzwerk gesteuert werden.
 - __Blink Home Device__ ([Dokumentation](Blink%20Home%20Device))  
 Modul welches ein Endgerät (Kamera, Türklingel o.Ä.) repräsentiert.
 
+- __Blink Home Accessory__ ([Dokumentation](Blink%20Home%20Accessory))  
+Modul welches ein Zubehör (Flutlich, Halterung) repräsentiert.
+
 ## Historie
 
+- 2024-06-28: v1.7 Support für Blink Zubehör (Flutlichthalterung) und Mini 2 Kamera, Anzeige Energieversorgung und Batterielandung
 - 2024-06-06: v1.6 Support von Symcon v7 und neuer Blink Indoor Kamera, 6.4 Kombatibilität, Downloads optimiert, neue Entwicklungsoption
 - 2023-10-13: v1.5 Bewegungserkennung für Blink Mini, Herunterladen von Video-Clips (Cloud & Lokaler USB Speicher)
 - 2022-08-15: v1.4 API für Blink Doorbells angeasst

@@ -68,6 +68,11 @@
  *  - Get Camera Config : GET /network/{network_id}/camera/{camera_id}/config
  *  - Update Camera Config : POST /network/{network_id}/camera/{camera_id}/update
  *
+ * Accessories
+ *  - Enable Fllodlight: POST /api/v1/accounts/{account_id}/networks/{network_id}/cameras/${camera_id}/accessories/storm/${storm_id}/lights/on
+ *  - Disable Fllodlight: POST /api/v1/accounts/{account_id}/networks/{network_id}/cameras/${camera_id}/accessories/storm/${storm_id}/lights/off
+ *
+ *
  * Videos
  *  - Get Video Events : GET /api/v1/accounts/{account_id}/media/changed?since={timestamp}&page={PageNumber}
  *  - Get Video : GET /api/v2/accounts/{account_id}/media/clip/{mp4_Filename}
@@ -96,8 +101,8 @@ trait BlinkHelper
     private static $BLINK_WEAKNESS = 2;
     // App constants
     // private static $UNIQUE_UID = '056952C3-95C6-3B98-E400-D597B6141F74';
-    private static $APP_VERSION = '6.30.2';             //  '6.30.2 (2310051512)'
-    private static $APP_BUILD = 'IOS_2310051512';
+    private static $APP_VERSION = '32.2';             //  '6.30.2 (2310051512)'
+    private static $APP_BUILD = 'IOS_22406121957';
     private static $CLIENT_NAME = 'IPSymconBlinkModul';
     private static $CLIENT_TYPE = 'ios';                // "android"
     private static $DEVICE_ID = 'IP-Symcon Modul';
@@ -428,6 +433,36 @@ trait BlinkHelper
         ];
         // return request
         return $this->doRequest($url, $headers, null, 'POST');
+    }
+
+    /**
+     * Enable/Disable floodlight for the given accessorie.
+     *
+     * POST /api/v1/accounts/{account_id}/networks/{network_id}/cameras/${camera_id}/accessories/storm/${storm_id}/lights/on
+     * POST /api/v1/accounts/{account_id}/networks/{network_id}/cameras/${camera_id}/accessories/storm/${storm_id}/lights/off
+     *
+     * Headers
+     *      content-type - application/json
+     *      token-auth - session auth token
+     *
+     * Response
+     *      A command object. This call is asynchronous and is monitored by the Command Status API call using the returned Command Id.
+     */
+    private function doLight(string $token, string $region, string $account, string $network, string $device, string $storm, bool $switch)
+    {
+        // prepeare request
+        $request = null;
+        // transform value
+        $state = $switch ? 'on' : 'off';
+        // prepeare url
+        $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/cameras/$device/accessories/storm/$storm/lights/$state";
+        // prepeare header
+        $headers = [
+            'content-type: application/json',
+            'token-auth: ' . $token,
+        ];
+        // return request
+        return $this->doRequest($url, $headers, $request, 'POST');
     }
 
     /**

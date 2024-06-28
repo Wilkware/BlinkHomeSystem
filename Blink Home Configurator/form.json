@@ -43,7 +43,7 @@
                 {
                     "caption": "DeviceID",
                     "name": "id",
-                    "width": "100px"
+                    "width": "75px"
                 },
                 {
                     "caption": "Name",
@@ -58,12 +58,17 @@
                 {
                     "caption": "Model",
                     "name": "model",
-                    "width": "150px"
+                    "width": "175px"
                 },
                 {
-                    "caption": "Battery",
+                    "caption": "Power",
+                    "name": "power",
+                    "width": "100px"
+                },
+                {
+                    "caption": "Charging",
                     "name": "battery",
-                    "width": "75ox"
+                    "width": "75px"
                 },
                 {
                     "caption": "Firmware",
@@ -71,7 +76,7 @@
                     "width": "75px"
                 },
                 {
-                    "caption": "NetworkID",
+                    "caption": "Network",
                     "name": "network",
                     "width": "75px"
                 }

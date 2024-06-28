@@ -11,7 +11,7 @@
                 },
                 {
                     "type": "Label",
-                    "label": "\nBlink Home Device\n ",
+                    "label": "\nBlink Home Accessory\n ",
                     "link": false,
                     "bold": true
                 }
@@ -19,11 +19,11 @@
         },
         {
             "type": "Label",
-            "label": "With this module you can make device-specific settings or read out information."
+            "label": "This module allows you to use and control specific accessory functions."
         },
         {
             "type": "ExpansionPanel",
-            "caption": "Device information ...",
+            "caption": "Accessorie information ...",
             "items": [
                 {
                     "type": "RowLayout",
@@ -40,24 +40,8 @@
                                     "value": "null"
                                 },
                                 {
-                                    "label": "Camera",
-                                    "value": "cameras"
-                                },
-                                {
-                                    "label": "Sync Modul",
-                                    "value": "sync_modules"
-                                },
-                                {
-                                    "label": "Sirens",
-                                    "value": "sirens"
-                                },
-                                {
-                                    "label": "Doorbell",
-                                    "value": "doorbells"
-                                },
-                                {
-                                    "label": "Mini Camera",
-                                    "value": "owls"
+                                    "label": "Accessorie",
+                                    "value": "accessories"
                                 }
                             ]
                         },
@@ -73,40 +57,12 @@
                                     "value": "null"
                                 },
                                 {
-                                    "label": "Blink Mini",
-                                    "value": "owl"
+                                    "label": "Floodlight Mount",
+                                    "value": "storm"
                                 },
                                 {
-                                    "label": "Blink Mini",
-                                    "value": "mini"
-                                },
-                                {
-                                    "label": "Blink Mini 2",
-                                    "value": "hawk"
-                                },
-                                {
-                                    "label": "Blink Indoor",
-                                    "value": "white"
-                                },
-                                {
-                                    "label": "Blink Indoor",
-                                    "value": "catalina_indoor"
-                                },
-                                {
-                                    "label": "Blink Outdoor",
-                                    "value": "catalina"
-                                },
-                                {
-                                    "label": "Blink Doorbell",
-                                    "value": "lotus"
-                                },
-                                {
-                                    "label": "Blink XT1",
-                                    "value": "xt"
-                                },
-                                {
-                                    "label": "Blink XT2",
-                                    "value": "xt2"
+                                    "label": "Pan-Tilt Mount",
+                                    "value": "rosie"
                                 }
                             ]
                         }
@@ -130,131 +86,16 @@
                             "enabled": false
                         }
                     ]
-                }
-            ]
-        },
-        {
-            "type": "ExpansionPanel",
-            "caption": "Images ...",
-            "items": [
-                {
-                    "type": "CheckBox",
-                    "name": "ImageVariable",
-                    "caption": "Create a media variable for snapshots!",
-                    "width": "450px"
-                },
-                {
-                    "type": "CheckBox",
-                    "name": "ImageMemory",
-                    "caption": "Use In-Memory Cache!",
-                    "width": "450px"
-                },
-                {
-                    "type": "CheckBox",
-                    "name": "ImageOverlay",
-                    "caption": "Create a timestamp on each snapshot!",
-                    "width": "450px"
-                },
-                {
-                    "type": "RowLayout",
-                    "items": [
-                        {
-                            "type": "NumberSpinner",
-                            "name": "OverlayTop",
-                            "caption": "Top margin:",
-                            "suffix": "px",
-                            "width": "221px"
-                        },
-                        {
-                            "type": "NumberSpinner",
-                            "name": "OverlayLeft",
-                            "caption": "Left margin:",
-                            "suffix": "px",
-                            "width": "221px"
-                        }
-                    ]
-                },
-                {
-                    "type": "RowLayout",
-                    "items": [
-                        {
-                            "type": "NumberSpinner",
-                            "name": "OverlaySize",
-                            "caption": "Font size:",
-                            "suffix": "px",
-                            "width": "221px"
-                        },
-                        {
-                            "type": "SelectColor",
-                            "name": "OverlayColor",
-                            "caption": "Font color:",
-                            "allowTransparent": false,
-                            "width": "221px"
-                        }
-                    ]
                 },
                 {
                     "type": "RowLayout",
                     "items": [
                         {
                             "type": "ValidationTextBox",
-                            "name": "OverlayFormat",
-                            "caption": "Time format:",
-                            "width": "221px"
-                        },
-                        {
-                            "type": "SelectColor",
-                            "name": "OverlayBackground",
-                            "caption": "Background color:",
-                            "allowTransparent": true,
-                            "width": "221px"
-                        }
-                    ]
-                },
-                {
-                    "type": "RowLayout",
-                    "items": [
-                        {
-                            "type": "ValidationTextBox",
-                            "name": "OverlayFont",
-                            "caption": "Path to the TrueType font:",
-                            "width": "450px"
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "type": "ExpansionPanel",
-            "caption": "Time control ...",
-            "items": [
-                {
-                    "type": "RowLayout",
-                    "items": [
-                        {
-                            "type": "NumberSpinner",
-                            "name": "ImageInterval",
-                            "caption": "Update interval:",
-                            "suffix": "minutes",
-                            "minimum": 0,
-                            "maximum": 1440,
-                            "width": "450px"
-                        }
-                    ]
-                },
-                {
-                    "type": "RowLayout",
-                    "items": [
-                        {
-                            "type": "SelectEvent",
-                            "name": "ImageSchedule",
-                            "caption": "Schedule:",
-                            "width": "450px"
-                        },
-                        {
-                            "type": "Label",
-                            "name": "LabelSchedule",
-                            "caption": "The schedule for updating the snapshots can be created via the button below!"
+                            "name": "TargetID",
+                            "caption": "Target ID:",
+                            "width": "250px",
+                            "enabled": false
                         }
                     ]
                 }
@@ -263,81 +104,29 @@
         {
             "type": "ExpansionPanel",
             "caption": "Advanced settings ...",
-            "items": [
-                {
-                    "type": "CheckBox",
-                    "name": "UpdateImage",
-                    "caption": "Create a variable to trigger a snapshot of the current view of the camera!"
-                },
-                {
-                    "type": "CheckBox",
-                    "name": "UpdateBattery",
-                    "caption": "Create a variable to display the battery charge level!",
-                    "visible": false
-                }
-            ]
+            "items": [],
+            "visible": false
         }
     ],
     "actions": [
         {
             "type": "Label",
-            "caption": "With the help of the button you can create a weekly programme.\nIt is created below the instance. It can then be set to your own needs."
+            "label": "Switching the floodlight on or off ..."
         },
         {
-            "type": "Button",
-            "caption": "Add Schedule",
-            "onClick": "IPS_RequestAction($id,'create_schedule',$id);"
-        },
-        {
-            "type": "Label",
-            "caption": "Taking a ..."
-        },
-        {
-            "type": "Button",
-            "caption": "Snapshot",
-            "onClick": "IPS_RequestAction($id,'snapshot',$id);",
-            "enabled": false
-        },
-        {
-            "name": "EchoPopup",
-            "type": "PopupAlert",
-            "visible": false,
-            "popup": {
-                "items": [
-                    {
-                        "type": "Label",
-                        "name": "EchoMessage",
-                        "caption": ""
-                    }
-                ]
-            }
-        },
-        {
-            "type": "ExpansionPanel",
-            "caption": "Development and debug information ...",
+            "type": "RowLayout",
             "items": [
                 {
-                    "type": "RowLayout",
-                    "items": [
-                        {
-                            "type": "Button",
-                            "caption": "Liveview",
-                            "onClick": "IPS_RequestAction($id,'liveview',$id);",
-                            "enabled": true
-                        },
-                        {
-                            "type": "Button",
-                            "caption": "Signals",
-                            "onClick": "IPS_RequestAction($id,'signals',$id);",
-                            "enabled": true
-                        },
-                        {
-                            "type": "Button",
-                            "caption": "Reset",
-                            "onClick": "IPS_RequestAction($id,'reset_command',$id);",
-                            "enabled": true
-                        }
-                    ]
+                    "type": "Button",
+                    "caption": "On",
+                    "onClick": "IPS_RequestAction($id,'switch_light',true);",
+                    "enabled": true
+                },
+                {
+                    "type": "Button",
+                    "caption": "Off",
+                    "onClick": "IPS_RequestAction($id,'switch_light',false);",
+                    "enabled": true
                 }
             ]
         },

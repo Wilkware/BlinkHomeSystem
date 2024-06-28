@@ -205,6 +205,12 @@ class BlinkHomeClient extends IPSModule
                         $result = $this->doMotion($token, $region, $account, $params['NetworkID'], $params['DeviceID'], $params['DeviceType'], $params['Detection']);
                     }
                     break;
+                case 'light':
+                    $params = (array) $data['Params'];
+                    if (isset($params['NetworkID']) && isset($params['DeviceID']) && isset($params['TargetID']) && isset($params['Switch'])) {
+                        $result = $this->doLight($token, $region, $account, $params['NetworkID'], $params['TargetID'], $params['DeviceID'], $params['Switch']);
+                    }
+                    break;
                 case 'command':
                     $params = (array) $data['Params'];
                     if (isset($params['NetworkID']) && isset($params['CommandID'])) {

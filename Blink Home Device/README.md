@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.6.20240606-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.7.20240628-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/style.yml?branch=main&label=CheckStyle&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
@@ -78,6 +78,7 @@ Zeitplan                 | Zeitraum in dem Aufnahmen im angeegebenen Intervall e
 Name           | Beschreibung
 -------------- | ------------------
 Anlegen einer Variabel zur Auslösung einer Momentaufnahme der aktuellen Ansicht der Kamera! | Variable für's Webfront zum Auslösen einer Aufnahme
+Erstellen einer Variable zur Anzeige des Ladezustands der Batterie! | Variable für's Webfront zum Anzeigen des Ladezustandes
 
 _Aktionsbereich:_
 
@@ -85,7 +86,8 @@ Aktion              | Beschreibung
 ------------------- | ------------------
 ZEITPLAN HINZUFÜGEN | Es wird ein Wochenplan mit 2 Zuständen (Aktiv & Inaktiv) angelegt und in den Einstellung hinterlegt.
 SNAPSHOT            | Löst eine Momentaufnahme(Snapshot) aus.
-LIVEVIEW            | Entwicklungs- und Debuginformationen ...
+LIVEVIEW            | Anzeige der LiveView Anfrageantwort
+SIGNALE             | Anzeige von verschiedenen Signalen (WiFi usw.)
 ZURÜCKSETZEN        | Reset des Kommando-Stacks um Kommunikation wieder zu synchronisieren.
 
 ### 5. Statusvariablen und Profile
@@ -108,6 +110,7 @@ Folgendes Profil wird angelegt:
 Name           | Typ       | Beschreibung
 -------------- | --------- | ----------------
 BHS.Update     | Integer   | Auslöser Profil (1: '►')
+BHS.Battery    | Integer   | Batterieladezustandsanzeige (0 ... 3)
 
 ### 6. WebFront
 
@@ -118,6 +121,13 @@ Man kann die Statusvariablen direkt im WF verlinken.
 Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 
 ### 8. Versionshistorie
+
+v1.7.20240628
+
+* _NEU_: Support für Blink Mini 2
+* _NEU_: Support für Anzeige des Ladezustandes von batteriebetriebenen Geräten
+* _NEU_: Neue Entwickleroption (Signale) um einige Sensordaten anzuzeigen
+* _FIX_: Anzeige-Popup ausgetauscht für fehlerfreie Auflistung
 
 v1.6.20240606
 

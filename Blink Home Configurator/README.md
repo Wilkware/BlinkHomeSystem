@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.6.20240606-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.7.20240628-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/style.yml?branch=main&label=CheckStyle&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
@@ -73,6 +73,13 @@ Es ist keine weitere Steuerung oder gesonderte Darstellung integriert.
 Das Modul bietet keine direkten Funktionsaufrufe.
 
 ### 8. Versionshistorie
+
+v1.7.20240628
+
+* _NEU_: Support für Mini 2 Kamera
+* _NEU_: Support für Fllodlight Mount (Zubehör)
+* _NEU_: Stromversorgungsart und Batterieladezustand hinzugefügt bzw. getrennt
+* _FIX_: Fehler in Übersetzungen berichtigt
 
 v1.6.20240606
 

@@ -464,7 +464,8 @@ class BlinkHomeSyncModule extends IPSModule
             if (isset($params['network'])) {
                 // Print
                 if ($value) {
-                    echo $this->PrettyPrint(self::BLINK_MAP_NETWORK, $params['network']);
+                    // Echo message
+                    $this->EchoMessage($this->PrettyPrint(self::BLINK_MAP_NETWORK, $params['network']));
                 } else {
                     $armed = $this->GetValue('recording');
                     // only if different
@@ -502,8 +503,8 @@ class BlinkHomeSyncModule extends IPSModule
             if (isset($params['sync_modules'])) {
                 foreach ($params['sync_modules'] as $param) {
                     if ($param['id'] == $device) {
-                        echo $this->PrettyPrint(self::BLINK_MAP_SYNCMODUL, $param);
-                        // Prepeare Info
+                        // Echo message
+                        $this->EchoMessage($this->PrettyPrint(self::BLINK_MAP_SYNCMODUL, $param));
                         break;
                     }
                 }
@@ -532,7 +533,8 @@ class BlinkHomeSyncModule extends IPSModule
         $response = $this->RequestDataFromParent('local_storage_status', $param);
         $this->SendDebug(__FUNCTION__, $response);
         if ($response !== false) {
-            echo $this->PrettyPrint(self::BLINK_MAP_STORAGE, $response);
+            // Echo message
+            $this->EchoMessage($this->PrettyPrint(self::BLINK_MAP_STORAGE, $response));
         } else {
             if ($value) {
                 echo $this->Translate('Call was not successfull!');
@@ -718,5 +720,16 @@ class BlinkHomeSyncModule extends IPSModule
             'Endpoint'    => $endpoint,
             'Params'      => $params,
         ]));
+    }
+
+    /**
+     * Show message via popup
+     *
+     * @param string $caption echo message
+     */
+    private function EchoMessage(string $caption)
+    {
+        $this->UpdateFormField('EchoMessage', 'caption', $this->Translate($caption));
+        $this->UpdateFormField('EchoPopup', 'visible', true);
     }
 }
