@@ -92,7 +92,7 @@ class BlinkHomeAccessory extends IPSModule
 
     /**
      * Enable or disable light
-     * 
+     *
      * @param bool $value true for switch on, otherwise off..
      */
     private function SwitchLight(bool $value)
