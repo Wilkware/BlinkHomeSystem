@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.6.20240606-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.8.20241024-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/style.yml?branch=main&label=CheckStyle&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
@@ -15,7 +15,7 @@ IP-Symcon Modul für die Steuerung aller aktiven Kameras im gleichen Netzwerk.
 3. [Installation](#user-content-3-installation)
 4. [Einrichten der Instanzen in IP-Symcon](#user-content-4-einrichten-der-instanzen-in-ip-symcon)
 5. [Statusvariablen und Profile](#user-content-5-statusvariablen-und-profile)
-6. [WebFront](#user-content-6-webfront)
+6. [Visualisierung](#user-content-6-visualisierung)
 7. [PHP-Befehlsreferenz](#user-content-7-php-befehlsreferenz)
 8. [Versionshistorie](#user-content-8-versionshistorie)
 
@@ -96,7 +96,7 @@ Name           | Typ       | Beschreibung
 -------------- | --------- | ----------------
 BHS.Download   | Integer   | Download Profil (1: '►')
 
-### 6. WebFront
+### 6. Visualisierung
 
 Man kann die Statusvariablen direkt im WF verlinken.
 
@@ -119,6 +119,10 @@ Schaltet alle im Netwerk befindlichen Kameras unscharf.
 __Beispiel__: `BHS_Disarm(12345);`
 
 ### 8. Versionshistorie
+
+v1.8.20241024
+
+* _FIX_: Umstellung der internen Verarbeitung von _utf8_encode_ auf _bin2hex_
 
 v1.6.20240606
 

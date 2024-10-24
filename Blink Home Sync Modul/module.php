@@ -367,7 +367,8 @@ class BlinkHomeSyncModule extends IPSModule
                     if (array_search($clip['id'], $medias) != 0) continue; // still saved
                     $param['ClipID'] = $clip['id'];
                     // Request
-                    $response = utf8_decode($this->RequestDataFromParent('clip', $param));
+                    //FIXME: $response = utf8_decode($this->RequestDataFromParent('clip', $param));
+                    $response = hex2bin($this->RequestDataFromParent('clip', $param));
                     $this->SaveMediaWithAttributes($store, $limit, $cache, $medias, $clip, $response);
                     IPS_Sleep(1000);
                 }
@@ -424,7 +425,8 @@ class BlinkHomeSyncModule extends IPSModule
                     if (array_search($video['id'], $medias) != 0) continue; // still saved
                     $param['MediaID'] = $video['media'];
                     // Request
-                    $response = utf8_decode($this->RequestDataFromParent('video', $param));
+                    //$response = utf8_decode($this->RequestDataFromParent('video', $param));
+                    $response = hex2bin($this->RequestDataFromParent('video', $param));
                     $this->SaveMediaWithAttributes($store, $limit, $cache, $medias, $video, $response);
                     IPS_Sleep(1000);
                 }

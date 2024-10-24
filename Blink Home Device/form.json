@@ -238,23 +238,27 @@
                             "suffix": "minutes",
                             "minimum": 0,
                             "maximum": 1440,
-                            "width": "450px"
+                            "width": "221px"
                         }
                     ]
+                },
+                {
+                    "type": "SelectEvent",
+                    "name": "ImageSchedule",
+                    "caption": "Schedule:",
+                    "width": "450px"
                 },
                 {
                     "type": "RowLayout",
                     "items": [
                         {
-                            "type": "SelectEvent",
-                            "name": "ImageSchedule",
-                            "caption": "Schedule:",
-                            "width": "450px"
+                            "type": "Button",
+                            "caption": "Add Schedule",
+                            "onClick": "IPS_RequestAction($id,'create_schedule',$id);"
                         },
                         {
                             "type": "Label",
-                            "name": "LabelSchedule",
-                            "caption": "The schedule for updating the snapshots can be created via the button below!"
+                            "caption": "With the help of the button you can create a weekly programme.\nIt is created below the instance. It can then be set to your own needs."
                         }
                     ]
                 }
@@ -274,6 +278,22 @@
                     "name": "UpdateBattery",
                     "caption": "Create a variable to display the battery charge level!",
                     "visible": false
+                },
+                {
+                    "type": "RowLayout",
+                    "items": [
+                        {
+                            "type": "CheckBox",
+                            "name": "ResetCommand",
+                            "caption": "Automatic reset of the command stack!"
+                        },
+                        {
+                            "type": "Label",
+                            "caption": "WARNING: Activation can lead to functional errors under certain circumstances!",
+                            "italic": true,
+                            "color": 16711680
+                        }
+                    ]
                 }
             ]
         }
@@ -281,22 +301,24 @@
     "actions": [
         {
             "type": "Label",
-            "caption": "With the help of the button you can create a weekly programme.\nIt is created below the instance. It can then be set to your own needs."
-        },
-        {
-            "type": "Button",
-            "caption": "Add Schedule",
-            "onClick": "IPS_RequestAction($id,'create_schedule',$id);"
-        },
-        {
-            "type": "Label",
             "caption": "Taking a ..."
         },
         {
-            "type": "Button",
-            "caption": "Snapshot",
-            "onClick": "IPS_RequestAction($id,'snapshot',$id);",
-            "enabled": false
+            "type": "RowLayout",
+            "items": [
+                {
+                    "type": "Button",
+                    "caption": "Snapshot",
+                    "onClick": "IPS_RequestAction($id,'snapshot',$id);",
+                    "enabled": false
+                },
+                {
+                    "type": "Button",
+                    "caption": "Record",
+                    "onClick": "IPS_RequestAction($id,'record',$id);",
+                    "enabled": true
+                }
+            ]
         },
         {
             "name": "EchoPopup",

@@ -61,7 +61,7 @@ class BlinkHomeClient extends IPSModule
         // Password
         $this->RegisterPropertyString('AccountPassword', '');
         // Heartbeat
-        $this->RegisterPropertyInteger('HeartbeatInterval', 24);
+        $this->RegisterPropertyInteger('HeartbeatInterval', 12);
         // Heartbeat Timer
         $this->RegisterTimer('TimerHeartbeat', 0, 'IPS_RequestAction(' . $this->InstanceID . ', "heartbeat", "");');
     }
@@ -113,8 +113,8 @@ class BlinkHomeClient extends IPSModule
         parent::ApplyChanges();
 
         $heartbeat = $this->ReadPropertyInteger('HeartbeatInterval');
-        // Timer ?
-        $this->SetTimerInterval('TimerHeartbeat', 60 * 1000 * $heartbeat);
+        // Timer (60min * 60sec * 1000ms)?
+        $this->SetTimerInterval('TimerHeartbeat', 60 * 60 * 1000 * $heartbeat);
     }
 
     /**
@@ -193,6 +193,12 @@ class BlinkHomeClient extends IPSModule
                         $encode = true;
                     }
                     break;
+                case 'record':
+                    $params = (array) $data['Params'];
+                    if (isset($params['NetworkID']) && isset($params['DeviceID']) && isset($params['DeviceType'])) {
+                        $result = $this->doRecord($token, $region, $account, $params['NetworkID'], $params['DeviceID'], $params['DeviceType']);
+                    }
+                    break;
                 case 'thumbnail':
                     $params = (array) $data['Params'];
                     if (isset($params['NetworkID']) && isset($params['DeviceID']) && isset($params['DeviceType'])) {
@@ -261,7 +267,8 @@ class BlinkHomeClient extends IPSModule
         }
         // binary data
         if ($encode == true) {
-            $result = utf8_encode($result);
+            $result = bin2hex($result);
+            //$result = utf8_encode($result);
         }
         // Return
         return $result;

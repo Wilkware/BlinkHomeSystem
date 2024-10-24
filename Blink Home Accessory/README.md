@@ -15,7 +15,7 @@ Mit diesem Modul können Sie spezifische Funktionen des Zubehörs nutzen und ste
 3. [Installation](#user-content-3-installation)
 4. [Einrichten der Instanzen in IP-Symcon](#user-content-4-einrichten-der-instanzen-in-ip-symcon)
 5. [Statusvariablen und Profile](#user-content-5-statusvariablen-und-profile)
-6. [WebFront](#user-content-6-webfront)
+6. [Visualisierung](#user-content-6-visualisierung)
 7. [PHP-Befehlsreferenz](#user-content-7-php-befehlsreferenz)
 8. [Versionshistorie](#user-content-8-versionshistorie)
 
@@ -75,7 +75,7 @@ switch_light        | Lichtschalter      | boolean | ~Switch    | Variable zum a
 
 Es werden keine zusätzlichen Profile benötigt.
 
-### 6. WebFront
+### 6. Visualisierung
 
 Man kann die Statusvariablen direkt im WF verlinken.
 

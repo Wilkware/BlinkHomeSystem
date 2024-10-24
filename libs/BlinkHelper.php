@@ -72,7 +72,6 @@
  *  - Enable Fllodlight: POST /api/v1/accounts/{account_id}/networks/{network_id}/cameras/${camera_id}/accessories/storm/${storm_id}/lights/on
  *  - Disable Fllodlight: POST /api/v1/accounts/{account_id}/networks/{network_id}/cameras/${camera_id}/accessories/storm/${storm_id}/lights/off
  *
- *
  * Videos
  *  - Get Video Events : GET /api/v1/accounts/{account_id}/media/changed?since={timestamp}&page={PageNumber}
  *  - Get Video : GET /api/v2/accounts/{account_id}/media/clip/{mp4_Filename}
@@ -100,148 +99,16 @@ trait BlinkHelper
     private static $BLINK_SUCCESS = 1;
     private static $BLINK_WEAKNESS = 2;
     // App constants
-    // private static $UNIQUE_UID = '056952C3-95C6-3B98-E400-D597B6141F74';
-    private static $APP_VERSION = '32.2';             //  '6.30.2 (2310051512)'
-    private static $APP_BUILD = 'IOS_22406121957';
+    private static $APP_VERSION = '36.0';               // Version
+    private static $APP_BUILD = 'IOS_2409051436';       // Build-Nummer
     private static $CLIENT_NAME = 'IPSymconBlinkModul';
     private static $CLIENT_TYPE = 'ios';                // "android"
     private static $DEVICE_ID = 'IP-Symcon Modul';
     // User Agernt
     private static $USER_AGENT = 'Blink/2210311418 CFNetwork/1399 Darwin/22.1.0';
-    //'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36';
     // Request constants
-    private static $REQUEST_WAIT = 1000; // 1 Second
-    private static $REQUEST_RETRY = 5; // 5 trys by default
-
-    /**
-     * Client Login to Blink Account on Blink Servers
-     *
-     * POST /api/v5/account/login
-     *
-     * Headers
-     *      content-type - application/json
-     *
-     * Body
-     *      email - Account userid/email
-     *      password - Account password
-     *      unique_id - (optional) UUID generated and identifying the client.
-     */
-    private function doLogin($email, $password, $uuid)
-    {
-        // prepeare url
-        $url = 'https://rest-prod.immedia-semi.com/api/v5/account/login';
-        // prepeare header
-        $headers = [
-            'content-type: application/json',
-        ];
-        // prepeare body (Login v5)
-        $body = [
-            // 'app-build'         => self::$APP_BUILD,
-            // 'app_version'       => self::$APP_VERSION,
-            'client_name'       => self::$CLIENT_NAME,
-            'client_type'       => self::$CLIENT_TYPE,
-            'device_identifier' => self::$DEVICE_ID,
-            'reauth'            => 'true',
-            'unique_id'         => $uuid,
-            'password'          => $password,
-            'email'             => $email,
-        ];
-        $request = json_encode($body);
-        // return request
-        return $this->doRequest($url, $headers, $request);
-    }
-
-    /**
-     * Verify client with PIN provided in an email or sms.
-     * *
-     * POST /api/v4/account/{account_id}/client/{client_id}/pin/verify
-     *
-     * Headers
-     *      content-type - application/json
-     *      token-auth - session auth token
-     *
-     * Parameters
-     *      account_id - Account ID
-     *      client_id - Client ID
-     *
-     * Body
-     *      pin - PIN provided in email
-     */
-    private function doVerify(string $token, string $code, string $region, string $account, string $client)
-    {
-        // prepeare url
-        $url = "https://rest-$region.immedia-semi.com/api/v4/account/$account/client/$client/pin/verify";
-        // prepeare header
-        $headers = [
-            'content-type: application/json',
-            'token-auth: ' . $token,
-        ];
-        // prepeare body (Login v5)
-        $body = [
-            'pin' => $code,
-        ];
-        $request = json_encode($body);
-        // return request
-        return $this->doRequest($url, $headers, $request);
-    }
-
-    /**
-     * Client Logout Blink Account on Blink Servers
-     *
-     * POST /api/v4/account/{account_id}/client/{client_id}/logout
-     *
-     * Headers
-     *      content-type - application/json
-     *      token-auth - session auth token
-     *
-     * Parameters
-     *      account_id - Account ID
-     *      client_id - Client ID
-     */
-    private function doLogout(string $token, string $region, string $account, string $client)
-    {
-        // prepeare url
-        $url = "https://rest-$region.immedia-semi.com/api/v4/account/$account/client/$client/logout";
-        // prepeare header
-        $headers = [
-            'content-type: application/json',
-            'token-auth: ' . $token,
-        ];
-        // return request
-        return $this->doRequest($url, $headers, null, 'POST');
-    }
-
-    /**
-     * Get Account Nofification Flags
-     *
-     * GET/POST /api/v1/accounts/{account_id}/notifications/configuration
-     *
-     * Headers
-     *      content-type - application/json
-     *      token-auth - session auth token
-     *
-     * Response
-     *      Flag status for various notifications, see example
-     */
-    private function doNotification(string $token, string $region, string $account)
-    {
-        // prepeare url
-        $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/notifications/configuration";
-        // prepeare header
-        $headers = [
-            'content-type: application/json',
-            'token-auth: ' . $token,
-        ];
-        // body
-        $body = [
-            'notifications' => [
-                'camera_usage' => true,
-            ],
-        ];
-        $request = json_encode($body);
-        // return request
-        return $this->doRequest($url, $headers, null);
-    }
+    private static $REQUEST_WAIT = 1000;                // 1 Second
+    private static $REQUEST_RETRY = 5;                  // 5 trys by default
 
     /**
      * Arm the given network - that is, start recording/reporting motion events for enabled cameras.
@@ -253,8 +120,8 @@ trait BlinkHelper
      *      token-auth - session auth token
      *
      * Response
-     *  A command object.
-     *
+     *      A command object. This call is asynchronous and is monitored by the Command Status API
+     *      call using the returned Command Id.
      */
     private function doArm(string $token, string $region, string $account, string $network)
     {
@@ -266,397 +133,7 @@ trait BlinkHelper
             'token-auth: ' . $token,
         ];
         // return request
-        return $this->doRequest($url, $headers, null, 'POST');
-    }
-
-    /**
-     * Disarm the given network - that is, stop recording/reporting motion events for enabled cameras.
-     *
-     * POST /api/v1/accounts/{account_id}/networks/{network_id}/state/arm
-     *
-     * Headers
-     *      content-type - application/json
-     *      token-auth - session auth token
-     *
-     * Response
-     *  A command object.
-     *
-     */
-    private function doDisarm(string $token, string $region, string $account, string $network)
-    {
-        // prepeare url
-        $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/state/disarm";
-        // prepeare header
-        $headers = [
-            'content-type: application/json',
-            'token-auth: ' . $token,
-        ];
-        // return request
-        return $this->doRequest($url, $headers, null, 'POST');
-    }
-
-    /**
-     * Request the local storage state of a sync modul.
-     *
-     * GET  /api/v1/accounts/{account}/networks/{network}/sync_modules/{sync_module_id}/local_storage/status")
-     *
-     * Headers
-     *      content-type - application/json
-     *      token-auth - session auth token
-     *
-     * Response
-     *  A command object.
-     *
-     */
-    private function doLocalStorageStatus(string $token, string $region, string $account, string $network, string $device)
-    {
-        // prepeare url
-        $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/sync_modules/$device/local_storage/status";
-        // prepeare header
-        $headers = [
-            'content-type: application/json',
-            'token-auth: ' . $token,
-        ];
-        // return request
-        return $this->doRequest($url, $headers, null);
-    }
-
-    /**
-     * Retrieve Client "home screen" data. Returns detailed information about the Account including Network, Synch Module, and Camera Info.
-     *
-     * GET /api/v3/accounts/{account_id}/homescreen
-     *
-     * Headers
-     *      content-type - application/json
-     *      token-auth - session auth token
-     *
-     * Parameters
-     *      account_id - Account ID
-     *
-     */
-    private function doHomeScreen(string $token, string $region, string $account)
-    {
-        // prepeare url
-        $url = "https://rest-$region.immedia-semi.com/api/v3/accounts/$account/homescreen";
-        // prepeare header
-        $headers = [
-            'content-type: application/json',
-            'token-auth: ' . $token,
-        ];
-        // return request
-        return $this->doRequest($url, $headers, null);
-    }
-
-    /**
-     * Get network info for sync-less module.
-     *
-     * GET /network/{network_id}
-     *
-     * Headers
-     *      content-type - application/json
-     *      token-auth - session auth token
-     *
-     * Parameters
-     *      account_id - Account ID
-     *
-     */
-    private function doNetwork(string $token, string $region, string $network)
-    {
-        // prepeare url
-        $url = "https://rest-$region.immedia-semi.com/network/$network";
-        // prepeare header
-        $headers = [
-            'content-type: application/json',
-            'token-auth: ' . $token,
-        ];
-        // return request
-        return $this->doRequest($url, $headers, null);
-    }
-
-    /**
-     * Retrieve the JPEG thumbnail picture of the given camera. The URL path is specified in the thumbnail attribute of the camera,
-     * for example from the HomeScreen call. Add the .jpg extension to the URL path.
-     *
-     * GET /media/production/account/{account_id}/network/{network_id}/camera/{camera_id}/{clip_file_name}.jpg
-     *
-     * Headers
-     *      content-type: image/jpeg
-     *      token-auth - session auth token
-     *
-     * Response
-     *      JPEG formated image
-     */
-    private function doImage(string $token, string $region, string $path)
-    {
-        // prepeare url
-        $url = "https://rest-$region.immedia-semi.com" . $path;
-        if (strpos($url, '.jpg') == false) {
-            $url = $url . '.jpg';
-        }
-        // prepeare header
-        $headers = [
-            'content-type: image/jpeg',
-            'token-auth: ' . $token,
-        ];
-        // return request
-        return $this->doRequest($url, $headers, null);
-    }
-
-    /**
-     * Set the thumbail by taking a snapshot of the current view of the camera.
-     *
-     * POST /network/{network_id}/camera/{camera_id}/thumbnail
-     *
-     * Headers
-     *      content-type - application/json
-     *      token-auth - session auth token
-     *
-     * Response
-     *      A command object.  This call is asynchronous and is monitored by the Command Status API call using the returned Command Id.
-     *
-     */
-    private function doThumbnail(string $token, string $region, string $account, string $network, string $device, string $type)
-    {
-        // prepeare url
-        if ($type == 'owls') {
-            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/owls/$device/thumbnail";
-        } elseif ($type == 'doorbells') {
-            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/doorbells/$device/thumbnail";
-        } else {
-            $url = "https://rest-$region.immedia-semi.com/network/$network/camera/$device/thumbnail";
-        }
-
-        // prepeare header
-        $headers = [
-            'content-type: application/json',
-            'token-auth: ' . $token,
-        ];
-        // return request
-        return $this->doRequest($url, $headers, null, 'POST');
-    }
-
-    /**
-     * Enable/Disable floodlight for the given accessorie.
-     *
-     * POST /api/v1/accounts/{account_id}/networks/{network_id}/cameras/${camera_id}/accessories/storm/${storm_id}/lights/on
-     * POST /api/v1/accounts/{account_id}/networks/{network_id}/cameras/${camera_id}/accessories/storm/${storm_id}/lights/off
-     *
-     * Headers
-     *      content-type - application/json
-     *      token-auth - session auth token
-     *
-     * Response
-     *      A command object. This call is asynchronous and is monitored by the Command Status API call using the returned Command Id.
-     */
-    private function doLight(string $token, string $region, string $account, string $network, string $device, string $storm, bool $switch)
-    {
-        // prepeare request
-        $request = null;
-        // transform value
-        $state = $switch ? 'on' : 'off';
-        // prepeare url
-        $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/cameras/$device/accessories/storm/$storm/lights/$state";
-        // prepeare header
-        $headers = [
-            'content-type: application/json',
-            'token-auth: ' . $token,
-        ];
-        // return request
-        return $this->doRequest($url, $headers, $request, 'POST');
-    }
-
-    /**
-     * Enable/Disable motion detection for the given Camera.
-     * Note: No motion detection or video recording will take place unless the system is armed.
-     *
-     * POST /network/{network_id}/camera/{camera_id}/enable
-     * POST /network/{network_id}/camera/{camera_id}/disable
-     *
-     * Headers
-     *      content-type - application/json
-     *      token-auth - session auth token
-     *
-     * Response
-     *      A command object. This call is asynchronous and is monitored by the Command Status API call using the returned Command Id.
-     */
-    private function doMotion(string $token, string $region, string $account, string $network, string $device, string $type, bool $detection)
-    {
-        // prepeare request
-        $request = null;
-        // transform value
-        $state = $detection ? 'enable' : 'disable';
-        // prepeare url
-        if ($type == 'owls') {
-            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/owls/$device/config";
-            $body = [
-                'enabled' => $detection,
-            ];
-            $request = json_encode($body);
-        } elseif ($type == 'doorbells') {
-            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/doorbells/$device/$state";
-        } else {
-            $url = "https://rest-$region.immedia-semi.com/network/$network/camera/$device/$state";
-        }
-        // prepeare header
-        $headers = [
-            'content-type: application/json',
-            'token-auth: ' . $token,
-            //            'user-agent: ' . self::$USER_AGENT,
-        ];
-        // return request
-        return $this->doRequest($url, $headers, $request, 'POST');
-    }
-
-    /**
-     * Return the status of the given command.
-     *
-     * GET /network/{network_id}/command/{command_id}
-     *
-     * Headers
-     *      content-type - application/json
-     *      token-auth - session auth token
-     *
-     * Response
-     *      An array of program objects
-     */
-    private function doCommand(string $token, string $region, string $network, string $command)
-    {
-        // prepeare url
-        $url = "https://rest-$region.immedia-semi.com/network/$network/command/$command";
-        // prepeare header
-        $headers = [
-            'content-type: application/json',
-            'token-auth: ' . $token,
-        ];
-        // return request
-        return $this->doRequest($url, $headers, null);
-    }
-
-    /**
-     * Ask for a live video stream of the given camera
-     *
-     * POST /api/v5/accounts/{account_id}/networks/{network_id}/cameras/{camera_id}/liveview
-     *
-     * Headers
-     *      content-type - application/json
-     *      token-auth - session auth token
-     *
-     * Response
-     *      An array of program objects
-     */
-    private function doLive(string $token, string $region, string $account, string $network, string $device, string $type)
-    {
-        // prepeare url
-        if ($type == 'owls') {
-            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/owls/$device/liveview";
-        } elseif ($type == 'doorbells') {
-            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/doorbells/$device/liveview";
-        } else {
-            $url = "https://rest-$region.immedia-semi.com/api/v5/accounts/$account/networks/$network/cameras/$device/liveview";
-        }
-        // prepeare header
-        $headers = [
-            'content-type: application/json',
-            'token-auth: ' . $token,
-        ];
-        // prepeare body (v5)
-        $body = [
-            'intent: liveview',
-            'motion_event_start_time: ',
-        ];
-        $request = json_encode($body);
-        // return request
-        return $this->doRequest($url, $headers, $request);
-    }
-
-    /**
-     * Ask for a live video stream of the given camera
-     *
-     * GET /api/v1/accounts/{account_id}/media/changed?since={timestamp}&page={PageNumber}
-     *
-     * Headers
-     *      content-type - application/json
-     *      token-auth - session auth token
-     *
-     * Parameters
-     *      since - a timestamp to return events since. e.g. 2020-08-03T16:50:24+0000.
-     *              The official mobile client seems to use the epoch to return all available events - i.e. 1970-01-01T00:00:00+0000
-     *      page - page number for multiple pages of results.
-     *
-     * Response
-     *      An array of media event objects
-     */
-    private function doEvents(string $token, string $region, string $account, int $timestamp = 0, int $page = 1)
-    {
-        //format timestamp
-        $ts = date('c', $timestamp);
-        // prepeare url
-        $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/media/changed?since=$ts&page=$page";
-
-        // prepeare header
-        $headers = [
-            'content-type: application/json',
-            'token-auth: ' . $token,
-        ];
-        // return request
-        return $this->doRequest($url, $headers, null);
-    }
-
-    /**
-     * Ask for local storage manifest, which lists all stored clips.
-     *
-     * POST /api/v1/accounts/{account_id}/networks/{network_id}/sync_modules/{sync_modul_id}/local_storage/manifest/request
-     *
-     * Headers
-     *      content-type - application/json
-     *      token-auth - session auth token
-     *
-     * Response
-     *      An array with the request manfest id
-     *
-     * GET /api/v1/accounts/{account}/networks/{network}/sync_modules/{sync_modul}/local_storage/manifest/request/{manifest_request_id}
-     *
-     * Headers
-     *      content-type - application/json
-     *      token-auth - session auth token
-     *
-     * Response
-     *      An array with the manfest id and clip id's
-     */
-    private function doManifest(string $token, string $region, string $account, string $network, string $device)
-    {
-        // prepeare url
-        $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/sync_modules/$device/local_storage/manifest/request";
-
-        // prepeare header
-        $headers = [
-            'content-type: application/json',
-            'token-auth: ' . $token,
-        ];
-
-        $retry = self::$REQUEST_RETRY;
-        while ($retry--) {
-            // read request
-            $response = $this->doRequest($url, $headers, null, 'POST');
-            if ($response == false) {
-                return $response;
-            }
-            // check result
-            $params = json_decode($response, true);
-            $this->SendDebug(__FUNCTION__, $params);
-            if (isset($params['id'])) {
-                $id = $params['id'];
-                // wait a little bit
-                IPS_Sleep(self::$REQUEST_WAIT);
-                // prepeare url
-                $url = $url . "/$id";
-                // return request
-                return $this->doRequest($url, $headers, null);
-            }
-            // wait a little bit
-            IPS_Sleep(self::$REQUEST_WAIT);
-        }
-        return false;
+        return $this->SendRequest($url, $headers, null, 'POST');
     }
 
     /**
@@ -694,7 +171,7 @@ trait BlinkHelper
         $retry = self::$REQUEST_RETRY;
         while ($retry--) {
             // read request
-            $response = $this->doRequest($url, $headers, null, 'POST');
+            $response = $this->SendRequest($url, $headers, null, 'POST');
             if ($response == false) {
                 return $response;
             }
@@ -705,12 +182,563 @@ trait BlinkHelper
                 // wait a little bit
                 IPS_Sleep(self::$REQUEST_WAIT);
                 // return request
-                return $this->doRequest($url, $headers, null);
+                return $this->SendRequest($url, $headers, null);
             }
             // wait a little bit
             IPS_Sleep(self::$REQUEST_WAIT);
         }
         return false;
+    }
+
+    /**
+     * Return the status of the given command.
+     *
+     * GET /network/{network_id}/command/{command_id}
+     *
+     * Headers
+     *      content-type - application/json
+     *      token-auth - session auth token
+     *
+     * Response
+     *      An array of program objects
+     */
+    private function doCommand(string $token, string $region, string $network, string $command)
+    {
+        // prepeare url
+        $url = "https://rest-$region.immedia-semi.com/network/$network/command/$command";
+        // prepeare header
+        $headers = [
+            'content-type: application/json',
+            'token-auth: ' . $token,
+        ];
+        // return request
+        return $this->SendRequest($url, $headers, null);
+    }
+
+    /**
+     * Disarm the given network - that is, stop recording/reporting motion events for enabled cameras.
+     *
+     * POST /api/v1/accounts/{account_id}/networks/{network_id}/state/arm
+     *
+     * Headers
+     *      content-type - application/json
+     *      token-auth - session auth token
+     *
+     * Response
+     *      A command object. This call is asynchronous and is monitored by the Command Status API
+     *      call using the returned Command Id.
+     */
+    private function doDisarm(string $token, string $region, string $account, string $network)
+    {
+        // prepeare url
+        $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/state/disarm";
+        // prepeare header
+        $headers = [
+            'content-type: application/json',
+            'token-auth: ' . $token,
+        ];
+        // return request
+        return $this->SendRequest($url, $headers, null, 'POST');
+    }
+
+    /**
+     * Ask for a live video stream of the given camera
+     *
+     * GET /api/v1/accounts/{account_id}/media/changed?since={timestamp}&page={PageNumber}
+     *
+     * Headers
+     *      content-type - application/json
+     *      token-auth - session auth token
+     *
+     * Parameters
+     *      since - a timestamp to return events since. e.g. 2020-08-03T16:50:24+0000.
+     *              The official mobile client seems to use the epoch to return all available events - i.e. 1970-01-01T00:00:00+0000
+     *      page - page number for multiple pages of results.
+     *
+     * Response
+     *      An array of media event objects
+     */
+    private function doEvents(string $token, string $region, string $account, int $timestamp = 0, int $page = 1)
+    {
+        //format timestamp
+        $ts = date('c', $timestamp);
+        // prepeare url
+        $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/media/changed?since=$ts&page=$page";
+
+        // prepeare header
+        $headers = [
+            'content-type: application/json',
+            'token-auth: ' . $token,
+        ];
+        // return request
+        return $this->SendRequest($url, $headers, null);
+    }
+
+    /**
+     * Retrieve Client "home screen" data. Returns detailed information about the Account including Network, Synch Module, and Camera Info.
+     *
+     * GET /api/v3/accounts/{account_id}/homescreen
+     *
+     * Headers
+     *      content-type - application/json
+     *      token-auth - session auth token
+     *
+     * Response
+     *      A array of account information.
+     */
+    private function doHomeScreen(string $token, string $region, string $account)
+    {
+        // prepeare url
+        $url = "https://rest-$region.immedia-semi.com/api/v3/accounts/$account/homescreen";
+        // prepeare header
+        $headers = [
+            'content-type: application/json',
+            'token-auth: ' . $token,
+        ];
+        // return request
+        return $this->SendRequest($url, $headers, null);
+    }
+
+    /**
+     * Retrieve the JPEG thumbnail picture of the given camera. The URL path is specified in the thumbnail attribute of the camera,
+     * for example from the HomeScreen call. Add the .jpg extension to the URL path.
+     *
+     * GET /media/production/account/{account_id}/network/{network_id}/camera/{camera_id}/{clip_file_name}.jpg
+     *
+     * Headers
+     *      content-type: image/jpeg
+     *      token-auth - session auth token
+     *
+     * Response
+     *      JPEG formated image
+     */
+    private function doImage(string $token, string $region, string $path)
+    {
+        // prepeare url
+        $url = "https://rest-$region.immedia-semi.com" . $path;
+        if (strpos($url, '.jpg') == false) {
+            $url = $url . '.jpg';
+        }
+        // prepeare header
+        $headers = [
+            'content-type: image/jpeg',
+            'token-auth: ' . $token,
+        ];
+        // return request
+        return $this->SendRequest($url, $headers, null);
+    }
+
+    /**
+     * Ask for a live video stream of the given camera
+     *
+     * POST /api/v5/accounts/{account_id}/networks/{network_id}/cameras/{camera_id}/liveview
+     *
+     * Headers
+     *      content-type - application/json
+     *      token-auth - session auth token
+     *
+     * Response
+     *      An array of program objects
+     */
+    private function doLive(string $token, string $region, string $account, string $network, string $device, string $type)
+    {
+        // prepeare url
+        if ($type == 'owls') {
+            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/owls/$device/liveview";
+        } elseif ($type == 'doorbells') {
+            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/doorbells/$device/liveview";
+        } else {
+            $url = "https://rest-$region.immedia-semi.com/api/v5/accounts/$account/networks/$network/cameras/$device/liveview";
+        }
+        // prepeare header
+        $headers = [
+            'content-type: application/json',
+            'token-auth: ' . $token,
+        ];
+        // prepeare body (v5)
+        $body = [
+            'intent: liveview',
+            'motion_event_start_time: ',
+        ];
+        $request = json_encode($body);
+        // return request
+        return $this->SendRequest($url, $headers, $request);
+    }
+    /**
+     * Enable/Disable floodlight for the given accessorie.
+     *
+     * POST /api/v1/accounts/{account_id}/networks/{network_id}/cameras/${camera_id}/accessories/storm/${storm_id}/lights/on
+     * POST /api/v1/accounts/{account_id}/networks/{network_id}/cameras/${camera_id}/accessories/storm/${storm_id}/lights/off
+     *
+     * Headers
+     *      content-type - application/json
+     *      token-auth - session auth token
+     *
+     * Response
+     *      A command object. This call is asynchronous and is monitored by the Command Status API
+     *      call using the returned Command Id.
+     */
+    private function doLight(string $token, string $region, string $account, string $network, string $device, string $storm, bool $switch)
+    {
+        // prepeare request
+        $request = null;
+        // transform value
+        $state = $switch ? 'on' : 'off';
+        // prepeare url
+        $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/cameras/$device/accessories/storm/$storm/lights/$state";
+        // prepeare header
+        $headers = [
+            'content-type: application/json',
+            'token-auth: ' . $token,
+        ];
+        // return request
+        return $this->SendRequest($url, $headers, $request, 'POST');
+    }
+
+    /**
+     * Request the local storage state of a sync modul.
+     *
+     * GET  /api/v1/accounts/{account}/networks/{network}/sync_modules/{sync_module_id}/local_storage/status")
+     *
+     * Headers
+     *      content-type - application/json
+     *      token-auth - session auth token
+     *
+     * Response
+     *      A command object. This call is asynchronous and is monitored by the Command Status API
+     *      call using the returned Command Id.
+     */
+    private function doLocalStorageStatus(string $token, string $region, string $account, string $network, string $device)
+    {
+        // prepeare url
+        $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/sync_modules/$device/local_storage/status";
+        // prepeare header
+        $headers = [
+            'content-type: application/json',
+            'token-auth: ' . $token,
+        ];
+        // return request
+        return $this->SendRequest($url, $headers, null);
+    }
+
+    /**
+     * Client Login to Blink Account on Blink Servers
+     *
+     * POST /api/v5/account/login
+     *
+     * Headers
+     *      content-type - application/json
+     *
+     * Body
+     *      email - Account userid/email
+     *      password - Account password
+     *      unique_id - (optional) UUID generated and identifying the client.
+     */
+    private function doLogin($email, $password, $uuid)
+    {
+        // prepeare url
+        $url = 'https://rest-prod.immedia-semi.com/api/v5/account/login';
+        // prepeare header
+        $headers = [
+            'content-type: application/json',
+        ];
+        // prepeare body (Login v5)
+        $body = [
+            // 'app-build'         => self::$APP_BUILD,
+            // 'app_version'       => self::$APP_VERSION,
+            'client_name'       => self::$CLIENT_NAME,
+            'client_type'       => self::$CLIENT_TYPE,
+            'device_identifier' => self::$DEVICE_ID,
+            'reauth'            => 'true',
+            'unique_id'         => $uuid,
+            'password'          => $password,
+            'email'             => $email,
+        ];
+        $request = json_encode($body);
+        // return request
+        return $this->SendRequest($url, $headers, $request);
+    }
+
+    /**
+     * Client Logout Blink Account on Blink Servers
+     *
+     * POST /api/v4/account/{account_id}/client/{client_id}/logout
+     *
+     * Headers
+     *      content-type - application/json
+     *      token-auth - session auth token
+     *
+     * Response
+     *      A command object. This call is asynchronous and is monitored by the Command Status API
+     *      call using the returned Command Id.
+     */
+    private function doLogout(string $token, string $region, string $account, string $client)
+    {
+        // prepeare url
+        $url = "https://rest-$region.immedia-semi.com/api/v4/account/$account/client/$client/logout";
+        // prepeare header
+        $headers = [
+            'content-type: application/json',
+            'token-auth: ' . $token,
+        ];
+        // return request
+        return $this->SendRequest($url, $headers, null, 'POST');
+    }
+
+    /**
+     * Ask for local storage manifest, which lists all stored clips.
+     *
+     * POST /api/v1/accounts/{account_id}/networks/{network_id}/sync_modules/{sync_modul_id}/local_storage/manifest/request
+     *
+     * Headers
+     *      content-type - application/json
+     *      token-auth - session auth token
+     *
+     * Response
+     *      An array with the request manfest id
+     *
+     * GET /api/v1/accounts/{account}/networks/{network}/sync_modules/{sync_modul}/local_storage/manifest/request/{manifest_request_id}
+     *
+     * Headers
+     *      content-type - application/json
+     *      token-auth - session auth token
+     *
+     * Response
+     *      An array with the manfest id and clip id's
+     */
+    private function doManifest(string $token, string $region, string $account, string $network, string $device)
+    {
+        // prepeare url
+        $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/sync_modules/$device/local_storage/manifest/request";
+
+        // prepeare header
+        $headers = [
+            'content-type: application/json',
+            'token-auth: ' . $token,
+        ];
+
+        $retry = self::$REQUEST_RETRY;
+        while ($retry--) {
+            // read request
+            $response = $this->SendRequest($url, $headers, null, 'POST');
+            if ($response == false) {
+                return $response;
+            }
+            // check result
+            $params = json_decode($response, true);
+            $this->SendDebug(__FUNCTION__, $params);
+            if (isset($params['id'])) {
+                $id = $params['id'];
+                // wait a little bit
+                IPS_Sleep(self::$REQUEST_WAIT);
+                // prepeare url
+                $url = $url . "/$id";
+                // return request
+                return $this->SendRequest($url, $headers, null);
+            }
+            // wait a little bit
+            IPS_Sleep(self::$REQUEST_WAIT);
+        }
+        return false;
+    }
+
+    /**
+     * Enable/Disable motion detection for the given Camera.
+     * Note: No motion detection or video recording will take place unless the system is armed.
+     *
+     * POST /network/{network_id}/camera/{camera_id}/enable
+     * POST /network/{network_id}/camera/{camera_id}/disable
+     *
+     * Headers
+     *      content-type - application/json
+     *      token-auth - session auth token
+     *
+     * Response
+     *      A command object. This call is asynchronous and is monitored by the Command Status API
+     *      call using the returned Command Id.
+     */
+    private function doMotion(string $token, string $region, string $account, string $network, string $device, string $type, bool $detection)
+    {
+        // prepeare request
+        $request = null;
+        // transform value
+        $state = $detection ? 'enable' : 'disable';
+        // prepeare url
+        if ($type == 'owls') {
+            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/owls/$device/config";
+            $body = [
+                'enabled' => $detection,
+            ];
+            $request = json_encode($body);
+        } elseif ($type == 'doorbells') {
+            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/doorbells/$device/$state";
+        } else {
+            $url = "https://rest-$region.immedia-semi.com/network/$network/camera/$device/$state";
+        }
+        // prepeare header
+        $headers = [
+            'content-type: application/json',
+            'token-auth: ' . $token,
+        ];
+        // return request
+        return $this->SendRequest($url, $headers, $request, 'POST');
+    }
+
+    /**
+     * Get Account Nofification Flags
+     *
+     * GET/POST /api/v1/accounts/{account_id}/notifications/configuration
+     *
+     * Headers
+     *      content-type - application/json
+     *      token-auth - session auth token
+     *
+     * Response
+     *      Flag status for various notifications, see example
+     */
+    private function doNotification(string $token, string $region, string $account)
+    {
+        // prepeare url
+        $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/notifications/configuration";
+        // prepeare header
+        $headers = [
+            'content-type: application/json',
+            'token-auth: ' . $token,
+        ];
+        // body
+        $body = [
+            'notifications' => [
+                'camera_usage' => true,
+            ],
+        ];
+        $request = json_encode($body);
+        // return request
+        return $this->SendRequest($url, $headers, null);
+    }
+
+    /**
+     * Get network info for sync-less module.
+     *
+     * GET /network/{network_id}
+     *
+     * Headers
+     *      content-type - application/json
+     *      token-auth - session auth token
+     *
+     * Response
+     *      A array of network information.
+     */
+    private function doNetwork(string $token, string $region, string $network)
+    {
+        // prepeare url
+        $url = "https://rest-$region.immedia-semi.com/network/$network";
+        // prepeare header
+        $headers = [
+            'content-type: application/json',
+            'token-auth: ' . $token,
+        ];
+        // return request
+        return $this->SendRequest($url, $headers, null);
+    }
+
+    /**
+     * Starts recording a clip..
+     *
+     * POST /network/{network_id}/camera/{camera_id}/clip"
+     * POST /api/v1/accounts/{account_id}/networks({network_id}/owls/{device_id}/clip
+     * POST /api/v1/accounts/{account_id}/networks({network_id}/doorbells/{device_id}/clip
+     *
+     * Headers
+     *      content-type - application/json
+     *      token-auth - session auth token
+     *
+     * Response
+     *      A command object. This call is asynchronous and is monitored by the Command Status API
+     *      call using the returned Command Id.
+     */
+    private function doRecord(string $token, string $region, string $account, string $network, string $device, string $type)
+    {
+        // prepeare url
+        if ($type == 'owls') {
+            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/owls/$device/clip";
+        } elseif ($type == 'doorbells') {
+            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/doorbells/$device/clip";
+        } else {
+            $url = "https://rest-$region.immedia-semi.com/network/$network/camera/$device/clip";
+        }
+
+        // prepeare header
+        $headers = [
+            'content-type: application/json',
+            'token-auth: ' . $token,
+        ];
+        // return request
+        return $this->SendRequest($url, $headers, null, 'POST');
+    }
+
+    /**
+     * Set the thumbail by taking a snapshot of the current view of the camera.
+     *
+     * POST /network/{network_id}/camera/{camera_id}/thumbnail
+     * POST /api/v1/accounts/{account_id}/networks({network_id}/owls/{device_id}/thumbnail
+     * POST /api/v1/accounts/{account_id}/networks({network_id}/doorbells/{device_id}/thumbnail
+     *
+     * Headers
+     *      content-type - application/json
+     *      token-auth - session auth token
+     *
+     * Response
+     *      A command object. This call is asynchronous and is monitored by the Command Status API
+     *      call using the returned Command Id.
+     */
+    private function doThumbnail(string $token, string $region, string $account, string $network, string $device, string $type)
+    {
+        // prepeare url
+        if ($type == 'owls') {
+            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/owls/$device/thumbnail";
+        } elseif ($type == 'doorbells') {
+            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/doorbells/$device/thumbnail";
+        } else {
+            $url = "https://rest-$region.immedia-semi.com/network/$network/camera/$device/thumbnail";
+        }
+
+        // prepeare header
+        $headers = [
+            'content-type: application/json',
+            'token-auth: ' . $token,
+        ];
+        // return request
+        return $this->SendRequest($url, $headers, null, 'POST');
+    }
+
+    /**
+     * Verify client with PIN provided in an email or sms.
+     *
+     * POST /api/v4/account/{account_id}/client/{client_id}/pin/verify
+     *
+     * Headers
+     *      content-type - application/json
+     *      token-auth - session auth token
+     *
+     * Body
+     *      pin - PIN provided in email
+     */
+    private function doVerify(string $token, string $code, string $region, string $account, string $client)
+    {
+        // prepeare url
+        $url = "https://rest-$region.immedia-semi.com/api/v4/account/$account/client/$client/pin/verify";
+        // prepeare header
+        $headers = [
+            'content-type: application/json',
+            'token-auth: ' . $token,
+        ];
+        // prepeare body (Login v5)
+        $body = [
+            'pin' => $code,
+        ];
+        $request = json_encode($body);
+        // return request
+        return $this->SendRequest($url, $headers, $request);
     }
 
     /**
@@ -737,11 +765,11 @@ trait BlinkHelper
         ];
 
         // return request
-        return $this->doRequest($url, $headers, null);
+        return $this->SendRequest($url, $headers, null);
     }
 
     /*
-     * doRequest - Sends the request to the device
+     * SendRequest - Sends the request to the device
      *
      * If $request not null, we will send a POST request, else a GET request.
      * Over the $method parameter can we force a POST or GET request!
@@ -752,7 +780,7 @@ trait BlinkHelper
      * @param string $mehtod 'GET' od 'POST'
      * @return mixed response data or false.
      */
-    private function doRequest(string $url, array $headers, ?string $request, string $method = 'GET')
+    private function SendRequest(string $url, array $headers, ?string $request, string $method = 'GET')
     {
         $this->SendDebug(__FUNCTION__, $url, 0);
         $this->SendDebug(__FUNCTION__, $headers, 0);
