@@ -112,6 +112,8 @@ class BlinkHomeSyncModule extends IPSModule
         $this->RegisterPropertyInteger('DownloadMode', 0);
         // Alerts
         $this->RegisterPropertyBoolean('CheckAlert', false);
+        $this->RegisterPropertyBoolean('CheckMotion', false);
+        $this->RegisterPropertyString('ListMotion', '[{"Value": 10,"Name": "Blink 1"},{"Value": 20,"Name": "Blink 2"},{"Value": 30,"Name": "Blink 3"},{"Value": 40,"Name": "Blink 4"},{"Value": 50,"Name": "Blink 5"},{"Value": 60,"Name": "Blink 6"},{"Value": 70,"Name": "Blink 7"},{"Value": 80,"Name": "Blink 8"},{"Value": 90,"Name": "Blink 9"},{"Value": 100,"Name": "Blink 10"}]');
         $this->RegisterPropertyInteger('AlertScript', 0);
         // Update Timer
         $this->RegisterTimer('TimerSyncUpdate', 0, 'IPS_RequestAction(' . $this->InstanceID . ', "network", false);');
@@ -173,6 +175,19 @@ class BlinkHomeSyncModule extends IPSModule
         if ($alert) {
             $this->EnableAction('alert');
         }
+        $motion = $this->ReadPropertyBoolean('CheckMotion');
+        if ($motion) {
+            $list = json_decode($this->ReadPropertyString('ListMotion'), true);
+            $asso = [];
+            foreach($list as $entry) {
+                $asso[] = [$entry['Value'], $entry['Name'], '', -1];
+            }
+            $this->RegisterProfileInteger('BHS.Cameras', 'Motion', '', '', 1, 100, 1, $asso);
+        }
+        $this->MaintainVariable('last_motion', $this->Translate('Last movement'), VARIABLETYPE_INTEGER, 'BHS.Cameras', 3, $motion);
+        if ($motion) {
+            $this->EnableAction('last_motion');
+        }
 
         // Sync Timer
         $syncUpdate = $this->ReadPropertyInteger('UpdateInterval');
@@ -227,6 +242,9 @@ class BlinkHomeSyncModule extends IPSModule
                 break;
             case 'alert':
                 $this->Alert($value);
+                break;
+            case 'last_motion':
+                $this->LastMotion($value);
                 break;
             default:
                 break;
@@ -303,6 +321,30 @@ class BlinkHomeSyncModule extends IPSModule
             }
         }
         // $this->LogMessage(date('D, d.m.Y H:i:s'), KL_NOTIFY);
+    }
+
+    /**
+     * Alarm was triggered.
+     *
+     * @param int $value Dim value for mapping
+     */
+    private function LastMotion(int $value)
+    {
+        $this->SetValueInteger('last_motion', $value);
+        // Debug
+        $this->SendDebug(__FUNCTION__, 'Last Motion: ' . $value, 0);
+        // Execute script
+        $script = $this->ReadPropertyInteger('AlertScript');
+        if ($value && $script != 0) {
+            if (IPS_ScriptExists($script)) {
+                $id = @$this->GetIDForIdent('last_motion');
+                $ca = GetValueFormatted($id);
+                $rs = IPS_RunScriptEx($script, ['MODUL' => $this->InstanceID, 'MOTION' => $ca, 'TIMESTAMP' => time()]);
+                $this->SendDebug(__FUNCTION__, 'Script #' . $script . ' executed! Return Value: ' . $rs);
+            } else {
+                $this->SendDebug(__FUNCTION__, 'Script #' . $script . ' does not exist!');
+            }
+        }
     }
 
     /**

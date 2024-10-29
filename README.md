@@ -25,6 +25,7 @@ Modul welches ein Zubehör (Flutlich, Halterung) repräsentiert.
 
 ## Historie
 
+- 2024-10-29: v1.9 Alarmeinstellungen um 'Letzte Bewegung' erweitert 
 - 2024-10-24: v1.8 Zeitversatz bei Neustart von IPS, Automatischer Reset Kommando-Stack, Aufnahme eine Clips auslösen
 - 2024-06-28: v1.7 Support für Blink Zubehör (Flutlichthalterung) und Mini 2 Kamera, Anzeige Energieversorgung und Batterielandung
 - 2024-06-06: v1.6 Support von Symcon v7 und neuer Blink Indoor Kamera, 6.4 Kombatibilität, Downloads optimiert, neue Entwicklungsoption

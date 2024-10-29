@@ -208,6 +208,42 @@
                     "italic": true
                 },
                 {
+                    "type": "CheckBox",
+                    "name": "CheckMotion",
+                    "caption": "Create a variable to save the camera with the last detected movement!"
+                },
+                {
+                    "type": "List",
+                    "name": "ListMotion",
+                    "caption": "Camera mapping:",
+                    "add": false,
+                    "delete": false,
+                    "changeOrder": false,
+                    "rowCount": 10,
+                    "columns": [
+                        {
+                            "name": "Value",
+                            "caption": "ID (Dimming level):",
+                            "width": "150px",
+                            "save": true
+                        },
+                        {
+                            "name": "Name",
+                            "caption": "Camera name:",
+                            "width": "auto",
+                            "edit": {
+                                "type": "ValidationTextBox"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "Label",
+                    "name": "LabelMotion",
+                    "caption": "NOTE: Detecting the camera that registered the last movement is done indirectly via a workaround using a dimmer switch. Different dimmer levels are assigned to specific cameras. The assignment of cameras to dimmer values then needs to be configured through a routine in the Alexa app.",
+                    "italic": true
+                },
+                {
                     "type": "SelectScript",
                     "name": "AlertScript",
                     "caption": "Simultaneous execution of a script:",
@@ -314,9 +350,19 @@
                     "caption": "Simulate an incoming alarm message!"
                 },
                 {
-                    "type": "Button",
-                    "caption": "Alert",
-                    "onClick": "IPS_RequestAction($id,'alert', true);"
+                    "type": "RowLayout",
+                    "items": [
+                        {
+                            "type": "Button",
+                            "caption": "Alert",
+                            "onClick": "IPS_RequestAction($id,'alert', true);"
+                        },
+                        {
+                            "type": "Button",
+                            "caption": "Motion",
+                            "onClick": "IPS_RequestAction($id,'last_motion', rand(1,10)*10);"
+                        }
+                    ]
                 }
             ]
         },

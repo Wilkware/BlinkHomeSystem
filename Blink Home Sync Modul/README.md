@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.8.20241024-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
+[![Version](https://img.shields.io/badge/Modul%20Version-1.9.20241029-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/style.yml?branch=main&label=CheckStyle&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
@@ -53,27 +53,52 @@ Gerätemodell   | Modellbezeichnung (Model 1 oder 2)
 Geräte-ID      | Interne Gerätenummer (6-stellig)
 Netwerk-ID     | Interne Netwerknummer (6-stellig)
 
-> Aufzeichnung von Bewegungsereignissen ...
+> Bewegungsereignissen ...
+
+Name                     | Beschreibung
+------------------------ | ------------------
+Variable zum manuellen Aktivieren bzw. Deaktivieren der Bewegungsaufzeichnung erstellen? | Schalter für Aktivieren bzw. Deaktivieren der Bewegungsaufzeichnung für das gesamte Netzwerk
+Zeitplan                 | Zeitplan zum Starten und Stoppen von Aufnahmen
+ZEITPLAN HINZUFÜGEN      | Es wird ein Wochenplan mit 2 Zuständen (Aktiv & Inaktiv) angelegt und in den Einstellung hinterlegt.
+Aktualisierungsintervall | Abfrageintervall des Aktivierungszustandes (0 = AUS)
+
+> Aufzeichnungen ...
 
 Name           | Beschreibung
 -------------- | ------------------
-STARTEN        | Schalter für direktes scharf Stellen der Aufnahme
-STOPPEN        | Schalter zum direkten Stoppen von Aufnahmen
-Zeitplan       | Zeitplan zum Starten und Stoppen von Aufnahmen
+Speicherort    | Kategorie (Ordner) wo die Aufnahmen (Clips) abgelegt werden sollen
+Speicherlimit  | Maximale Anzahl an zu speichernden Aufnahmen (max. letzten 25 Aufnahmen)
+Nur In-Memory-Cache verwenden (keine Speicherung auf Platte)? | Schalter für Speichermodus
+Downloadmodus  | Von welchem Medium sollen die Aufnahmen abgeholt werden (Cloudspeicher, lokaler USB-Speicher oder Beide)
 
-> Erweiterte Einstellungen  ...
+
+> Alarmeinstellungen ...
 
 Name           | Beschreibung
 -------------- | ------------------
-Variable zum Umschalten der Aufzeichnung erstellen? | Schaltvariable für's Webfront
+Anlegen einer Variabel zum Anzeigen einer erfassten Bewegung! | Legt einen Schalter für Alarm (EIN/AUS) an
+Erstelle eine Variable, um die Kamera mit der letzte erkannten Bewegung zu speichern! | Legt ein Variable zum erfassen der Kamera wo die letzte Bewegung staffand an
+Kamerazuordnung | Zuordnung der Kameras zu einer virtuellen ID (Umweg über Dimmwert eines Lichtes)
+Gleichzeitiges Ausführen eines Skriptes | Hinterlegung eines Skriptes das bei Bewegungserkennung aufgerufen wird.
 
 Aktionsbereich:
 
 Aktion              | Beschreibung
 ------------------- | ------------------
-ZEITPLAN HINZUFÜGEN | Es wird ein Wochenplan mit 2 Zuständen (Aktiv & Inaktiv) angelegt und in den Einstellung hinterlegt.
 NETZWERK            | Ausgabe der Netwerkinformationen.
 SYNC MODUL          | Ausgabe der Modulinformationen.
+SPEICHERSTATUS      | Ausgabe der Speicherinformationen.
+
+> Entwicklungs- und Debuginformationen ...
+
+Aktion         | Beschreibung
+-------------- | ------------------
+STARTEN        | Schalter für direktes scharf Stellen der Aufnahme
+STOPPEN        | Schalter zum direkten Stoppen von Aufnahmen
+EVENTS         | Versucht Aufnahmen von der Cloud herunterzuladen (Abo notwendig)
+CLIPS          | Versucht Aufnahmen vom lokalen USB-Medium herunterzuladen (USB Stick am Modul notwendig)
+ALARM          | Simuliert eine eingehende Alarmmeldung
+BEWEGUNG       | Simuliert eine Bewegung mit zufälliger Kamera-ID (zwischen 10 und 100)
 
 ### 5. Statusvariablen und Profile
 
@@ -120,6 +145,11 @@ __Beispiel__: `BHS_Disarm(12345);`
 
 ### 8. Versionshistorie
 
+v1.9.20241029
+
+* _FIX_: Alarmeinstellungen wurden um die Möglichkeit erweitert, die Kamera mit der letzten registrierten Bewegung zu speichern
+* _FIX_: Dokumentation korriegiert und überarbeitet
+
 v1.8.20241024
 
 * _FIX_: Umstellung der internen Verarbeitung von _utf8_encode_ auf _bin2hex_
@@ -153,6 +183,13 @@ v1.1.20220130
 v1.0.20220110
 
 * _NEU_: Initialversion
+
+## Danksagung
+
+Ich möchte mich für die Unterstützung bei der Entwicklung dieses Moduls bedanken bei ...
+
+* _HarmonyFan_ : für die geniale Idee mit den Dimmwerten bei den Alarmeinstellungen und Alexa
+* _richimaint_. _da8ter_, _djtark_ : und viel Andere für das generelle Testen und Melden von Bugs
 
 ## Entwickler
 
