@@ -179,7 +179,7 @@ class BlinkHomeSyncModule extends IPSModule
         if ($motion) {
             $list = json_decode($this->ReadPropertyString('ListMotion'), true);
             $asso = [];
-            foreach($list as $entry) {
+            foreach ($list as $entry) {
                 $asso[] = [$entry['Value'], $entry['Name'], '', -1];
             }
             $this->RegisterProfileInteger('BHS.Cameras', 'Motion', '', '', 1, 100, 1, $asso);
