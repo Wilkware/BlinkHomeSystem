@@ -147,7 +147,7 @@ __Beispiel__: `BHS_Disarm(12345);`
 
 v1.9.20241029
 
-* _FIX_: Alarmeinstellungen wurden um die Möglichkeit erweitert, die Kamera mit der letzten registrierten Bewegung zu speichern
+* _NEU_: Alarmeinstellungen wurden um die Möglichkeit erweitert, die Kamera mit der letzten registrierten Bewegung zu speichern
 * _FIX_: Dokumentation korriegiert und überarbeitet
 
 v1.8.20241024
