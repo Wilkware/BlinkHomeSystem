@@ -1,18 +1,18 @@
-# Blink Home System
+# 🛡️ Blink Home System
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Bibliothek-purple.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
+[![Product](https://img.shields.io/badge/Symcon%20Version-8.1-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
 [![Licence](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 IP-Symcon Modulbibliothek für die Einbindung und Verwaltung des drahtlosen HD-Heimüberwachungs- und Alarmsystem von Blink.
 
 Folgende Module beinhaltet diese Bibliothek:
 
-- __Blink Home Configurator__ ([Dokumentation](Blink%20Home%20Configurator))  
-Konfigurators für alle im Netzwerk befindlichen Bilnk Geräte.
-
 - __Blink Home Client__ ([Dokumentation](Blink%20Home%20Client))  
 Dieses Modul bildet die zentrale Kommunikation mit den Blink Servern ab.
+
+- __Blink Home Configurator__ ([Dokumentation](Blink%20Home%20Configurator))  
+Konfigurators für alle im Netzwerk befindlichen Bilnk Geräte.
 
 - __Blink Home Sync Modul__ ([Dokumentation](Blink%20Home%20Sync%20Modul))  
 Mit diesem Modul können alle aktivierten Kameras im Netzwerk gesteuert werden.
@@ -23,8 +23,9 @@ Modul welches ein Endgerät (Kamera, Türklingel o.Ä.) repräsentiert.
 - __Blink Home Accessory__ ([Dokumentation](Blink%20Home%20Accessory))  
 Modul welches ein Zubehör (Flutlich, Halterung) repräsentiert.
 
-## Historie
+## 📜 Historie
 
+- 2025-10-13: v2.0 Neue Authentifizierung, Support von Outdoor 4, 8.1 Kombatibilität, Visualisierung und Liveview
 - 2024-10-29: v1.9 Alarmeinstellungen um 'Letzte Bewegung' erweitert 
 - 2024-10-24: v1.8 Zeitversatz bei Neustart von IPS, Automatischer Reset Kommando-Stack, Aufnahme eine Clips auslösen
 - 2024-06-28: v1.7 Support für Blink Zubehör (Flutlichthalterung) und Mini 2 Kamera, Anzeige Energieversorgung und Batterielandung
@@ -36,19 +37,19 @@ Modul welches ein Zubehör (Flutlich, Halterung) repräsentiert.
 - 2022-01-30: v1.1 Bugfixing, Blink Mini Support, Aufnahmeaktivierung über Zeitplan, Erweitertes Overlay
 - 2022-01-10: v1.0 Initialversion
 
-## Entwickler
+## 👨‍💻 Entwickler
 
 Seit nunmehr über 10 Jahren fasziniert mich das Thema Haussteuerung. In den letzten Jahren betätige ich mich auch intensiv in der IP-Symcon Community und steuere dort verschiedenste Skript und Module bei. Ihr findet mich dort unter dem Namen @pitti ;-)
 
 [![GitHub](https://img.shields.io/badge/GitHub-@wilkware-181717.svg?style=for-the-badge&logo=github)](https://wilkware.github.io/)
 
-## Spenden
+## 💰 Spenden
 
 Die Software ist für die nicht kommerzielle Nutzung kostenlos, über eine Spende bei Gefallen der Bibliothek würde ich mich freuen.
 
 [![PayPal](https://img.shields.io/badge/PayPal-spenden-00457C.svg?style=for-the-badge&logo=paypal)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8816166)
 
-## Lizenz
+## ©️ Lizenz
 
 Namensnennung - Nicht-kommerziell - Weitergabe unter gleichen Bedingungen 4.0 International
 

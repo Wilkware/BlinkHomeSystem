@@ -6,7 +6,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../libs/_traits.php';
 
 // Blink Home Sync Modul
-class BlinkHomeSyncModule extends IPSModule
+class BlinkHomeSyncModule extends IPSModuleStrict
 {
     // Helper Traits
     use DebugHelper;
@@ -15,82 +15,110 @@ class BlinkHomeSyncModule extends IPSModule
     use ProfileHelper;
     use VariableHelper;
 
-    // Sync state constant
-    private const BLINK_SYNC_TIME = 60;
-    private const BLINK_SYNC_TRIALS = 3;
-    // Schedule constant
+    /**
+     * @var int Max clip size
+     */
+    private const BLINK_SYNC_SIZE = 1000;
+
+    /**
+     * @var int Schedule recording constant OFF
+     */
     private const BLINK_SCHEDULE_RECORDING_OFF = 1;
+
+    /**
+     * @var int Schedule recording constant ON
+     */
     private const BLINK_SCHEDULE_RECORDING_ON = 2;
+
+    /**
+     * @var string Schedule recording constant IDENT
+     */
     private const BLINK_SCHEDULE_RECORDING_IDENT = 'circuit_recording';
+
+    /**
+     * @var array<int,array{0:string,1:int,2:string}> Schedule recording constant ACTION (Switch)
+     */
     private const BLINK_SCHEDULE_RECORDING_SWITCH = [
         self::BLINK_SCHEDULE_RECORDING_OFF => ['Inaktive', 0xFF0000, "IPS_RequestAction(\$_IPS['TARGET'], 'schedule_recording', \$_IPS['ACTION']);"],
         self::BLINK_SCHEDULE_RECORDING_ON  => ['Aktive', 0x00FF00, "IPS_RequestAction(\$_IPS['TARGET'], 'schedule_recording', \$_IPS['ACTION']);"],
     ];
 
-    // Echo maps
+    /**
+     * @var array<int,array{0:string,1:string,2:int,3:?string}> Storage information map
+     */
     private const BLINK_MAP_STORAGE = [
-        ['local_storage_enabled', 'Local save', 5],
-        ['usb_state', 'USB status', 3],
-        ['usb_storage_used', 'USB used', 1],
-        ['usb_storage_full', 'USB full', 0],
-        ['storage_warning', 'Storage warning', 1],
-        ['sm_backup_enabled', 'Backup enabeld', 5],
-        ['last_backup_completed', 'Last backup', 4],
-        ['usb_format_compatible', 'USB format compatible', 0],
-        ['sm_backup_in_progress', 'Backup in progress', 0],
-        ['last_backup_result', 'Last backup result', 3],
-    ];
-    private const BLINK_MAP_NETWORK = [
-        ['name', 'Name', 3],
-        ['description', 'Description', 3],
-        ['network_key', 'Network key', 3],
-        ['network origin', 'Network origin', 3],
-        ['locale', 'Locale', 3],
-        ['time_zone', 'Timezone', 3],
-        ['dst', 'Daylight savings time', 0],
-        ['ping_interval', 'Ping interval', 1],
-        ['armed', 'Armed', 5],
-        ['autoarm_geo_enable', 'Auto arm geo', 5],
-        ['autoarm_time_enable', 'Auto arm time', 5],
-        ['lv_mode', 'Locale save mode', 3],
-        ['video_destination', 'Video destination', 3],
-        ['storage_used', 'Storage used', 1],
-        ['storage_total', 'Storage total', 1],
-        ['video_count', 'Video count', 1],
-        ['video_history_count', 'Video history count', 1],
-        ['sm_backup_enabled', 'Sync module backup', 0],
-        ['busy', 'Busy', 0],
-        ['camera_error', 'Camera error', 0],
-        ['sync_module_error', 'Sync module error', 0],
-        ['account_id', 'Accound ID', 1],
-        ['status', 'Status', 3],
-        ['created_at', 'Created at', 4],
-        ['updated_at', 'Updated at', 4],
-    ];
-
-    private const BLINK_MAP_SYNCMODUL = [
-        ['name', 'Name', 3],
-        ['status', 'Status', 3],
-        ['serial', 'Serial', 3],
-        ['fw_version', 'Firmware', 3],
-        ['type', 'Type', 3],
-        ['subtype', 'Subtype', 3],
-        ['wifi_strength', 'Wifi strength', 1],
-        ['network_id', 'Network ID', 1],
-        ['onboarded', 'Onboarded', 0],
-        ['enable_temp_alerts', 'Enable temparature alerts', 0],
-        ['local_storage_enabled', 'Local storage enabled', 0],
-        ['local_storage_compatible', 'Local storage compatible', 0],
-        ['local_storage_status', 'Local storage status', 3],
-        ['last_hb', 'Last heartbeat at', 4],
-        ['created_at', 'Created at', 4],
-        ['updated_at', 'Updated at', 4],
+        ['local_storage_enabled', 'Local save', 5, null],
+        ['usb_state', 'USB status', 3, null],
+        ['usb_storage_used', 'USB used', 1, null],
+        ['usb_storage_full', 'USB full', 0, null],
+        ['storage_warning', 'Storage warning', 1, null],
+        ['sm_backup_enabled', 'Backup enabeld', 5, null],
+        ['last_backup_completed', 'Last backup', 4, null],
+        ['usb_format_compatible', 'USB format compatible', 0, null],
+        ['sm_backup_in_progress', 'Backup in progress', 0, null],
+        ['last_backup_result', 'Last backup result', 3, null],
     ];
 
     /**
-     * Overrides the internal IPS_Create($id) function
+     * @var array<int,array{0:string,1:string,2:int,3:?string}> Ntework information map
      */
-    public function Create()
+    private const BLINK_MAP_NETWORK = [
+        ['name', 'Name', 3, null],
+        ['description', 'Description', 3, null],
+        ['network_key', 'Network key', 3, null],
+        ['network origin', 'Network origin', 3, null],
+        ['locale', 'Locale', 3, null],
+        ['time_zone', 'Timezone', 3, null],
+        ['dst', 'Daylight savings time', 0, null],
+        ['ping_interval', 'Ping interval', 1, null],
+        ['armed', 'Armed', 5, null],
+        ['autoarm_geo_enable', 'Auto arm geo', 5, null],
+        ['autoarm_time_enable', 'Auto arm time', 5, null],
+        ['lv_mode', 'Locale save mode', 3, null],
+        ['video_destination', 'Video destination', 3, null],
+        ['storage_used', 'Storage used', 1, null],
+        ['storage_total', 'Storage total', 1, null],
+        ['video_count', 'Video count', 1, null],
+        ['video_history_count', 'Video history count', 1, null],
+        ['sm_backup_enabled', 'Sync module backup', 0, null],
+        ['busy', 'Busy', 0, null],
+        ['camera_error', 'Camera error', 0, null],
+        ['sync_module_error', 'Sync module error', 0, null],
+        ['account_id', 'Accound ID', 1, null],
+        ['status', 'Status', 3, null],
+        ['created_at', 'Created at', 4, null],
+        ['updated_at', 'Updated at', 4, null],
+    ];
+
+    /**
+     * @var array<int,array{0:string,1:string,2:int,3:?string}> Symc modul information map
+     */
+    private const BLINK_MAP_SYNCMODUL = [
+        ['name', 'Name', 3, null],
+        ['status', 'Status', 3, null],
+        ['serial', 'Serial', 3, null],
+        ['fw_version', 'Firmware', 3, null],
+        ['type', 'Type', 3, null],
+        ['subtype', 'Subtype', 3, null],
+        ['wifi_strength', 'Wifi strength', 1, null],
+        ['network_id', 'Network ID', 1, null],
+        ['onboarded', 'Onboarded', 0, null],
+        ['enable_temp_alerts', 'Enable temparature alerts', 0, null],
+        ['local_storage_enabled', 'Local storage enabled', 0, null],
+        ['local_storage_compatible', 'Local storage compatible', 0, null],
+        ['local_storage_status', 'Local storage status', 3, null],
+        ['last_hb', 'Last heartbeat at', 4, null],
+        ['created_at', 'Created at', 4, null],
+        ['updated_at', 'Updated at', 4, null],
+    ];
+
+    /**
+     * In contrast to Construct, this function is called only once when creating the instance and starting IP-Symcon.
+     * Therefore, status variables and module properties which the module requires permanently should be created here.
+     *
+     * @return void
+     */
+    public function Create(): void
     {
         //Never delete this line!
         parent::Create();
@@ -120,18 +148,23 @@ class BlinkHomeSyncModule extends IPSModule
     }
 
     /**
-     * Overrides the internal IPS_Destroy($id) function
+     * This function is called when deleting the instance during operation and when updating via "Module Control".
+     * The function is not called when exiting IP-Symcon.
+     *
+     * @return void
      */
-    public function Destroy()
+    public function Destroy(): void
     {
         //Never delete this line!
         parent::Destroy();
     }
 
     /**
-     * Overrides the internal IPS_ApplyChanges($id) function
+     * Is executed when "Apply" is pressed on the configuration page and immediately after the instance has been created.
+     *
+     * @return void
      */
-    public function ApplyChanges()
+    public function ApplyChanges(): void
     {
         //Never delete this line!
         parent::ApplyChanges();
@@ -155,14 +188,14 @@ class BlinkHomeSyncModule extends IPSModule
         $recording = $this->ReadPropertyBoolean('CheckRecording');
         $this->MaintainVariable('recording', $this->Translate('Recording'), VARIABLETYPE_BOOLEAN, '~Switch', 0, $recording);
         if ($recording) {
-            //$this->SetValueBoolean('recording', false);
+            $this->SetValueBoolean('recording', false);
             $this->EnableAction('recording');
         }
 
         // Download variable
         $store = $this->ReadPropertyInteger('StorageCategory');
         $limit = $this->ReadPropertyInteger('StorageLimit');
-        $download = (IPS_CategoryExists($store)) & ($limit != 0);
+        $download = (IPS_CategoryExists($store) && ($limit != 0));
         $this->MaintainVariable('download', $this->Translate('Download'), VARIABLETYPE_INTEGER, 'BHS.Download', 2, $download);
         if ($download) {
             $this->SetValueInteger('download', 3);
@@ -195,15 +228,17 @@ class BlinkHomeSyncModule extends IPSModule
     }
 
     /**
-     * RequestAction.
+     * Is called when, for example, a button is clicked in the visualization.
      *
-     *  @param string $ident Ident.
-     *  @param string $value Value.
+     * @param string $ident Ident of the variable
+     * @param mixed $value The value to be set
+     *
+     * @return void
      */
-    public function RequestAction($ident, $value)
+    public function RequestAction(string $ident, mixed $value): void
     {
         // Debug output
-        $this->SendDebug(__FUNCTION__, $ident . ' => ' . $value);
+        $this->LogDebug(__FUNCTION__, $ident . ' => ' . $value);
         switch ($ident) {
             case 'create_schedule':
                 $this->CreateScheduleRecording();
@@ -256,17 +291,19 @@ class BlinkHomeSyncModule extends IPSModule
      * Arm the given network - that is, start recording/reporting motion events for enabled cameras.
      *
      * BHS_Arm();
+     *
+     * @return bool True if successful, otherwise False.
      */
-    public function Arm()
+    public function Arm(): bool
     {
         // Params
         $param = ['NetworkID' => $this->ReadPropertyString('NetworkID')];
         // Request
         $response = $this->RequestDataFromParent('arm', $param);
         // Debug
-        $this->SendDebug(__FUNCTION__, $response);
+        $this->LogDebug(__FUNCTION__, $response);
         // Result?
-        if ($response !== false) {
+        if ($response !== '[]') {
             $this->SetValueBoolean('recording', true);
             //echo $this->Translate('Call was successfull!');
             return true;
@@ -280,17 +317,19 @@ class BlinkHomeSyncModule extends IPSModule
      * Disarm the given network - that is, stop recording/reporting motion events for enabled cameras.
      *
      * BHS_Disarm();
+     *
+     * @return bool True if successful, otherwise False.
      */
-    public function Disarm()
+    public function Disarm(): bool
     {
         // Params
         $param = ['NetworkID' => $this->ReadPropertyString('NetworkID')];
         // Request
         $response = $this->RequestDataFromParent('disarm', $param);
         // Debug
-        $this->SendDebug(__FUNCTION__, $response);
+        $this->LogDebug(__FUNCTION__, $response);
         // Result?
-        if ($response !== false) {
+        if ($response !== '[]') {
             $this->SetValueBoolean('recording', false);
             //echo $this->Translate('Call was successfull!');
             return true;
@@ -304,20 +343,22 @@ class BlinkHomeSyncModule extends IPSModule
      * Alarm was triggered.
      *
      * @param bool $value Switch alert
+     *
+     * @return void
      */
-    private function Alert(bool $value)
+    private function Alert(bool $value): void
     {
         $this->SetValueBoolean('alert', $value);
         // Debug
-        $this->SendDebug(__FUNCTION__, 'Alert ' . boolval($value), 0);
+        $this->LogDebug(__FUNCTION__, 'Alert ' . boolval($value));
         // Execute script
         $script = $this->ReadPropertyInteger('AlertScript');
         if ($value && $script != 0) {
             if (IPS_ScriptExists($script)) {
                 $rs = IPS_RunScriptEx($script, ['MODUL' => $this->InstanceID, 'ALERT' => $value, 'TIMESTAMP' => time()]);
-                $this->SendDebug(__FUNCTION__, 'Script #' . $script . ' executed! Return Value: ' . $rs);
+                $this->LogDebug(__FUNCTION__, 'Script #' . $script . ' executed! Return Value: ' . $rs);
             } else {
-                $this->SendDebug(__FUNCTION__, 'Script #' . $script . ' does not exist!');
+                $this->LogDebug(__FUNCTION__, 'Script #' . $script . ' does not exist!');
             }
         }
         // $this->LogMessage(date('D, d.m.Y H:i:s'), KL_NOTIFY);
@@ -327,12 +368,14 @@ class BlinkHomeSyncModule extends IPSModule
      * Alarm was triggered.
      *
      * @param int $value Dim value for mapping
+     *
+     * @return void
      */
-    private function LastMotion(int $value)
+    private function LastMotion(int $value): void
     {
         $this->SetValueInteger('last_motion', $value);
         // Debug
-        $this->SendDebug(__FUNCTION__, 'Last Motion: ' . $value, 0);
+        $this->LogDebug(__FUNCTION__, 'Last Motion: ' . $value);
         // Execute script
         $script = $this->ReadPropertyInteger('AlertScript');
         if ($value && $script != 0) {
@@ -340,9 +383,9 @@ class BlinkHomeSyncModule extends IPSModule
                 $id = @$this->GetIDForIdent('last_motion');
                 $ca = GetValueFormatted($id);
                 $rs = IPS_RunScriptEx($script, ['MODUL' => $this->InstanceID, 'MOTION' => $ca, 'TIMESTAMP' => time()]);
-                $this->SendDebug(__FUNCTION__, 'Script #' . $script . ' executed! Return Value: ' . $rs);
+                $this->LogDebug(__FUNCTION__, 'Script #' . $script . ' executed! Return Value: ' . $rs);
             } else {
-                $this->SendDebug(__FUNCTION__, 'Script #' . $script . ' does not exist!');
+                $this->LogDebug(__FUNCTION__, 'Script #' . $script . ' does not exist!');
             }
         }
     }
@@ -351,8 +394,10 @@ class BlinkHomeSyncModule extends IPSModule
      * Download (all) local stored media clips.
      *
      * @param int $mode Subsequense mode for download videos (cloud, local, both)
+     *
+     * @return void
      */
-    private function Download(int $mode)
+    private function Download(int $mode): void
     {
         switch ($mode) {
             case 0:
@@ -372,17 +417,19 @@ class BlinkHomeSyncModule extends IPSModule
      * Download the latest video clip recordings (LOCAL STORAGE).
      *
      * @param bool $value Debug switch
+     *
+     * @return void
      */
-    private function Clips(bool $value)
+    private function Clips(bool $value): void
     {
         $store = $this->ReadPropertyInteger('StorageCategory');
         $limit = $this->ReadPropertyInteger('StorageLimit');
         $cache = $this->ReadPropertyBoolean('OnlyCache');
         $media = [];
         if (IPS_CategoryExists($store)) {
-            $this->SendDebug(__FUNCTION__, 'Download max ' . $limit . ' clips to: ' . IPS_GetName($store), 0);
+            $this->LogDebug(__FUNCTION__, 'Download max ' . $limit . ' clips to: ' . IPS_GetName($store));
         } else {
-            $this->SendDebug(__FUNCTION__, 'No category set to store!', 0);
+            $this->LogDebug(__FUNCTION__, 'No category set to store!');
             return;
         }
         // Params
@@ -393,15 +440,24 @@ class BlinkHomeSyncModule extends IPSModule
         // Request
         $response = $this->RequestDataFromParent('manifest', $param);
         // Debug
-        $this->SendDebug(__FUNCTION__, $response);
+        $this->LogDebug(__FUNCTION__, $response);
         // Result?
-        if ($response !== false) {
+        if ($response !== '[]') {
             $data = json_decode($response, true);
             if (isset($data['manifest_id'])) {
                 // newest clips at first
                 $clips = $this->OrderData($data['clips'], 'created_at', 'DSC');
-                // Limit result set
-                $clips = array_slice($clips, 0, $limit); // echo count($clips) . PHP_EOL;
+                // Limit result set - $clips = array_slice($clips, 0, $limit);
+                $filtered = [];
+                foreach ($clips as $clip) {
+                    if (isset($clip['size']) && $clip['size'] < self::BLINK_SYNC_SIZE) {
+                        $filtered[] = $clip;
+                        if (count($filtered) >= $limit) {
+                            break;
+                        }
+                    }
+                }
+                $clips = $filtered;
                 // Exists and how much medias
                 $medias = $this->ReadMediaWithAttributes($store, $limit, $clips);
                 $param['ManifestID'] = $data['manifest_id'];
@@ -409,23 +465,32 @@ class BlinkHomeSyncModule extends IPSModule
                     if (array_search($clip['id'], $medias) != 0) continue; // still saved
                     $param['ClipID'] = $clip['id'];
                     // Request
-                    //FIXME: $response = utf8_decode($this->RequestDataFromParent('clip', $param));
-                    $response = hex2bin($this->RequestDataFromParent('clip', $param));
+                    do {
+                        $response = hex2bin($this->RequestDataFromParent('clip', $param));
+                        // check for {"message":"Media not found","code":700}
+                        $length = strlen($response);
+                        $error = ($length === 40);
+                        $this->LogDebug(__FUNCTION__, 'Length-Check: ' . $length . ' => ' . boolval($error));
+                        if ($error) {
+                            $this->LogMessage($response);
+                            IPS_Sleep(1000);
+                        }
+                    } while ($error);
                     $this->SaveMediaWithAttributes($store, $limit, $cache, $medias, $clip, $response);
                     IPS_Sleep(1000);
                 }
             }
             else {
-                $this->SendDebug(__FUNCTION__, 'No monifest id in response!', 0);
-                return false;
+                $this->LogDebug(__FUNCTION__, 'No monifest id in response!');
+                return;
             }
         } else {
             if ($value) {
                 echo $this->Translate('Call was not successfull!');
             } else {
-                $this->SendDebug(__FUNCTION__, 'No Clip Information!');
+                $this->LogDebug(__FUNCTION__, 'No Clip Information!');
             }
-            return false;
+            return;
         }
     }
 
@@ -433,17 +498,19 @@ class BlinkHomeSyncModule extends IPSModule
      * Download the latest video event recordings (CLOUD).
      *
      * @param bool $value Debug switch
+     *
+     * @return void
      */
-    private function Events(bool $value)
+    private function Events(bool $value): void
     {
         $store = $this->ReadPropertyInteger('StorageCategory');
         $limit = $this->ReadPropertyInteger('StorageLimit');
         $cache = $this->ReadPropertyBoolean('OnlyCache');
         $media = [];
         if (IPS_CategoryExists($store)) {
-            $this->SendDebug(__FUNCTION__, 'Download max ' . $limit . ' clips to: ' . IPS_GetName($store), 0);
+            $this->LogDebug(__FUNCTION__, 'Download max ' . $limit . ' clips to: ' . IPS_GetName($store));
         } else {
-            $this->SendDebug(__FUNCTION__, 'No category set to store!', 0);
+            $this->LogDebug(__FUNCTION__, 'No category set to store!');
             return;
         }
         // Params
@@ -451,16 +518,16 @@ class BlinkHomeSyncModule extends IPSModule
         // Request
         $response = $this->RequestDataFromParent('events', $param);
         // Debug
-        $this->SendDebug(__FUNCTION__, $response);
+        $this->LogDebug(__FUNCTION__, $response);
         // Result?
-        if ($response !== false) {
+        if ($response !== '[]') {
             $data = json_decode($response, true);
             if (isset($data['media'])) {
                 // newest clips at first
                 $videos = $this->OrderData($data['media'], 'created_at', 'DSC');
                 // Limit result set
                 $videos = array_slice($videos, 0, $limit); // echo count($videos) . PHP_EOL;
-                $this->SendDebug(__FUNCTION__, $videos);
+                $this->LogDebug(__FUNCTION__, $videos);
                 // Exists and how much medias
                 $medias = $this->ReadMediaWithAttributes($store, $limit, $videos);
                 foreach ($videos as $video) {
@@ -474,16 +541,16 @@ class BlinkHomeSyncModule extends IPSModule
                 }
             }
             else {
-                $this->SendDebug(__FUNCTION__, 'No medias in response!', 0);
-                return false;
+                $this->LogDebug(__FUNCTION__, 'No medias in response!');
+                return;
             }
         } else {
             if ($value) {
                 echo $this->Translate('Call was not successfull!');
             } else {
-                $this->SendDebug(__FUNCTION__, 'No Event Information!');
+                $this->LogDebug(__FUNCTION__, 'No Event Information!');
             }
-            return false;
+            return;
         }
     }
 
@@ -491,25 +558,27 @@ class BlinkHomeSyncModule extends IPSModule
      * Display Network Information
      *
      * @param bool $value Debug switch
+     *
+     * @return void
      */
-    private function Network(bool $value)
+    private function Network(bool $value): void
     {
         // Debug
-        $this->SendDebug(__FUNCTION__, 'Obtain network information.');
+        $this->LogDebug(__FUNCTION__, 'Obtain network information.');
         // Params
         $param = ['NetworkID' => $this->ReadPropertyString('NetworkID')];
         // Request data
         $response = $this->RequestDataFromParent('network', $param);
-        $this->SendDebug(__FUNCTION__, $response);
+        $this->LogDebug(__FUNCTION__, $response);
         // Result?
-        if ($response !== false) {
+        if ($response !== '[]') {
             $params = json_decode($response, true);
-            $this->SendDebug(__FUNCTION__, $params);
+            $this->LogDebug(__FUNCTION__, $params);
             if (isset($params['network'])) {
                 // Print
                 if ($value) {
                     // Echo message
-                    $this->EchoMessage($this->PrettyPrint(self::BLINK_MAP_NETWORK, $params['network']));
+                    $this->EchoMessage($this->PrettyPrint(self::BLINK_MAP_NETWORK, json_encode($params['network'])));
                 } else {
                     $armed = $this->GetValue('recording');
                     // only if different
@@ -522,7 +591,7 @@ class BlinkHomeSyncModule extends IPSModule
             if ($value) {
                 echo $this->Translate('Call was not successfull!');
             } else {
-                $this->SendDebug(__FUNCTION__, 'No Network Information!');
+                $this->LogDebug(__FUNCTION__, 'No Network Information!');
             }
         }
     }
@@ -531,24 +600,26 @@ class BlinkHomeSyncModule extends IPSModule
      * Display Sync Module Information
      *
      * @param bool $value Debug switch
+     *
+     * @return void
      */
-    private function SyncModule(bool $value)
+    private function SyncModule(bool $value): void
     {
         // Debug
-        $this->SendDebug(__FUNCTION__, 'Obtain sync module information.');
+        $this->LogDebug(__FUNCTION__, 'Obtain sync module information.');
         // Sync Module Device
         $device = $this->ReadPropertyString('DeviceID');
         // Request data
         $response = $this->RequestDataFromParent('homescreen');
         // Result?
-        if ($response !== false) {
+        if ($response !== '[]') {
             $params = json_decode($response, true);
-            $this->SendDebug(__FUNCTION__, $params);
+            $this->LogDebug(__FUNCTION__, $params);
             if (isset($params['sync_modules'])) {
                 foreach ($params['sync_modules'] as $param) {
                     if ($param['id'] == $device) {
                         // Echo message
-                        $this->EchoMessage($this->PrettyPrint(self::BLINK_MAP_SYNCMODUL, $param));
+                        $this->EchoMessage($this->PrettyPrint(self::BLINK_MAP_SYNCMODUL, json_encode($param)));
                         break;
                     }
                 }
@@ -557,7 +628,7 @@ class BlinkHomeSyncModule extends IPSModule
             if ($value) {
                 echo $this->Translate('Call was not successfull!');
             } else {
-                $this->SendDebug(__FUNCTION__, 'No Sync Module Information!');
+                $this->LogDebug(__FUNCTION__, 'No Sync Module Information!');
             }
         }
     }
@@ -566,24 +637,26 @@ class BlinkHomeSyncModule extends IPSModule
      * Display Local Storage Status
      *
      * @param bool $value Debug switch
+     *
+     * @return void
      */
-    private function LocalStorageState(bool $value)
+    private function LocalStorageState(bool $value): void
     {
         // Debug
-        $this->SendDebug(__FUNCTION__, 'Obtain local storage status.');
+        $this->LogDebug(__FUNCTION__, 'Obtain local storage status.');
         // Params
         $param = ['NetworkID' => $this->ReadPropertyString('NetworkID'), 'DeviceID' => $this->ReadPropertyString('DeviceID')];
         // Request data
         $response = $this->RequestDataFromParent('local_storage_status', $param);
-        $this->SendDebug(__FUNCTION__, $response);
-        if ($response !== false) {
+        $this->LogDebug(__FUNCTION__, $response);
+        if ($response !== '[]') {
             // Echo message
             $this->EchoMessage($this->PrettyPrint(self::BLINK_MAP_STORAGE, $response));
         } else {
             if ($value) {
                 echo $this->Translate('Call was not successfull!');
             } else {
-                $this->SendDebug(__FUNCTION__, 'No Local Storage Status Information!');
+                $this->LogDebug(__FUNCTION__, 'No Local Storage Status Information!');
             }
         }
     }
@@ -592,24 +665,26 @@ class BlinkHomeSyncModule extends IPSModule
      * Weekly Schedule event
      *
      * @param integer $value Action value (ON=2, OFF=1)
+     *
+     * @return void
      */
-    private function ScheduleRecording(int $value)
+    private function ScheduleRecording(int $value): void
     {
         $schedule = $this->ReadPropertyInteger('RecordingSchedule');
-        $this->SendDebug(__FUNCTION__, 'Value: ' . $value . ',Schedule: ' . $schedule);
+        $this->LogDebug(__FUNCTION__, 'Value: ' . $value . ',Schedule: ' . $schedule);
         if ($schedule == 0) {
-            $this->SendDebug(__FUNCTION__, 'Schedule not linked!');
+            $this->LogDebug(__FUNCTION__, 'Schedule not linked!');
             // nothing todo
             return;
         }
         // Is Activate OFF
         if ($value == self::BLINK_SCHEDULE_RECORDING_OFF) {
-            $this->SendDebug(__FUNCTION__, 'OFF: Disarm recording!');
+            $this->LogDebug(__FUNCTION__, 'OFF: Disarm recording!');
             // Stop Recording
             $this->Disarm();
         }
         if ($value == self::BLINK_SCHEDULE_RECORDING_ON) {
-            $this->SendDebug(__FUNCTION__, 'ON: Arm recording!');
+            $this->LogDebug(__FUNCTION__, 'ON: Arm recording!');
             // Start Recording
             $this->Arm();
         }
@@ -618,11 +693,12 @@ class BlinkHomeSyncModule extends IPSModule
     /**
      * Create week schedule for snapshots
      *
+     * @return void
      */
-    private function CreateScheduleRecording()
+    private function CreateScheduleRecording(): void
     {
         $eid = $this->CreateWeeklySchedule($this->InstanceID, $this->Translate('Schedule recording'), self::BLINK_SCHEDULE_RECORDING_IDENT, self::BLINK_SCHEDULE_RECORDING_SWITCH, -1);
-        if ($eid !== false) {
+        if (IPS_EventExists($eid)) {
             $this->UpdateFormField('RecordingSchedule', 'value', $eid);
         }
     }
@@ -630,13 +706,13 @@ class BlinkHomeSyncModule extends IPSModule
     /**
      * Read all media attributes from the given category
      *
-     * @param int $store
-     * @param int $limit
-     * @param array $source
+     * @param int   $store  Store location ID
+     * @param int   $limit  Store media limit (default:10)
+     * @param array<int,array{id:int}>  $source List of media entries with at least an 'id'
      *
-     * @return array collection of found medias
+     * @return array<int,int> Collection of found media IDs mapped by object ID
      */
-    private function ReadMediaWithAttributes(int $store, int $limit, array $source)
+    private function ReadMediaWithAttributes(int $store, int $limit, array $source): array
     {
         $childs = IPS_GetChildrenIDs($store);
         $medias = [];
@@ -663,18 +739,18 @@ class BlinkHomeSyncModule extends IPSModule
     }
 
     /**
-     * SaveMediaWithAttributes
+     * Save media with attributes
      *
-     * @param int $store
-     * @param int $limit
-     * @param bool $cache
-     * @param array $medias
-     * @param array $source
-     * @param string $response
+     * @param int        $store    Store location ID
+     * @param int        $limit    Store media limit
+     * @param bool       $cache    Whether to cache the media file
+     * @param array<int> $medias   Reference to array of media IDs mapped to their source IDs
+     * @param array{id:int,created_at:string,device_name?:string,camera_name?:string} $source  Media source data
+     * @param string     $response Raw media content
      *
-     * @return bool
+     * @return bool TRUE if successful, otherwise FALSE
      */
-    private function SaveMediaWithAttributes(int $store, int $limit, bool $cache, array &$medias, array $source, string $response)
+    private function SaveMediaWithAttributes(int $store, int $limit, bool $cache, array &$medias, array $source, string $response): bool
     {
         $ident = 'media_' . $source['id'];
         $name = date('YmdHis_', strtotime($source['created_at']));
@@ -715,34 +791,24 @@ class BlinkHomeSyncModule extends IPSModule
     }
 
     /**
-     * Order assoziate array data
+     * Sort an associative array by one or multiple keys.
      *
-     * @param array $arr
-     * @param string|null $key
-     * @param string $direction
+     * @param list<mixed>  $arr        The array to sort (list of associative arrays)
+     * @param string       $key        Key to sort by or an array of key => direction
+     * @param string       $direction  Sorting direction ('ASC' or 'DESC') when a single key is used
+     *
+     * @return list<mixed> Sorted array
      */
-    private function OrderData(array $arr, string $key = null, string $direction = 'ASC')
+    private function OrderData(array $arr, string $key, string $direction = 'ASC'): array
     {
-        // Check "order by key"
-        if (!is_string($key) && !is_array($key)) {
-            throw new InvalidArgumentException('Order() expects the first parameter to be a valid key or array');
-        }
         // Build order-by clausel
         $props = [];
-        if (is_string($key)) {
-            $props[$key] = strtolower($direction) == 'asc' ? 1 : -1;
-        }else {
-            $i = count($key);
-            foreach ($key as $k => $dir) {
-                $props[$k] = strtolower($dir) == 'asc' ? $i : -($i);
-                $i--;
-            }
-        }
+        $props[$key] = strtolower($direction) == 'asc' ? 1 : -1;
         // Sort by passed keys
         usort($arr, function ($a, $b) use ($props)
         {
             foreach ($props as $key => $val) {
-                if ($a[$key] == $b[$key]) continue;
+                if ($a[$key] === $b[$key]) continue;
                 return $a[$key] > $b[$key] ? $val : -($val);
             }
             return 0;
@@ -755,9 +821,11 @@ class BlinkHomeSyncModule extends IPSModule
      * Returns the ascending list of category names for a given category id
      *
      * @param string $endpoint API endpoint request.
+     * @param array<string,mixed>  $params   Optional parameters for the API request
+     *
      * @return string Result of the API call.
      */
-    private function RequestDataFromParent(string $endpoint, array $params = [])
+    private function RequestDataFromParent(string $endpoint, array $params = []): string
     {
         return $this->SendDataToParent(json_encode([
             'DataID'      => '{83027B09-C481-91E7-6D24-BF49AA871452}',
@@ -770,8 +838,10 @@ class BlinkHomeSyncModule extends IPSModule
      * Show message via popup
      *
      * @param string $caption echo message
+     *
+     * @return void
      */
-    private function EchoMessage(string $caption)
+    private function EchoMessage(string $caption): void
     {
         $this->UpdateFormField('EchoMessage', 'caption', $this->Translate($caption));
         $this->UpdateFormField('EchoPopup', 'visible', true);

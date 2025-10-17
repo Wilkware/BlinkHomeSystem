@@ -1,8 +1,8 @@
 # Blink Home Sync Modul
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.9.20241029-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
+[![Product](https://img.shields.io/badge/Symcon%20Version-8.1-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
+[![Version](https://img.shields.io/badge/Modul%20Version-2.0.20251013-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/style.yml?branch=main&label=CheckStyle&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
@@ -26,7 +26,7 @@ Es ist derzeit noch nicht absehbar, welchen Funktionsumfang das Modul endgültig
 
 ### 2. Voraussetzungen
 
-* IP-Symcon ab Version 6.4
+* IP-Symcon ab Version 8.1
 
 ### 3. Installation
 
@@ -40,6 +40,8 @@ Es ist derzeit noch nicht absehbar, welchen Funktionsumfang das Modul endgültig
 * Über den _'Blink Home Configurator'_ kann eine einfache Installation vorgenommen werden  
 Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)
 
+* Wie man die Meldungen von Bewegungen bzw. Alarmen via Amazon Alexa einstellt ist im [Forum](https://community.symcon.de/t/modul-blink-home-system/127808/197?u=pitti) beschrieben.
+
 __Konfigurationsseite__:
 
 Einstellungsbereich:
@@ -50,8 +52,8 @@ Name           | Beschreibung
 -------------- | ------------------
 Gerätetyp      | Typbezeichnung (Sync Modul)
 Gerätemodell   | Modellbezeichnung (Model 1 oder 2)
-Geräte-ID      | Interne Gerätenummer (6-stellig)
-Netwerk-ID     | Interne Netwerknummer (6-stellig)
+Geräte-ID      | Interne Gerätenummer
+Netwerk-ID     | Interne Netwerknummer
 
 > Bewegungsereignissen ...
 
@@ -79,7 +81,7 @@ Name           | Beschreibung
 Anlegen einer Variabel zum Anzeigen einer erfassten Bewegung! | Legt einen Schalter für Alarm (EIN/AUS) an
 Erstelle eine Variable, um die Kamera mit der letzte erkannten Bewegung zu speichern! | Legt ein Variable zum erfassen der Kamera wo die letzte Bewegung staffand an
 Kamerazuordnung | Zuordnung der Kameras zu einer virtuellen ID (Umweg über Dimmwert eines Lichtes)
-Gleichzeitiges Ausführen eines Skriptes | Hinterlegung eines Skriptes das bei Bewegungserkennung aufgerufen wird.
+Gleichzeitiges Ausführen eines Skriptes | Hinterlegung eines Skriptes das bei Bewegungserkennung aufgerufen wird (IPS_RunScriptEX). Der Zeitstempel (Unix timestamp) wird im Array als 'TIMESTAMP' übergeben. Die ID des ausführenden Moduls wird in 'MODUL' mitgegeben. Die letze Bewegung wird als Text in 'MOTION' und die allgemeine Alarmmeldung als Bool in 'ALERT' übergeben. Ob 'MOTION' oder 'ALERT' mitgegeben wird hängt von der geschaltenen Variable ab. Beides gleichzeitig wird nicht übergeben!
 
 Aktionsbereich:
 
@@ -120,6 +122,7 @@ Folgendes Profil wird angelegt:
 Name           | Typ       | Beschreibung
 -------------- | --------- | ----------------
 BHS.Download   | Integer   | Download Profil (1: '►')
+BHS.Cameras    | Integer   | Kamera Namen (max. 10 Stück), Profil wird dynamisch erzeugt
 
 ### 6. Visualisierung
 
@@ -144,6 +147,16 @@ Schaltet alle im Netwerk befindlichen Kameras unscharf.
 __Beispiel__: `BHS_Disarm(12345);`
 
 ### 8. Versionshistorie
+
+v2.0.20251013
+
+* _NEU_: Support für Blink Outdoor 4
+* _NEU_: Umstellung auf Strict-Modus (IPSModuleStrict)
+* _NEU_: Umstellung auf globale einheitliche Versionsnummer
+* _NEU_: Kompatibilität auf IPS 8.1 vereinheitlicht
+* _FIX_: Abholen der Aufzeichnungen nochmal verbessert
+* _FIX_: Interne Bibliotheken und Konfiguration überarbeitet und vereinheitlicht
+* _FIX_: Inline-Dokumentation komplett überarbeitet
 
 v1.9.20241029
 

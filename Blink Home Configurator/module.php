@@ -6,12 +6,14 @@ declare(strict_types=1);
 require_once __DIR__ . '/../libs/_traits.php';
 
 // Blink Home Configurator
-class BlinkHomeConfigurator extends IPSModule
+class BlinkHomeConfigurator extends IPSModuleStrict
 {
     // Helper Traits
     use DebugHelper;
 
-    // Blink Device Models (up to now)
+    /**
+     * @var array<string,string> Blink Device Types (up to now)
+     */
     private const BLINK_DEVICE_TYPE = [
         'null'              => '<unknown>',
         'cameras'           => 'Camera',
@@ -23,7 +25,9 @@ class BlinkHomeConfigurator extends IPSModule
         'accessories'       => 'Accessorie',
     ];
 
-    // Blink Device Models (up to now)
+    /**
+     * @var array<string,string> Blink Device Models (up to now)
+     */
     private const BLINK_DEVICE_MODEL = [
         'null'              => '<unknown>',
         'sm1'               => 'Blink Sync Module 1',
@@ -32,6 +36,7 @@ class BlinkHomeConfigurator extends IPSModule
         'white'             => 'Blink Indoor',
         'catalina_indoor'   => 'Blink Indoor',
         'catalina'          => 'Blink Outdoor',
+        'sedona'            => 'Blink Outdoor 4',
         'owl'               => 'Blink Mini',
         'hawk'              => 'Blink Mini 2',
         'xt'                => 'Blink XT1',
@@ -41,19 +46,33 @@ class BlinkHomeConfigurator extends IPSModule
         'rosie'             => 'Blink Pan-Tilt Mount',
     ];
 
-    // ModulID (Blink Home Client)
+    /**
+     * @var string ModulID (Blink Home Client)
+     */
     private const BLINK_CLIENT_GUID = '{AF126D6D-83D1-44C2-6F61-96A4BB7A0E62}';
-    // ModulID (Blink Home Sync Modul)
+
+    /**
+     * @var string ModulID (Blink Home Sync Modul)
+     */
     private const BLINK_MODULE_GUID = '{3E3F3E1C-899C-2E17-E95E-6803DB5E95FE}';
-    // ModulID (Blink Home Device)
+
+    /**
+     * @var string ModulID (Blink Home Device)
+     */
     private const BLINK_DEVICE_GUID = '{7D2B8EFA-23D0-D29C-DBEE-E81F1FC2DBDC}';
-    // ModulID (Blink Home Accessory)
+
+    /**
+     * @var string ModulID (Blink Home Accessory)
+     */
     private const BLINK_ACCESSORY_GUID = '{1D064E05-B3D7-54C6-F37D-D0068AEF7B89}';
 
     /**
-     * Overrides the internal IPS_Create($id) function
+     * In contrast to Construct, this function is called only once when creating the instance and starting IP-Symcon.
+     * Therefore, status variables and module properties which the module requires permanently should be created here.
+     *
+     * @return void
      */
-    public function Create()
+    public function Create(): void
     {
         //Never delete this line!
         parent::Create();
@@ -64,32 +83,25 @@ class BlinkHomeConfigurator extends IPSModule
     }
 
     /**
-     * Overrides the internal IPS_Destroy($id) function
+     * This function is called when deleting the instance during operation and when updating via "Module Control".
+     * The function is not called when exiting IP-Symcon.
+     *
+     * @return void
      */
-    public function Destroy()
+    public function Destroy(): void
     {
         //Never delete this line!
         parent::Destroy();
     }
 
     /**
-     * Overrides the internal IPS_ApplyChanges($id) function
-     */
-    public function ApplyChanges()
-    {
-        //Never delete this line!
-        parent::ApplyChanges();
-
-        // Register reference to categorie
-        $this->RegisterReference($this->ReadPropertyInteger('TargetCategory'));
-    }
-
-    /**
-     * Configuration Form.
+     * The content can be overwritten in order to transfer a self-created configuration page.
+     * This way, content can be generated dynamically.
+     * In this case, the "form.json" on the file system is completely ignored.
      *
-     * @return JSON configuration string.
+     * @return string Content of the configuration page.
      */
-    public function GetConfigurationForm()
+    public function GetConfigurationForm(): string
     {
         $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
 
@@ -127,7 +139,7 @@ class BlinkHomeConfigurator extends IPSModule
                 $connected[IPS_GetProperty($instance, 'DeviceID')][] = $instance;
             }
         }
-        $this->SendDebug(__FUNCTION__, $connected);
+        $this->LogDebug(__FUNCTION__, $connected);
 
         // All discovered devices/modules
         $devices = $this->DiscoveryBlinkDevices();
@@ -210,11 +222,25 @@ class BlinkHomeConfigurator extends IPSModule
     }
 
     /**
+     * Is executed when "Apply" is pressed on the configuration page and immediately after the instance has been created.
+     *
+     * @return void
+     */
+    public function ApplyChanges(): void
+    {
+        //Never delete this line!
+        parent::ApplyChanges();
+
+        // Register reference to categorie
+        $this->RegisterReference($this->ReadPropertyInteger('TargetCategory'));
+    }
+
+    /**
      * Delivers all found blink devices.
      *
-     * @return array configuration list all devices
+     * @return array<int, array<string,mixed>> configuration list of all devices
      */
-    private function DiscoveryBlinkDevices()
+    private function DiscoveryBlinkDevices(): array
     {
         // Collect all devices
         $data = [];
@@ -244,60 +270,41 @@ class BlinkHomeConfigurator extends IPSModule
             // Floodlight Mount
             if (isset($devises['accessories']['storm'])) {
                 foreach ($devises['accessories']['storm'] as $dev) {
+                    $this->LogDebug(__FUNCTION__, $dev);
                     $nid = $this->GetBlinkTargetNetwork($dev['target_id'], $data);
+                    if ($nid == -1) {
+                        $nid = $this->Translate('<unknown>');
+                    }
                     $data[] = ['guid' => self::BLINK_ACCESSORY_GUID, 'id'=> $dev['id'],  'name' => $this->Translate('Floodlight'), 'type' => 'accessories', 'model' => $dev['type'], 'target' => $dev['target_id'], 'battery' => $dev['battery'], 'serial' => $dev['serial'], 'power' => $this->Translate('Battery'), 'network' => $nid];
                 }
             }
             // Pan-Tilt
             if (isset($devises['accessories']['rosie'])) {
                 foreach ($devises['accessories']['rosie'] as $dev) {
-                    $this->SendDebug(__FUNCTION__, $dev);
+                    $this->LogDebug(__FUNCTION__, $dev);
                 }
             }
         }
 
-        $this->SendDebug(__FUNCTION__, $response);
+        $this->LogDebug(__FUNCTION__, $response);
         return $data;
-    }
-
-    /**
-     * Returns the instance ID for a given device.
-     *
-     * @param string $device Blink Device ID
-     * @return array device data
-     */
-    private function GetBlinkHomeInstance($device)
-    {
-        $ids = IPS_GetInstanceListByModuleID(self::BLINK_DEVICE_GUID);
-        foreach ($ids as $id) {
-            if (IPS_GetProperty($id, 'DeviceID') == $device) {
-                return $id;
-            }
-        }
-        $ids = IPS_GetInstanceListByModuleID(self::BLINK_MODULE_GUID);
-        foreach ($ids as $id) {
-            if (IPS_GetProperty($id, 'DeviceID') == $device) {
-                return $id;
-            }
-        }
-        return 0;
     }
 
     /**
      * Returns the network ID for a given device.
      *
-     * @param string target device id
-     * @param array device data
-     * @return string Network ID
+     * @param int $target  Target device ID
+     * @param array<int,array<string,mixed>> $devices Array of devices
+     * @return int Network ID
      */
-    private function GetBlinkTargetNetwork($target, $devices)
+    private function GetBlinkTargetNetwork(int $target, array $devices): int
     {
         foreach ($devices as $dev) {
             if ($dev['id'] == $target) {
                 return $dev['network'];
             }
         }
-        return $this->Translate('<unknown>');
+        return -1;
     }
 
     /**
@@ -306,7 +313,7 @@ class BlinkHomeConfigurator extends IPSModule
      * @param string $endpoint API endpoint request.
      * @return string Result of the API call.
      */
-    private function RequestDataFromParent(string $endpoint)
+    private function RequestDataFromParent(string $endpoint): string
     {
         return $this->SendDataToParent(json_encode([
             'DataID'      => '{83027B09-C481-91E7-6D24-BF49AA871452}',
@@ -315,10 +322,10 @@ class BlinkHomeConfigurator extends IPSModule
     }
 
     /**
-     * Returns the ascending list of category names for a given category id
+     * Returns the ascending list of category names for a given category id.
      *
      * @param int $categoryId Category ID.
-     * @return array List of reverse catergory names.
+     * @return array<int,string> List of category names from root to leaf
      */
     private function GetPathOfCategory(int $categoryId): array
     {

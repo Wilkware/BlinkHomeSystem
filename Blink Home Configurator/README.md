@@ -1,8 +1,8 @@
-# Blink Home Configurator
+# 🔎 Blink Home Configurator
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.7.20240628-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
+[![Product](https://img.shields.io/badge/Symcon%20Version-8.1-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
+[![Version](https://img.shields.io/badge/Modul%20Version-2.0.20251013-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/style.yml?branch=main&label=CheckStyle&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
@@ -29,7 +29,7 @@ Wenn jemand noch weitere im Einsatz hat, bitte einfach bei mir melden!
 
 ### 2. Voraussetzungen
 
-* IP-Symcon ab Version 6.4
+* IP-Symcon ab Version 8.1
 
 ### 3. Installation
 
@@ -73,6 +73,16 @@ Es ist keine weitere Steuerung oder gesonderte Darstellung integriert.
 Das Modul bietet keine direkten Funktionsaufrufe.
 
 ### 8. Versionshistorie
+
+v2.0.20251013
+
+* _NEU_: Support für Blink Outdoor 4 Kamera
+* _NEU_: Umstellung auf Strict-Modus (IPSModuleStrict)
+* _NEU_: Umstellung auf globale einheitliche Versionsnummer
+* _NEU_: Kompatibilität auf IPS 8.1 vereinheitlicht
+* _FIX_: Interne Bibliotheken und Konfiguration überarbeitet und vereinheitlicht
+* _FIX_: Ungenutzten Code entfernt
+* _FIX_: Inline-Dokumentation komplett überarbeitet
 
 v1.7.20240628
 

@@ -6,7 +6,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../libs/_traits.php';
 
 // Blink Home Device
-class BlinkHomeDevice extends IPSModule
+class BlinkHomeDevice extends IPSModuleStrict
 {
     // Helper Traits
     use DebugHelper;
@@ -15,10 +15,16 @@ class BlinkHomeDevice extends IPSModule
     use ProfileHelper;
     use VariableHelper;
 
-    // Profiles
+    /**
+     * @var array<int,array{0:int,1:string,2:string,3:int}> Profile UPDATE
+     */
     private const BLINK_PROFILE_UPDATE = [
         [1, '►', '', 0xFF8000],
     ];
+
+    /**
+     * @var array<int,array{0:int,1:string,2:string,3:int}> Profile BATTERY
+     */
     private const BLINK_PROFILE_BATTERY = [
         [0, 'unknown', '', 0xFF00FF],
         [1, 'critical', 'Battery-0', 0xFF0000],
@@ -26,42 +32,66 @@ class BlinkHomeDevice extends IPSModule
         [3, 'ok', 'Battery-100', 0x00FF00],
     ];
 
-    // Echo Maps
+    /**
+     * @var array<int,array{0:string,1:string,2:int,3:?string}> Echo map LIVEVIEW
+     */
     private const BLINK_MAP_LIVEVIEW = [
-        ['command_id', 'Command ID', 1],
-        ['join_available', 'Join available', 0],
-        ['join_state', 'Join state', 3],
-        ['server', 'Server', 3],
-        ['duration', 'Duration', 1],
-        ['extended_duration', 'Extended duration', 1],
-        ['continue_interval', 'Continue interval', 1],
-        ['continue_warning', 'Continue warning', 1],
-        ['polling_interval', 'Polling interval', 1],
-    ];
-    private const BLINK_MAP_SIGNALS = [
-        ['power', 'Power supply', 3],
-        ['lfr', 'Sync signal strength', 1],
-        ['wifi', 'WiFi strength', 1],
-        ['temp', 'Temperature', 1],
-        ['battery', 'Battery', 1],
+        ['command_id', 'Command ID', 1, null],
+        ['join_available', 'Join available', 0, null],
+        ['join_state', 'Join state', 3, null],
+        ['server', 'Server', 3, null],
+        ['duration', 'Duration', 1, null],
+        ['extended_duration', 'Extended duration', 1, null],
+        ['continue_interval', 'Continue interval', 1, null],
+        ['continue_warning', 'Continue warning', 1, null],
+        ['polling_interval', 'Polling interval', 1, null],
     ];
 
-    // Schedule constant
+    /**
+     * @var array<int,array{0:string,1:string,2:int,3:?string}> Echo map SIGNALS
+     */
+    private const BLINK_MAP_SIGNALS = [
+        ['power', 'Power supply', 3, null],
+        ['lfr', 'Sync signal strength', 1, null],
+        ['wifi', 'WiFi strength', 1, null],
+        ['temp', 'Temperature', 1, null],
+        ['battery', 'Battery', 1, null],
+    ];
+
+    /**
+     * @var int Schedule snapshot constant OFF
+     */
     private const BLINK_SCHEDULE_SNAPSHOT_OFF = 1;
+    /**
+     * @var int Schedule snapshot constant ON
+     */
     private const BLINK_SCHEDULE_SNAPSHOT_ON = 2;
+
+    /**
+     * @var string Schedule snapshot constant IDENT
+     */
     private const BLINK_SCHEDULE_SNAPSHOT_IDENT = 'circuit_snapshot';
+
+    /**
+     * @var array<int,array{0:string,1:int,2:string}> Schedule snapshot constant ACTION (Switch)
+     */
     private const BLINK_SCHEDULE_SNAPSHOT_SWITCH = [
         self::BLINK_SCHEDULE_SNAPSHOT_OFF => ['Inaktive', 0xFF0000, "IPS_RequestAction(\$_IPS['TARGET'], 'schedule_snapshot', \$_IPS['ACTION']);"],
         self::BLINK_SCHEDULE_SNAPSHOT_ON  => ['Aktive', 0x00FF00, "IPS_RequestAction(\$_IPS['TARGET'], 'schedule_snapshot', \$_IPS['ACTION']);"],
     ];
 
-    // Command Call Interval
+    /**
+     * @var int Command Call Interval
+     */
     private const BLINK_COMMAND_TIMER_INTERVAL = 2000;
 
     /**
-     * Overrides the internal IPSModule::Create($id) function
+     * In contrast to Construct, this function is called only once when creating the instance and starting IP-Symcon.
+     * Therefore, status variables and module properties which the module requires permanently should be created here.
+     *
+     * @return void
      */
-    public function Create()
+    public function Create(): void
     {
         //Never delete this line!
         parent::Create();
@@ -69,6 +99,8 @@ class BlinkHomeDevice extends IPSModule
         $this->ConnectParent('{AF126D6D-83D1-44C2-6F61-96A4BB7A0E62}');
         // CommandStatus
         $this->RegisterAttributeString('CommandID', '');
+        // Authdata for LiveView
+        $this->RegisterAttributeString('AuthData', '');
         // Device
         $this->RegisterPropertyString('DeviceID', '');
         $this->RegisterPropertyString('NetworkID', '');
@@ -88,6 +120,9 @@ class BlinkHomeDevice extends IPSModule
         // Schedule
         $this->RegisterPropertyInteger('ImageInterval', 0);
         $this->RegisterPropertyInteger('ImageSchedule', 0);
+        // Liveview
+        $this->RegisterPropertyBoolean('LiveViewEnable', false);
+        $this->RegisterPropertyString('LiveViewServer', '');
         // Variable
         $this->RegisterPropertyBoolean('UpdateImage', false);
         $this->RegisterPropertyBoolean('UpdateBattery', false);
@@ -95,23 +130,31 @@ class BlinkHomeDevice extends IPSModule
         // Register update timer
         $this->RegisterTimer('TimerSnapshot', 0, 'IPS_RequestAction(' . $this->InstanceID . ', "snapshot", "");');
         $this->RegisterTimer('TimerCommand', 0, 'IPS_RequestAction(' . $this->InstanceID . ', "command", "");');
+
+        // Set visualization type to 1, as we want to offer HTML
+        $this->SetVisualizationType(0);
     }
 
     /**
-     * Overrides the internal IPSModule::Destroy($id) function
+     * This function is called when deleting the instance during operation and when updating via "Module Control".
+     * The function is not called when exiting IP-Symcon.
+     *
+     * @return void
      */
-    public function Destroy()
+    public function Destroy(): void
     {
         //Never delete this line!
         parent::Destroy();
     }
 
     /**
-     * Configuration Form.
+     * The content can be overwritten in order to transfer a self-created configuration page.
+     * This way, content can be generated dynamically.
+     * In this case, the "form.json" on the file system is completely ignored.
      *
-     * @return JSON configuration string.
+     * @return string Content of the configuration page.
      */
-    public function GetConfigurationForm()
+    public function GetConfigurationForm(): string
     {
         // Get Form
         $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
@@ -126,7 +169,7 @@ class BlinkHomeDevice extends IPSModule
 
         // Power supply is battery?
         $model = $this->ReadPropertyString('DeviceModel');
-        if (!in_array($model, ['mini', 'owl', 'hack'])) {
+        if (!in_array($model, ['mini', 'hawk', 'owl', 'hack'])) {
             $form['elements'][5]['items'][1]['visible'] = true;
         }
 
@@ -134,14 +177,16 @@ class BlinkHomeDevice extends IPSModule
         $form['actions'][1]['items'][0]['enabled'] = $snapshot;
 
         // Debug output
-        //$this->SendDebug(__FUNCTION__, $form);
+        //$this->LogDebug(__FUNCTION__, $form);
         return json_encode($form);
     }
 
     /**
-     * Overrides the internal IPSModule::ApplyChanges($id) function
+     * Is executed when "Apply" is pressed on the configuration page and immediately after the instance has been created.
+     *
+     * @return void
      */
-    public function ApplyChanges()
+    public function ApplyChanges(): void
     {
         //Never delete this line!
         parent::ApplyChanges();
@@ -154,6 +199,7 @@ class BlinkHomeDevice extends IPSModule
         $update = $this->ReadPropertyBoolean('UpdateImage');
         $battery = $this->ReadPropertyBoolean('UpdateBattery');
         $schedule = $this->ReadPropertyInteger('ImageSchedule');
+        $liveview = $this->ReadPropertyBoolean('LiveViewEnable');
         // Register Profile
         $this->RegisterProfileInteger('BHS.Update', 'Script', '', '', 0, 0, 0, self::BLINK_PROFILE_UPDATE);
         $this->RegisterProfileInteger('BHS.Battery', 'Battery', '', '', 0, 3, 1, self::BLINK_PROFILE_BATTERY);
@@ -163,17 +209,17 @@ class BlinkHomeDevice extends IPSModule
             $this->EnableAction('motion_detection');
         }
         // Update image
-        $this->MaintainVariable('snapshot', $this->Translate('Snapshot'), VARIABLETYPE_INTEGER, 'BHS.Update', 2, $update & $image);
+        $this->MaintainVariable('snapshot', $this->Translate('Snapshot'), VARIABLETYPE_INTEGER, 'BHS.Update', 2, $update && $image);
         if ($update & $image) {
             $this->SetValueInteger('snapshot', 1);
             $this->EnableAction('snapshot');
         }
         // Record clip
-        $this->MaintainVariable('record', $this->Translate('Record'), VARIABLETYPE_INTEGER, 'BHS.Update', 4, true);
-        $this->SetValueInteger('snapshot', 1);
+        $this->MaintainVariable('record', $this->Translate('Record'), VARIABLETYPE_INTEGER, 'BHS.Update', 3, true);
+        $this->SetValueInteger('record', 1);
         $this->EnableAction('record');
         // Update battery
-        $this->MaintainVariable('battery', $this->Translate('Battery'), VARIABLETYPE_INTEGER, 'BHS.Battery', 3, $battery);
+        $this->MaintainVariable('battery', $this->Translate('Battery'), VARIABLETYPE_INTEGER, 'BHS.Battery', 4, $battery);
         // Media Object
         if ($image) {
             $this->CreateMediaImage('thumbnail', $this->Translate('Image'), $device, 'jpg', $cache);
@@ -185,28 +231,32 @@ class BlinkHomeDevice extends IPSModule
                     $this->SetTimerInterval('TimerSnapshot', $rand + (60 * 1000 * $interval));
                 } else {
                     $wsi = $this->GetWeeklyScheduleInfo($schedule, time(), true);
-                    $this->SendDebug(__FUNCTION__, $wsi);
+                    $this->LogDebug(__FUNCTION__, $wsi);
                     if ($wsi['ActionID'] == self::BLINK_SCHEDULE_SNAPSHOT_ON) {
                         $this->SetTimerInterval('TimerSnapshot', $rand + (60 * 1000 * $interval));
                     }
                 }
             }
-        } else {
-            // Timer Reset
+        }
+        // Timer Reset
+        if (!$image || ($interval <= 0)) {
             $this->SetTimerInterval('TimerSnapshot', 0);
         }
+        // Enable Visu for Liveview or Image
+        $this->SetVisualizationType(($liveview || $image) ? 1 : 0);
     }
 
     /**
-     * RequestAction.
+     * Is called when, for example, a button is clicked in the visualization.
      *
-     *  @param string $ident Ident.
-     *  @param string $value Value.
+     * @param string $ident Ident of the variable
+     * @param mixed $value The value to be set
+     * @return void
      */
-    public function RequestAction($ident, $value)
+    public function RequestAction(string $ident, mixed $value): void
     {
         // Debug output
-        $this->SendDebug(__FUNCTION__, $ident . ' => ' . $value);
+        $this->LogDebug(__FUNCTION__, $ident . ' => ' . $value);
         switch ($ident) {
             case 'create_schedule':
                 $this->CreateScheduleSnapshot();
@@ -229,6 +279,9 @@ class BlinkHomeDevice extends IPSModule
             case 'signals':
                 $this->Signals();
                 break;
+            case 'config':
+                $this->Configuration();
+                break;
             case 'command':
                 $this->Command();
                 break;
@@ -242,33 +295,106 @@ class BlinkHomeDevice extends IPSModule
     }
 
     /**
+     * This function is called by IP-Symcon and processes sent data and, if necessary, forwards it to
+     * all child instances. Data can be sent using the SendDataToChildren function.
+     *
+     * @param string $json Data package in JSON format
+     *
+     * @return string Optional response to the parent instance
+     */
+    public function ReceiveData(string $json): string
+    {
+        $this->LogDebug(__FUNCTION__, $json);
+        $data = json_decode($json, true);
+        if (isset($data['AuthData'])) {
+            $this->WriteAttributeString('AuthData', serialize($data['AuthData']));
+        }
+        if (isset($data['Battery'])) {
+            $device = $this->ReadPropertyString('DeviceID');
+            foreach ($data['Battery'] as $entry) {
+                if ($entry['device'] == $device) {
+                    $this->SetValueInteger('battery', $entry['battery']);
+                }
+            }
+        }
+        return '';
+    }
+
+    /**
+     * If the HTML-SDK is to be used, this function must be overwritten in order to return the HTML content.
+     *
+     * @return string Initial display of a representation via HTML SDK
+     */
+    public function GetVisualizationTile(): string
+    {
+        // Add a script to set the values when loading, analogous to changes at runtime
+        // Although the return from GetFullUpdateMessage is already JSON-encoded, json_encode is still executed a second time
+        // This adds quotation marks to the string and any quotation marks within it are escaped correctly
+        $initialHandling = '<script>handleMessage(' . json_encode($this->GetFullUpdateMessage()) . ');</script>';
+        // Add static HTML from file
+        $module = file_get_contents(__DIR__ . '/module.html');
+        // Important: $initialHandling at the end, as the handleMessage function is only defined in the HTML
+        return $module . $initialHandling;
+    }
+
+    /**
+     * Generate a message that updates all elements in the HTML display.
+     *
+     * @return String JSON encoded message information
+     */
+    private function GetFullUpdateMessage()
+    {
+        // dataset variable
+        $result = [
+            'client' => array_merge(
+                unserialize($this->ReadAttributeString('AuthData')),
+                [
+                    'device'  => $this->ReadPropertyString('DeviceID'),
+                    'network' => $this->ReadPropertyString('NetworkID'),
+                    'type'    => $this->ReadPropertyString('DeviceType'),
+                    'model'   => $this->ReadPropertyString('DeviceModel')
+                ]
+            ),
+            'server'    => $this->ReadPropertyString('LiveViewServer'),
+            'motion'    => $this->GetValue('motion_detection'),
+            'poster'    => $this->GetBase64Image(@$this->GetIDForIdent('thumbnail')),
+            'live'      => $this->ReadPropertyBoolean('LiveViewEnable'),
+            'snapshot'  => $this->ReadPropertyBoolean('ImageVariable'),
+        ];
+        $this->LogDebug(__FUNCTION__, $result);
+        return json_encode($result);
+    }
+
+    /**
      * Weekly Schedule event
      *
      * @param integer $value Action value (ON=2, OFF=1)
+     *
+     * @return void
      */
-    private function ScheduleSnapshot(int $value)
+    private function ScheduleSnapshot(int $value): void
     {
         $schedule = $this->ReadPropertyInteger('ImageSchedule');
-        $this->SendDebug(__FUNCTION__, 'Value: ' . $value . ',Schedule: ' . $schedule);
+        $this->LogDebug(__FUNCTION__, 'Value: ' . $value . ',Schedule: ' . $schedule);
         if ($schedule == 0) {
             // nothing todo
             return;
         }
         // Is Activate OFF
         if ($value == self::BLINK_SCHEDULE_SNAPSHOT_OFF) {
-            $this->SendDebug(__FUNCTION__, 'OFF: Deactivate schedule timer!');
+            $this->LogDebug(__FUNCTION__, 'OFF: Deactivate schedule timer!');
             // Reset Timer
             $this->SetTimerInterval('TimerSnapshot', 0);
             return;
         }
         // Image schedule is aktiv?
         $image = $this->ReadPropertyBoolean('ImageVariable');
-        $this->SendDebug(__FUNCTION__, 'ON: Image is:' . $image);
+        $this->LogDebug(__FUNCTION__, 'ON: Image is:' . $image);
         if ($image == true) {
             $interval = $this->ReadPropertyInteger('ImageInterval');
-            $this->SendDebug(__FUNCTION__, 'ON: Interval is:' . $interval);
+            $this->LogDebug(__FUNCTION__, 'ON: Interval is:' . $interval);
             if ($interval > 0) {
-                $this->SendDebug(__FUNCTION__, 'ON: Activate schedule timer:' . $interval);
+                $this->LogDebug(__FUNCTION__, 'ON: Activate schedule timer:' . $interval);
                 $this->SetTimerInterval('TimerSnapshot', 60 * 1000 * $interval);
                 // Start with Update and than wait for Timer
                 $this->Thumbnail();
@@ -280,12 +406,14 @@ class BlinkHomeDevice extends IPSModule
      * Set the thumbail by taking a snapshot of the current view of the camera.
      *
      * BHS_Thumbnail();
+     *
+     * @return void
      */
-    private function Thumbnail()
+    private function Thumbnail(): void
     {
         $command = $this->ReadAttributeString('CommandID');
         if ($command != '') {
-            $this->SendDebug(__FUNCTION__, 'Command still active!');
+            $this->LogDebug(__FUNCTION__, 'Command still active!');
             $reset = $this->ReadPropertyBoolean('ResetCommand');
             if ($reset) {
                 $this->LogMessage('[' . IPS_GetName($this->InstanceID) . '] ' . ' Commando was reset!', KL_WARNING);
@@ -302,14 +430,14 @@ class BlinkHomeDevice extends IPSModule
         $param = ['NetworkID' => $network, 'DeviceID' => $device, 'DeviceType' => $type];
         // Request
         $response = $this->RequestDataFromParent('thumbnail', $param);
-        $this->SendDebug(__FUNCTION__, $response);
+        $this->LogDebug(__FUNCTION__, $response);
         if ($response === '[]') {
             $this->LogMessage('[' . IPS_GetName($this->InstanceID) . '] ' . 'No command info for thumbnail', KL_ERROR);
             return;
         }
         // Command
         $command = json_decode($response, true);
-        $this->SendDebug(__FUNCTION__, $command);
+        $this->LogDebug(__FUNCTION__, $command);
         if (isset($command['id'])) {
             $this->WriteAttributeString('CommandID', $command['id']);
             // Start Trigger
@@ -321,8 +449,10 @@ class BlinkHomeDevice extends IPSModule
 
     /**
      * Enable / Disable motion detection
+     *
+     * @return void
      */
-    private function MotionDetection(bool $value)
+    private function MotionDetection(bool $value): void
     {
         $device = $this->ReadPropertyString('DeviceID');
         $network = $this->ReadPropertyString('NetworkID');
@@ -332,20 +462,23 @@ class BlinkHomeDevice extends IPSModule
         // Request
         $response = $this->RequestDataFromParent('motion', $param);
         if ($response === '[]') {
-            $this->SendDebug(__FUNCTION__, 'Error occurred for switching motion detection');
+            $this->LogDebug(__FUNCTION__, 'Error occurred for switching motion detection');
         } else {
             $this->SetValueBoolean('motion_detection', $value);
+            $this->UpdateVisualizationValue(json_encode(['motion' => $value]));
         }
     }
 
     /**
      * Get Image from server
+     *
+     * @return void
      */
-    private function Image()
+    private function Image(): void
     {
         $response = $this->RequestDataFromParent('homescreen');
         if ($response === '[]') {
-            $this->SendDebug(__FUNCTION__, 'No Result for HomeScreen!');
+            $this->LogDebug(__FUNCTION__, 'No Result for HomeScreen!');
             return;
         }
         $device = $this->ReadPropertyString('DeviceID');
@@ -357,10 +490,6 @@ class BlinkHomeDevice extends IPSModule
             foreach ($devises[$type] as $dev) {
                 if ($dev['id'] == $device) {
                     $path = $dev['thumbnail'];
-                    // battery update
-                    if (!isset($dev['battery'])) {
-                        $this->SetValueInteger('battery', 4);
-                    }
                     // if battery than signals
                     if (isset($dev['signals'])) {
                         if (isset($dev['signals']['battery'])) {
@@ -372,22 +501,21 @@ class BlinkHomeDevice extends IPSModule
             }
         }
         if ($path === '') {
-            $this->SendDebug(__FUNCTION__, 'No Path for Thambnail!');
+            $this->LogDebug(__FUNCTION__, 'No Path for Thambnail!');
             return;
         }
         // get image
         $param = ['Path' => $path];
         // Request
-        //FIXME: $response = utf8_decode($this->RequestDataFromParent('image', $param));
         $response = hex2bin($this->RequestDataFromParent('image', $param));
         if ($response === '[]') {
-            $this->SendDebug(__FUNCTION__, 'No Image for Path!');
+            $this->LogDebug(__FUNCTION__, 'No Image for Path!');
             return;
         }
         // Media object
         $mediaID = @$this->GetIDForIdent('thumbnail');
-        if ($mediaID === false) {
-            $this->SendDebug(__FUNCTION__, 'No Media for Content!');
+        if (!IPS_MediaExists($mediaID)) {
+            $this->LogDebug(__FUNCTION__, 'No Media for Content!');
             return;
         }
         // Create timestamp overlay?
@@ -437,12 +565,39 @@ class BlinkHomeDevice extends IPSModule
             IPS_SetMediaContent($mediaID, base64_encode($response));
             IPS_SendMediaEvent($mediaID);
         }
+        $this->UpdateVisualizationValue(json_encode(['poster' => $this->GetBase64Image($mediaID)]));
+    }
+
+    /**
+     * Get device config data
+     *
+     * @return void
+     */
+    private function Configuration(): void
+    {
+        $network = $this->ReadPropertyString('NetworkID');
+        $device = $this->ReadPropertyString('DeviceID');
+        $type = $this->ReadPropertyString('DeviceType');
+        // Parameter
+        $param = ['NetworkID' => $network, 'DeviceID' => $device, 'DeviceType' => $type];
+        // Request
+        $response = $this->RequestDataFromParent('config', $param);
+        $this->LogDebug(__FUNCTION__, $response);
+        if ($response === '[]') {
+            $this->LogDebug(__FUNCTION__, 'Error occurred for config');
+        }
+        else {
+            // Echo message
+            $this->EchoMessage($this->PrettyPrint(null, $response, true));
+        }
     }
 
     /**
      * Get Live Video URL from server
+     *
+     * @return void
      */
-    private function LiveView()
+    private function LiveView(): void
     {
         $network = $this->ReadPropertyString('NetworkID');
         $device = $this->ReadPropertyString('DeviceID');
@@ -451,9 +606,9 @@ class BlinkHomeDevice extends IPSModule
         $param = ['NetworkID' => $network, 'DeviceID' => $device, 'DeviceType' => $type];
         // Request
         $response = $this->RequestDataFromParent('liveview', $param);
-        $this->SendDebug(__FUNCTION__, $response);
+        $this->LogDebug(__FUNCTION__, $response);
         if ($response === '[]') {
-            $this->SendDebug(__FUNCTION__, 'Error occurred for liveview');
+            $this->LogDebug(__FUNCTION__, 'Error occurred for liveview');
         }
         else {
             // Echo message
@@ -463,8 +618,10 @@ class BlinkHomeDevice extends IPSModule
 
     /**
      * Start a live recording clip.
+     *
+     * @return void
      */
-    private function Record()
+    private function Record(): void
     {
         $network = $this->ReadPropertyString('NetworkID');
         $device = $this->ReadPropertyString('DeviceID');
@@ -473,9 +630,9 @@ class BlinkHomeDevice extends IPSModule
         $param = ['NetworkID' => $network, 'DeviceID' => $device, 'DeviceType' => $type];
         // Request
         $response = $this->RequestDataFromParent('record', $param);
-        $this->SendDebug(__FUNCTION__, $response);
+        $this->LogDebug(__FUNCTION__, $response);
         if ($response === '[]') {
-            $this->SendDebug(__FUNCTION__, 'Error occurred for liveview');
+            $this->LogDebug(__FUNCTION__, 'Error occurred for liveview');
         }
         else {
             // Echo message
@@ -485,12 +642,14 @@ class BlinkHomeDevice extends IPSModule
 
     /**
      * Get Signal information
+     *
+     * @return void
      */
-    private function Signals()
+    private function Signals(): void
     {
         $response = $this->RequestDataFromParent('homescreen');
         if ($response === '[]') {
-            $this->SendDebug(__FUNCTION__, 'No Result for HomeScreen!');
+            $this->LogDebug(__FUNCTION__, 'No Result for HomeScreen!');
             return;
         }
         $device = $this->ReadPropertyString('DeviceID');
@@ -506,7 +665,6 @@ class BlinkHomeDevice extends IPSModule
                         $signals['power'] = $this->Translate('Battery');
                     } else {
                         $signals['power'] = 'USB';
-                        $this->SetValueInteger('battery', 4);
                     }
                     // if battery than signals
                     if (isset($dev['signals'])) {
@@ -524,13 +682,15 @@ class BlinkHomeDevice extends IPSModule
             }
         }
         // Echo message
-        $this->EchoMessage($this->PrettyPrint(self::BLINK_MAP_SIGNALS, $signals));
+        $this->EchoMessage($this->PrettyPrint(self::BLINK_MAP_SIGNALS, json_encode($signals)));
     }
 
     /**
      * Command status polling
+     *
+     * @return void
      */
-    private function Command()
+    private function Command(): void
     {
         // Stop Timer
         $this->SetTimerInterval('TimerCommand', 0);
@@ -540,20 +700,19 @@ class BlinkHomeDevice extends IPSModule
         // Safty check
         if ($command == '') {
             $this->LogMessage('[' . IPS_GetName($this->InstanceID) . '] ' . ' Zombie Command!', KL_ERROR);
-            $this->SendDebug(__FUNCTION__, 'Zombie Command!');
+            $this->LogDebug(__FUNCTION__, 'Zombie Command!');
             return;
         }
         $param = ['NetworkID' => $network, 'CommandID' => $command];
         // Request
         $response = $this->RequestDataFromParent('command', $param);
         if ($response === '[]') {
-            $this->SendDebug(__FUNCTION__, 'No Result for Command!');
+            $this->LogDebug(__FUNCTION__, 'No Result for Command!');
             return;
         }
         $command = json_decode($response, true);
         if ($command['complete'] == true) {
-            $this->SendDebug(__FUNCTION__, $command);
-            //$this->SendDebug(__FUNCTION__, 'Command completed!');
+            $this->LogDebug(__FUNCTION__, $command);
             $this->WriteAttributeString('CommandID', '');
             if ($command['status'] == 0) {
                 $this->Image();
@@ -569,9 +728,10 @@ class BlinkHomeDevice extends IPSModule
      * Returns the ascending list of category names for a given category id
      *
      * @param string $endpoint API endpoint request.
+     * @param array<string,mixed>  $params   Optional parameters for the API request
      * @return string Result of the API call.
      */
-    private function RequestDataFromParent(string $endpoint, array $params = [])
+    private function RequestDataFromParent(string $endpoint, array $params = []): string
     {
         return $this->SendDataToParent(json_encode([
             'DataID'      => '{83027B09-C481-91E7-6D24-BF49AA871452}',
@@ -583,11 +743,12 @@ class BlinkHomeDevice extends IPSModule
     /**
      * Create week schedule for snapshots
      *
+     * @return void
      */
-    private function CreateScheduleSnapshot()
+    private function CreateScheduleSnapshot(): void
     {
         $eid = $this->CreateWeeklySchedule($this->InstanceID, $this->Translate('Schedule snapshot'), self::BLINK_SCHEDULE_SNAPSHOT_IDENT, self::BLINK_SCHEDULE_SNAPSHOT_SWITCH, -1);
-        if ($eid !== false) {
+        if (IPS_EventExists($eid)) {
             $this->UpdateFormField('ImageSchedule', 'value', $eid);
         }
     }
@@ -595,18 +756,20 @@ class BlinkHomeDevice extends IPSModule
     /**
      * Create a media variable to take over the snapshots.
      *
-     *  @param string $ident Ident.
-     *  @param string $name Name
-     *  @param string $filename Image file name.
-     *  @param string $fileext Image file extension.
-     *  @param bool §cache Use In-memory cache
+     * @param string   $ident      Ident.
+     * @param string   $name       Name
+     * @param string   $filename   Image file name.
+     * @param string   $fileext    Image file extension.
+     * @param bool     $cache      Use In-memory cache
+     *
+     * @return void
      */
-    private function CreateMediaImage(string $ident, string $name, string $filename, string $fileext = 'jpg', bool $cache = true)
+    private function CreateMediaImage(string $ident, string $name, string $filename, string $fileext = 'jpg', bool $cache = true): void
     {
         $file = IPS_GetKernelDir() . 'media' . DIRECTORY_SEPARATOR . $filename . '.' . $fileext;  // Image-Datei
 
         $mediaID = @$this->GetIDForIdent($ident);
-        if ($mediaID === false) {
+        if (!IPS_MediaExists($mediaID)) {
             $mediaID = IPS_CreateMedia(1);
             IPS_SetParent($mediaID, $this->InstanceID);
             IPS_SetIdent($mediaID, $ident);
@@ -627,9 +790,10 @@ class BlinkHomeDevice extends IPSModule
      * Create a red, green, blue array from the color value
      *
      * @param int $num Color value.
-     * @return array Color splitted in red, green and blue values.
+     *
+     * @return array{0:int,1:int,2:int} [Red, Green, Blue] values
      */
-    private function Int2RGB(int $num)
+    private function Int2RGB(int $num): array
     {
         $rgb[0] = ($num & 0xFF0000) >> 16;
         $rgb[1] = ($num & 0x00FF00) >> 8;
@@ -641,8 +805,10 @@ class BlinkHomeDevice extends IPSModule
      * Show message via popup
      *
      * @param string $caption echo message
+     *
+     * @return void
      */
-    private function EchoMessage(string $caption)
+    private function EchoMessage(string $caption): void
     {
         $this->UpdateFormField('EchoMessage', 'caption', $this->Translate($caption));
         $this->UpdateFormField('EchoPopup', 'visible', true);

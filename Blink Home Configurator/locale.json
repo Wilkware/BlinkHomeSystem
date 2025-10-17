@@ -2,7 +2,6 @@
     "translations": {
         "de": {
             "Blink Home Configurator": "Blink Home Konfigurator",
-            "\nBlink Home Configurator\n ": "\nBlink Home Konfigurator\n ",
             "Using this configurator, you can select from the list of currently found devices and create an instance for a new device or check an existing instance.": "Mit Hilfe dieser Konfigurators kann man aus der Liste der aktuell gefundenen Geräte auswählen und eine Instanz für ein neues Gerät erstellen oder eine vorhandene Instanz prüfen.",
             "Target Category:": "Zielkategorie:",
             "Devices:": "Geräte:",
@@ -27,7 +26,7 @@
             "Mini Camera": "Mini-Kamera",
             "Accessorie": "Zubehör",
             "Floodlight": "Flutlicht",
-            "Source code, donation and licence ...": "Quellcode, Spende und Lizenz ...",
+            "🎗️ Source code, donation and licence ...": "🎗️ Quellcode, Spende und Lizenz ...",
             "The software is free of charge for non-commercial use, I would appreciate a donation if you like the module.": "Die Software ist für die nicht kommerzielle Nutzung kostenlos, über eine Spende bei Gefallen des Moduls würde ich mich sehr freuen."
         }
     }

@@ -1,8 +1,8 @@
-# Blink Home Device
+# 📷 Blink Home Device
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.8.20241024-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
+[![Product](https://img.shields.io/badge/Symcon%20Version-8.1-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
+[![Version](https://img.shields.io/badge/Modul%20Version-2.0.20251013-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/style.yml?branch=main&label=CheckStyle&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
@@ -26,7 +26,7 @@ Es ist derzeit noch nicht absehbar, welchen Funktionsumfang das Modul endgültig
 
 ### 2. Voraussetzungen
 
-* IP-Symcon ab Version 6.4
+* IP-Symcon ab Version 8.1
 
 ### 3. Installation
 
@@ -44,16 +44,16 @@ __Konfigurationsseite__:
 
 _Einstellungsbereich:_
 
-> Geräteinformationen ...
+> 📳 Geräteinformationen ...
 
 Name           | Beschreibung
 -------------- | ------------------
 Gerätetyp      | Typbezeichnung (Kamera)
 Gerätemodell   | Modellbezeichnung
-Geräte-ID      | Interne Gerätenummer (6-stellig)
-Netwerk-ID     | Interne Netwerknummer (6-stellig)
+Geräte-ID      | Interne Gerätenummer
+Netwerk-ID     | Interne Netwerknummer
 
-> Bilder ...
+> 🖼️ Bilder ...
 
 Name                                                   | Beschreibung
 ------------------------------------------------------ | -----------------------------------------------------
@@ -66,19 +66,27 @@ Schriftgröße                                           | Schriftgröße des Ze
 Schriftfarbe                                           | Farbliche Gestaltung des Zeitstempels
 Pfad zu der TrueType-Schriftart                        | Angabe welcher Truetype-Font verwendet werden soll (voller Dateipfad)
 
-> Zeitsteuerung ...
+> ⏱️ Zeitsteuerung ...
 
 Name                     | Beschreibung
 ------------------------ | ------------------
 Aktualisierungsintervall | Zeit zwischen 2 Aufnahmen (Standard 60 Minuten), 0 deaktiviert die Aufnahmen. ACHTUNG: zu kurzes Intervall geht auf die Lebensdauer der Batterie!
 Zeitplan                 | Zeitraum in dem Aufnahmen im angeegebenen Intervall erfolgen sollen.
 
-> Erweiterte Einstellungen  ...
+> 🎥 Liveansicht ...
+
+Name                     | Beschreibung
+------------------------ | ------------------
+Live-Ansicht über Middleware-Server aktivieren! | Dadurch wird eine spezielle Kachel-Darstellung aktiviert, welche das Starten und Stoppen der Live-Ansicht in der Visualisierung ermöglicht
+Url des Middleware-Servers (IP:PORT) | Url (IP-Adresse + eingestellten Port) zum Server
+
+> ⚙️ Erweiterte Einstellungen  ...
 
 Name           | Beschreibung
 -------------- | ------------------
 Anlegen einer Variabel zur Auslösung einer Momentaufnahme der aktuellen Ansicht der Kamera! | Variable für's Webfront zum Auslösen einer Aufnahme
 Erstellen einer Variable zur Anzeige des Ladezustands der Batterie! | Variable für's Webfront zum Anzeigen des Ladezustandes
+Automatisches Zurücksetzen des Kommando-Stacks! | Automatisches Zurücksetzen der Kommando ID beim auftretten von Fehlern.
 
 _Aktionsbereich:_
 
@@ -87,6 +95,7 @@ Aktion              | Beschreibung
 ZEITPLAN HINZUFÜGEN | Es wird ein Wochenplan mit 2 Zuständen (Aktiv & Inaktiv) angelegt und in den Einstellung hinterlegt.
 SNAPSHOT            | Löst eine Momentaufnahme(Snapshot) aus.
 LIVEVIEW            | Anzeige der LiveView Anfrageantwort
+KONFIGURATION       | Anzeige der Geräte-Konfigurationsdaten
 SIGNALE             | Anzeige von verschiedenen Signalen (WiFi usw.)
 ZURÜCKSETZEN        | Reset des Kommando-Stacks um Kommunikation wieder zu synchronisieren.
 
@@ -102,6 +111,7 @@ circuit_snapshot    | Zeitplan Snapshot  | event   |            | Wochenplan fü
 thumbnail           | Bild               | media   |            | Medienobject zum Speichern der Aufnahme
 motion_detection    | Bewegungserkennung | boolean | ~Switch    | Variable zum an- und ausschalten der Bewegungserkennung
 snapshot            | Auslöser           | integer | BHS.Update | Variable zum Auslösen einer Momentaufnahme
+battery             | Batterie           | integer | BHS.Battery| Variable zur Anzeige des Ladezustands (nur wenn batteriebetrieben)
 
 #### Profile
 
@@ -116,11 +126,27 @@ BHS.Battery    | Integer   | Batterieladezustandsanzeige (0 ... 3)
 
 Man kann die Statusvariablen direkt im WF verlinken.
 
+Wenn Die Option "Liveview" aktiviert 
+
+
 ### 7. PHP-Befehlsreferenz
 
 Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 
 ### 8. Versionshistorie
+
+v2.0.20251013
+
+* _NEU_: Support für TileVisu (Kachel-Visualisierung)
+* _NEU_: Support für Liveview über externen Middleware-Server
+* _NEU_: Support für Blink Outdoor 4
+* _NEU_: Neue Entwickleroption (Konfiguration) um gesamte Gerätedaten anzuzeigen
+* _NEU_: Umstellung auf Strict-Modus (IPSModuleStrict)
+* _NEU_: Umstellung auf globale einheitliche Versionsnummer
+* _NEU_: Kompatibilität auf IPS 8.1 vereinheitlicht
+* _FIX_: Umbau der Ermittlung des Ladezustandes bei Batteriebetrieb
+* _FIX_: Interne Bibliotheken und Konfiguration überarbeitet und vereinheitlicht
+* _FIX_: Inline-Dokumentation komplett überarbeitet
 
 v1.8.20241024
 

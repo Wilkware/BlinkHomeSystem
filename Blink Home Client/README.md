@@ -1,8 +1,8 @@
-# Blink Home Client
+# ☁️ Blink Home Client
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.7.20240628-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
+[![Product](https://img.shields.io/badge/Symcon%20Version-8.1-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
+[![Version](https://img.shields.io/badge/Modul%20Version-2.0.20251013-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/style.yml?branch=main&label=CheckStyle&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
@@ -36,16 +36,16 @@ Derzeit unterstützt das Modul folgende Funktionalität:
 Folgende Geräte wurden getestet:
 
 * Blink Sync Modul 2 (1st Gen & 2nd Gen)
-* Blink Outdoor (3rd Gen)
+* Blink Outdoor (3rd Gen & 4th Gen)
 * Blink Indoor (1st Gen & 3rd Gen)
-* Blink Mini (1st Gen)
+* Blink Mini (1st Gen & 2nd Gen)
 * Blink Doorbell
 
 Wenn jemand noch andere Geräte im Einsatz hat, bitte einfach bei mir melden!
 
 ### 2. Voraussetzungen
 
-* IP-Symcon ab Version 6.4
+* IP-Symcon ab Version 8.1
 
 ### 3. Installation
 
@@ -61,14 +61,14 @@ __Konfigurationsseite__:
 
 _Einstellungsbereich:_
 
-> Konto-Informationen ...
+> 🔐 Konto-Informationen ...
 
 Name                    | Beschreibung
 ----------------------- | ----------------------------------
 Blink Account eMail     | Registrierte Mail-Adresse bei Blink
 Blink Account Kennwort  | Hinterlegtes Kennwort
 
-> Erweiterte Einstellungen ...
+> ⚙️ Erweiterte Einstellungen ...
 
 Name                    | Beschreibung
 ----------------------- | ---------------------------------
@@ -101,27 +101,40 @@ Versucht den Client mit den Account-Daten an den Blink-Servern anzumelden.
 Die Funktion liefert '0' im Fehlerfall, '1' im Erfolgsfall und '2' im Verifizierungsfall.
 
 ```php
-void BHS_Verify(int $InstanzID);
+void BHS_Verify(int $InstanzID, string $Pin);
 ```
 
 Sendet den per Telefon oder Mail erhaltenen Verifizierungscode an die Blink-Server.
 Die Funktion liefert '1' im Erfolgsfall, sonst '0'.
 
 ```php
-void BHS_Logout(int $InstanzID);
+void BHS_Refresh(int $InstanzID);
 ```
 
-Meldet den Client von den Blink-Servern ab.
+Erneuert den Login Status des Clients (Refresh Token).
 Die Funktion liefert '1' im Erfolgsfall, sonst '0'.
 
 ```php
-void BHS_Notification(int $InstanzID);
+bool BHS_Notification(int $InstanzID);
 ```
 
 Gibt im angemeldeten Zusatnd die Benachrichtigungsoptionen aus.
-Die Funktion liefert '1' im Erfolgsfall, sonst '0'.
+Die Funktion liefert `true` im Erfolgsfall, sonst `false`.
 
 ### 8. Versionshistorie
+
+v2.0.20251013
+
+* _NEU_: Umstellung auf neues OAuth2 Authentifizierungsverfahren
+* _NEU_: Umstellung des 'Heartbeat'-Verfahrens (Refresh Token)
+* _NEU_: Support für Liveview (Distributed AUTH Data)
+* _NEU_: Blink Outdoor 4 Support
+* _NEU_: Globaler Support für Abgleich des Batterie-Ladezustandes aller Geräte im Netwerk
+* _NEU_: Umstellung auf Strict-Modus (IPSModuleStrict)
+* _NEU_: Umstellung auf globale einheitliche Versionsnummer
+* _NEU_: Kompatibilität auf IPS 8.1 vereinheitlicht
+* _FIX_: Interne Bibliotheken und Konfiguration überarbeitet und vereinheitlicht
+* _FIX_: Inline-Dokumentation komplett überarbeitet
 
 v1.8.20241024
 

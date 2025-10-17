@@ -1,8 +1,8 @@
-# Blink Home Accessory
+# 🔦 Blink Home Accessory
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
-[![Product](https://img.shields.io/badge/Symcon%20Version-6.4-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-1.0.20240628-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
+[![Product](https://img.shields.io/badge/Symcon%20Version-8.1-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
+[![Version](https://img.shields.io/badge/Modul%20Version-2.0.20251013-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/style.yml?branch=main&label=CheckStyle&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
@@ -26,7 +26,7 @@ Es ist derzeit noch nicht absehbar, welchen Funktionsumfang das Modul endgültig
 
 ### 2. Voraussetzungen
 
-* IP-Symcon ab Version 6.4
+* IP-Symcon ab Version 8.1
 
 ### 3. Installation
 
@@ -44,7 +44,7 @@ __Konfigurationsseite__:
 
 _Einstellungsbereich:_
 
-> Zubehörinformationen ...
+> 📳 Zubehörinformationen ...
 
 Name           | Beschreibung
 -------------- | ------------------
@@ -70,10 +70,15 @@ Die Statusvariablen werden automatisch angelegt. Das Löschen einzelner kann zu 
 Ident               | Name               | Typ     | Profil     | Beschreibung
 ------------------- | ------------------ | ------- | ---------- | -------------------
 switch_light        | Lichtschalter      | boolean | ~Switch    | Variable zum an- und ausschalten des Flutlichtes
+battery             | Batterie           | integer | BHS.Battery| Variable zur Anzeige des Ladezustands
 
 #### Profile
 
-Es werden keine zusätzlichen Profile benötigt.
+Folgendes Profil wird angelegt:
+
+Name           | Typ       | Beschreibung
+-------------- | --------- | ----------------
+BHS.Battery    | Integer   | Batterieladezustandsanzeige (0 ... 3)
 
 ### 6. Visualisierung
 
@@ -84,6 +89,15 @@ Man kann die Statusvariablen direkt im WF verlinken.
 Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 
 ### 8. Versionshistorie
+
+v2.0.20251013
+
+* _NEU_: Support für Anzeige des Batterie-Ladezustandes
+* _NEU_: Umstellung auf Strict-Modus (IPSModuleStrict)
+* _NEU_: Umstellung auf globale einheitliche Versionsnummer
+* _NEU_: Kompatibilität auf IPS 8.1 vereinheitlicht
+* _FIX_: Interne Bibliotheken und Konfiguration überarbeitet und vereinheitlicht
+* _FIX_: Inline-Dokumentation komplett überarbeitet
 
 v1.0.20240630
 

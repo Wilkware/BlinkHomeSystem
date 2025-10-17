@@ -6,7 +6,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../libs/_traits.php';
 
 // Blink Home Client (I/O)
-class BlinkHomeClient extends IPSModule
+class BlinkHomeClient extends IPSModuleStrict
 {
     // Helper Traits
     use BlinkHelper;
@@ -14,45 +14,66 @@ class BlinkHomeClient extends IPSModule
     use EventHelper;
     use FormatHelper;
 
-    // Echo maps
-    private const BLINK_MAP_NOTIFICATIONS = [
-        ['low_battery', 'Low battery', 5],
-        ['camera_offline', 'Camera offline', 5],
-        ['camera_usage', 'Camera usage', 5],
-        ['scheduling', 'Scheduling (On/Off)', 5],
-        ['motion', 'Motion', 5],
-        ['sync_module_offline', 'Sync module offline', 5],
-        ['temperature', 'High temperature', 5],
-        ['doorbell', 'Doorbell', 5],
-        ['wifi', 'Wifi', 5],
-        ['lfr', 'Lost frame received', 5],
-        ['bandwidth', 'Bandwidth', 5],
-        ['battery_dead', 'Battery dead', 5],
-        ['local_storage', 'Local storage', 5],
-        ['accessory_connected', 'Accessory connected', 5],
-        ['accessory_disconnected', 'Accessory disconnected', 5],
-        ['accessory_low_battery', 'Accessory low battery', 5],
-        ['general', 'System offline', 5],
+    /**
+     * @var string Childs GUID
+     */
+    private const BLINK_CHILDS_GUID = '{7DD36C8D-6581-25FE-9FEA-98024108BED6}';
+
+    /**
+     * @var array<int,string> Blink Battery Device Types (up to now)
+     */
+    private const BLINK_BATTERY_DEVICES = [
+        'cameras',
+        'sirens',
+        'doorbells',
+        'doorbell_buttons',
+        'accessories',
     ];
 
     /**
-     * Overrides the internal IPSModule::Create($id) function
+     * @var array<int,array{0:string,1:string,2:int,3:?string}> Echo map NOTIFICATIONS
      */
-    public function Create()
+    private const BLINK_MAP_NOTIFICATIONS = [
+        ['low_battery', 'Low battery', 5, null],
+        ['camera_offline', 'Camera offline', 5, null],
+        ['camera_usage', 'Camera usage', 5, null],
+        ['scheduling', 'Scheduling (On/Off)', 5, null],
+        ['motion', 'Motion', 5, null],
+        ['sync_module_offline', 'Sync module offline', 5, null],
+        ['temperature', 'High temperature', 5, null],
+        ['doorbell', 'Doorbell', 5, null],
+        ['wifi', 'Wifi', 5, null],
+        ['lfr', 'Lost frame received', 5, null],
+        ['bandwidth', 'Bandwidth', 5, null],
+        ['battery_dead', 'Battery dead', 5, null],
+        ['local_storage', 'Local storage', 5, null],
+        ['accessory_connected', 'Accessory connected', 5, null],
+        ['accessory_disconnected', 'Accessory disconnected', 5, null],
+        ['accessory_low_battery', 'Accessory low battery', 5, null],
+        ['general', 'System offline', 5, null],
+    ];
+
+    /**
+     * In contrast to Construct, this function is called only once when creating the instance and starting IP-Symcon.
+     * Therefore, status variables and module properties which the module requires permanently should be created here.
+     *
+     * @return void
+     */
+    public function Create(): void
     {
         //Never delete this line!
         parent::Create();
 
-        // The Account ID is returned in a successful login response.
+        // The Account ID is returned in a successful login process.
         $this->RegisterAttributeString('AccountID', '');
-        // The Client ID is returned in a successful login response.
-        $this->RegisterAttributeString('ClientID', '');
-        // The auth token is provided in the response to a successful login.
-        $this->RegisterAttributeString('AuthToken', '');
+        // The access token is provided in the response to a successful login process.
+        $this->RegisterAttributeString('AccessToken', '');
+        // The refresh token is provided in the response to a successful login process.
+        $this->RegisterAttributeString('RefreshToken', '');
         // The unique id of the client
         $this->RegisterAttributeString('UniqueID', $this->UUIDv4());
         // Verify Client
-        $this->RegisterAttributeBoolean('Verify', false);
+        $this->RegisterAttributeInteger('VerifyClient', self::$BLINK_LOGOUT);
         // Region where your Blink system is registered (default: prod).
         $this->RegisterAttributeString('Region', 'prod');
 
@@ -61,73 +82,112 @@ class BlinkHomeClient extends IPSModule
         // Password
         $this->RegisterPropertyString('AccountPassword', '');
         // Heartbeat
-        $this->RegisterPropertyInteger('HeartbeatInterval', 12);
+        $this->RegisterPropertyBoolean('Heartbeat', true);
         // Heartbeat Timer
         $this->RegisterTimer('TimerHeartbeat', 0, 'IPS_RequestAction(' . $this->InstanceID . ', "heartbeat", "");');
     }
 
     /**
-     * Overrides the internal IPSModule::Destroy($id) function
+     * This function is called when deleting the instance during operation and when updating via "Module Control".
+     * The function is not called when exiting IP-Symcon.
+     *
+     * @return void
      */
-    public function Destroy()
+    public function Destroy(): void
     {
         //Never delete this line!
         parent::Destroy();
     }
 
     /**
-     * Configuration Form.
+     * The content can be overwritten in order to transfer a self-created configuration page.
+     * This way, content can be generated dynamically.
+     * In this case, the "form.json" on the file system is completely ignored.
      *
-     * @return JSON configuration string.
+     * @return string Content of the configuration page.
      */
-    public function GetConfigurationForm()
+    public function GetConfigurationForm(): string
     {
-        $token = $this->ReadAttributeString('AuthToken');
-        $verify = $this->ReadAttributeBoolean('Verify');
+        $verify = $this->ReadAttributeInteger('VerifyClient');
         // Debug output
-        $this->SendDebug(__FUNCTION__, 'AuthToken: ' . $token . ' Verify: ' . ($verify ? 'Y' : 'N'));
+        $this->LogDebug(__FUNCTION__, ' Verify: ' . $verify);
         // Get Form
         $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
         // LoggedIn?
-        if (!empty($token)) {
-            if ($verify) {
-                $this->SetStatus(102);
-            } else {
-                $this->SetStatus(203);
-            }
-        } else {
-            $this->SetStatus(104);
+        switch ($verify) {
+            case self::$BLINK_VERIFY:
+                $form['actions'][1]['items'][1]['enabled'] = true;  // Verify
+                $form['actions'][1]['items'][2]['enabled'] = false; // Refresh
+                $form['actions'][3]['items'][0]['enabled'] = false; // Options
+                break;
+            case self::$BLINK_LOGIN:
+                $form['actions'][1]['items'][1]['enabled'] = false; // Verify
+                $form['actions'][1]['items'][2]['enabled'] = true;  // Refresh
+                $form['actions'][3]['items'][0]['enabled'] = true;  // Options
+                break;
+            case self::$BLINK_LOGOUT:
+            default:
+                $form['actions'][1]['items'][1]['enabled'] = false;  // Verify
+                $form['actions'][1]['items'][2]['enabled'] = false;  // Refresh
+                $form['actions'][3]['items'][0]['enabled'] = false;  // Options
+                break;
         }
-        // Device Name (alias)
         // Debug output
-        //$this->SendDebug(__FUNCTION__, $form);
+        //$this->LogDebug(__FUNCTION__, $form);
         return json_encode($form);
     }
 
     /**
-     * Overrides the internal IPSModule::ApplyChanges($id) function
+     * Is executed when "Apply" is pressed on the configuration page and immediately after the instance has been created.
+     *
+     * @return void
      */
-    public function ApplyChanges()
+    public function ApplyChanges(): void
     {
         //Never delete this line!
         parent::ApplyChanges();
 
-        $heartbeat = $this->ReadPropertyInteger('HeartbeatInterval');
-        // Timer (60min * 60sec * 1000ms)?
-        $this->SetTimerInterval('TimerHeartbeat', 60 * 60 * 1000 * $heartbeat);
+        // Set Status
+        $verify = $this->ReadAttributeInteger('VerifyClient');
+        if ($verify === self::$BLINK_LOGIN) {
+            $this->SetStatus(102);
+        } elseif ($verify === self::$BLINK_VERIFY) {
+            $this->SetStatus(203);
+        } else {
+            $this->SetStatus(104);
+        }
+
+        // Try Refresh Token after restart or enabling heartbeat...
+        $heartbeat = $this->ReadPropertyBoolean('Heartbeat');
+        if (!$heartbeat) {
+            $this->SetTimerInterval('TimerHeartbeat', 0);
+        } else {
+            $this->Heartbeat();
+        }
     }
 
     /**
-     * RequestAction.
+     * Is called when, for example, a button is clicked in the visualization.
      *
-     *  @param string $ident Ident.
-     *  @param string $value Value.
+     * @param string $ident Ident of the variable
+     * @param mixed $value The value to be set
+     *
+     * @return void
      */
-    public function RequestAction($ident, $value)
+    public function RequestAction(string $ident, mixed $value): void
     {
         // Debug output
-        $this->SendDebug(__FUNCTION__, $ident . ' => ' . $value);
+        $this->LogDebug(__FUNCTION__, $ident . ' => ' . $value);
         switch ($ident) {
+            case 'login':
+                $this->Login();
+                break;
+            case 'verify':
+                $this->Verify($value);
+                break;
+            case 'refresh':
+                $this->Refresh();
+                break;
             case 'heartbeat':
                 $this->Heartbeat();
                 break;
@@ -138,34 +198,46 @@ class BlinkHomeClient extends IPSModule
     }
 
     /**
-     * Overrides the internal IPSModule::ForwardData($JSONStringString) function
+     * This function is called by IP-Symcon and processes sent data and forwards it to the parent instance.
+     * Data can be sent using the SendDataToParent function.
+     * Further information on data forwarding can be found under Dataflow.
+     *
+     * @param string $json
+     *
+     * @return string Result of the function, which is returned to the calling child instance
      */
-    public function ForwardData($json)
+    public function ForwardData(string $json): string
     {
-        $this->SendDebug(__FUNCTION__, $json);
+        $this->LogDebug(__FUNCTION__, $json);
         $data = json_decode($json, true);
         $result = '[]';
         $encode = false;
         // Verify
-        $verify = $this->ReadAttributeBoolean('Verify');
+        $verify = $this->ReadAttributeInteger('VerifyClient');
         if (!$verify) {
             return $result;
         }
         // Inputs
         $account = $this->ReadAttributeString('AccountID');
-        $client = $this->ReadAttributeString('ClientID');
-        $token = $this->ReadAttributeString('AuthToken');
+        $token = $this->ReadAttributeString('AccessToken');
         $region = $this->ReadAttributeString('Region');
         // Endpoint
         if (isset($data['Endpoint'])) {
             switch ($data['Endpoint']) {
                 case 'homescreen':
                     $result = $this->doHomeScreen($token, $region, $account);
+                    $this->SetBatteryStates($result);
                     break;
                 case 'arm':
                     $params = (array) $data['Params'];
                     if (isset($params['NetworkID'])) {
                         $result = $this->doArm($token, $region, $account, $params['NetworkID']);
+                    }
+                    break;
+                case 'config':
+                    $params = (array) $data['Params'];
+                    if (isset($params['NetworkID']) && isset($params['DeviceID']) && isset($params['DeviceType'])) {
+                        $result = $this->doConfig($token, $region, $account, $params['NetworkID'], $params['DeviceID'], $params['DeviceType']);
                     }
                     break;
                 case 'disarm':
@@ -256,11 +328,11 @@ class BlinkHomeClient extends IPSModule
                     }
                     break;
                 default:
-                    $this->SendDebug(__FUNCTION__, 'Invalid Command: ' . $data['Endpoint']);
+                    $this->LogDebug(__FUNCTION__, 'Invalid Command: ' . $data['Endpoint']);
                     break;
             }
         }
-        $this->SendDebug(__FUNCTION__, $result);
+        $this->LogDebug(__FUNCTION__, $result);
         // safty check
         if ($result === false) {
             $result = '[]';
@@ -275,100 +347,116 @@ class BlinkHomeClient extends IPSModule
     }
 
     /**
-     * Logout from the blink server.
+     * Login to the blink server.
      *
-     * @return True if successful, otherwise false.
+     * @return int 0 for failure, 1 for success and 2 for verification needed.
      */
-    public function Login()
+    public function Login(): int
     {
-        $ret = self::$BLINK_FAILURE;
+        $verify = self::$BLINK_LOGOUT;
         $user = $this->ReadPropertyString('AccountUser');
         $password = $this->ReadPropertyString('AccountPassword');
         $uuid = $this->ReadAttributeString('UniqueID');
+        //$this->LogDebug(__FUNCTION__, 'Username: ' . $user . ', Password: ' . (empty($password) ? 'N' : 'Y') . ', UUID: ' . $uuid);
+
         // Safty check
         if (empty($user)) {
             $this->SetStatus(201);
             echo $this->Translate('Login not possible!');
-            return $ret;
+            return $verify;
         }
         if (empty($password)) {
             $this->SetStatus(202);
             echo $this->Translate('Login not possible!');
-            return $ret;
+            return $verify;
         }
         // API call
-        $response = $this->doLogin($user, $password, $uuid);
+        $response = $this->doLogin($user, $password, $uuid, null, null);
         // Result?
         if ($response !== false) {
             $params = json_decode($response, true);
-            $this->SendDebug(__FUNCTION__, $params);
-            if (isset($params['account']['account_id'], $params['account']['client_id'], $params['auth']['token'], $params['account']['tier'])) {
-                // AccountID
-                $this->WriteAttributeString('AccountID', $params['account']['account_id']);
-                // ClientID
-                $this->WriteAttributeString('ClientID', $params['account']['client_id']);
-                // AuthToken
-                $this->WriteAttributeString('AuthToken', $params['auth']['token']);
-                // AccountTier
-                $this->WriteAttributeString('Region', $params['account']['tier']);
-            } else {
-                $this->SetStatus(104);
-                if (isset($params['message'])) {
-                    echo $params['message'];
-                } else {
-                    echo $this->Translate('Login not possible!');
-                }
-                return $ret;
-            }
+            $this->LogDebug(__FUNCTION__, $params);
             // Verification?
-            $verify = !($params['account']['client_verification_required']);
-            $this->WriteAttributeBoolean('Verify', $verify);
-            if ($verify) {
-                $this->SetStatus(102);
-                echo $this->Translate('Login was successfull!');
-                $ret = self::$BLINK_SUCCESS;
-            } else {
+            $verify = isset($params['next_time_in_secs']) ? self::$BLINK_VERIFY : self::$BLINK_LOGOUT;
+            if ($verify === self::$BLINK_VERIFY) {
+                $this->UpdateFormField('Verify', 'enabled', true);
                 $this->SetStatus(203);
                 echo $this->Translate('Login must be verified!');
-                $ret = self::$BLINK_WEAKNESS;
+            } else {
+                $this->UpdateFormField('Verify', 'enabled', false);
+                $this->SetStatus(104);
+                echo $this->Translate('Login was not successfull!');
             }
         } else {
+            $this->SetStatus(104);
             echo $this->Translate('Login was not successfull!');
         }
         // Return
-        return $ret;
+        $this->WriteAttributeInteger('VerifyClient', $verify);
+        return $verify;
     }
 
     /**
-     * Logout from the blink server.
+     * Verify the Login/Account
+     *
+     * @param string $pin  Verfication Code
+     *
+     * @return int 0 for failure, 1 for success.
      */
-    public function Verify(string $pin)
+    public function Verify(string $pin): int
     {
-        $ret = self::$BLINK_FAILURE;
-        $account = $this->ReadAttributeString('AccountID');
-        $client = $this->ReadAttributeString('ClientID');
-        $token = $this->ReadAttributeString('AuthToken');
-        $region = $this->ReadAttributeString('Region');
+        $verify = self::$BLINK_LOGOUT;
+        $username = $this->ReadPropertyString('AccountUser');
+        $password = $this->ReadPropertyString('AccountPassword');
+        $uuid = $this->ReadAttributeString('UniqueID');
+        //$this->LogDebug(__FUNCTION__, 'Username: ' . $username . ', Password: ' . (empty($password) ? 'N' : 'Y') . ', UUID: ' . $uuid);
+
         // Safty check
-        if (empty($token) || empty($account) || empty($client)) {
-            $this->SendDebug(__FUNCTION__, 'Token: ' . $token . ', AccountID: ' . $account . ', ClientID: ' . $client);
+        if (empty($username)) {
+            $this->SetStatus(201);
             echo $this->Translate('Verify not possible!');
-            return $ret;
+            return $verify;
+        }
+        if (empty($password)) {
+            $this->SetStatus(202);
+            echo $this->Translate('Verify not possible!');
+            return $verify;
+        }
+        if (empty($pin)) {
+            $this->SetStatus(203);
+            echo $this->Translate('Verify not possible!');
+            return $verify;
         }
         // API call
-        $response = $this->doVerify($token, $pin, $region, $account, $client);
+        $response = $this->doLogin($username, $password, $uuid, $pin, null);
         // Result?
         if ($response !== false) {
             $params = json_decode($response, true);
-            $this->SendDebug(__FUNCTION__, $params);
-            // Verification?
-            $verify = !($params['require_new_pin']);
-            $this->WriteAttributeBoolean('Verify', $verify);
-            if ($verify) {
+            $this->LogDebug(__FUNCTION__, $params);
+            // Token?
+            $verify = isset($params['access_token']) ? self::$BLINK_LOGIN : self::$BLINK_LOGOUT;
+            $this->WriteAttributeInteger('VerifyClient', $verify);
+            if ($verify === self::$BLINK_LOGIN) {
+                $this->LogDebug(__FUNCTION__, 'Verified!');
+                // Save tokens
+                $this->WriteAttributeString('AccessToken', $params['access_token']);
+                $this->WriteAttributeString('RefreshToken', $params['refresh_token']);
+                // Start Heartbeat
+                $this->SetTimerInterval('TimerHeartbeat', $params['expires_in'] * 1000);
+                // Account/Client ID
+                $response = $this->doTier($params['access_token']);
+                if ($response !== false) {
+                    $params = json_decode($response, true);
+                    $this->LogDebug(__FUNCTION__, $params);
+                    $this->WriteAttributeString('AccountID', $params['account_id']);
+                    $this->WriteAttributeString('Region', $params['tier']);
+                }
+                $this->UpdateFormField('Refresh', 'enabled', true);
+                $this->UpdateFormField('Options', 'enabled', true);
                 $this->SetStatus(102);
                 echo $this->Translate('Verify was successfull!');
-                $ret = self::$BLINK_SUCCESS;
             } else {
+                $this->LogDebug(__FUNCTION__, 'Not verified!');
                 $this->SetStatus(203);
                 echo $this->Translate('Verify was not successfull!');
             }
@@ -377,74 +465,106 @@ class BlinkHomeClient extends IPSModule
             echo $this->Translate('Verify was not successfull!');
         }
         // Return
-        return $ret;
+        return $verify;
     }
 
     /**
-     * Logout from the blink server.
+     * Execute a keep alive call
+     *
+     * @return int 0 for success, 1 for failure.
      */
-    public function Logout()
+    public function Refresh(): int
     {
-        $ret = self::$BLINK_FAILURE;
-        $account = $this->ReadAttributeString('AccountID');
-        $client = $this->ReadAttributeString('ClientID');
-        $token = $this->ReadAttributeString('AuthToken');
+        // Login check
+        $verify = $this->ReadAttributeInteger('VerifyClient');
+        if ($verify !== self::$BLINK_LOGIN) {
+            $this->LogDebug(__FUNCTION__, 'Not logged in!');
+            return self::$BLINK_LOGOUT;
+        }
+
+        $user = $this->ReadPropertyString('AccountUser');
+        $password = 'password'; // Do not use the password for refresh
+        $token = $this->ReadAttributeString('RefreshToken');
+        $uuid = $this->ReadAttributeString('UniqueID');
         $region = $this->ReadAttributeString('Region');
+
         // Safty check
-        if (empty($token) || empty($account) || empty($client) || empty($region)) {
-            $this->SendDebug(__FUNCTION__, 'Token: ' . $token . ', AccountID: ' . $account . ', ClientID: ' . $client . ', Region: ' . $region);
-            echo $this->Translate('Logout not possible!');
-            return $ret;
+        if (empty($user) || empty($token)) {
+            $this->SetStatus(201);
+            echo $this->Translate('Refresh not possible!');
+            return self::$BLINK_LOGOUT;
         }
         // API call
-        $response = $this->doLogout($token, $region, $account, $client);
+        $response = $this->doLogin($user, $password, $uuid, null, $token);
         // Result?
         if ($response !== false) {
             $params = json_decode($response, true);
-            $this->SendDebug(__FUNCTION__, $params);
-            // Reset all
-            $this->WriteAttributeString('AccountID', '');
-            $this->WriteAttributeString('ClientID', '');
-            $this->WriteAttributeString('AuthToken', '');
-            $this->SetStatus(104);
-            echo $this->Translate('Logout was successfull!');
-            $ret = self::$BLINK_SUCCESS;
+            $this->LogDebug(__FUNCTION__, $params);
+            // Verification?
+            $verify = isset($params['access_token']) ? self::$BLINK_LOGIN : self::$BLINK_LOGOUT;
+            if ($verify === self::$BLINK_LOGIN) {
+                // Save tokens
+                $this->WriteAttributeString('AccessToken', $params['access_token']);
+                $this->WriteAttributeString('RefreshToken', $params['refresh_token']);
+                // Start Heartbeat
+                $this->SetTimerInterval('TimerHeartbeat', $params['expires_in'] * 1000);
+                // Distribute for liveview
+                $this->SendDataToChildren(json_encode([
+                    'DataID'    => self::BLINK_CHILDS_GUID,
+                    'AuthData'  => [
+                        'account'   => $user,
+                        'region'    => $region,
+                        'token'     => $params['access_token']
+                    ],
+                    'Battery'   => unserialize($this->GetBuffer('battery'))
+                ]));
+
+                $this->SetStatus(102);
+                echo $this->Translate('Refresh was successfull!');
+            } else {
+                $this->SetStatus(104);
+                echo $this->Translate('Refresh was not successfull!');
+            }
         } else {
-            echo $this->Translate('Logout was not successfull!');
+            $this->SetStatus(104);
+            echo $this->Translate('Refresh was not successfull!');
         }
         // Return
-        return $ret;
+        $this->WriteAttributeInteger('VerifyClient', $verify);
+        return $verify;
     }
 
     /**
      * Display Account Notifications
      *
      * BHS_Notification();
+     *
+     * @return bool true for success, false for failure.
      */
-    public function Notification()
+    public function Notification(): bool
     {
-        $ret = self::$BLINK_FAILURE;
+        $ret = false;
         // Debug
-        $this->SendDebug(__FUNCTION__, 'Obtain device information.', 0);
+        $this->LogDebug(__FUNCTION__, 'Obtain device information.');
         // Safty check
-        $verify = $this->ReadAttributeBoolean('Verify');
+        $verify = $this->ReadAttributeInteger('VerifyClient');
         if (!$verify) {
             echo $this->Translate('Logged out!');
             return $ret;
         }
         // Inputs
         $account = $this->ReadAttributeString('AccountID');
-        $token = $this->ReadAttributeString('AuthToken');
+        $token = $this->ReadAttributeString('AccessToken');
         $region = $this->ReadAttributeString('Region');
         // API call
         $response = $this->doNotification($token, $region, $account);
         // Result?
         if ($response !== false) {
             $params = json_decode($response, true);
-            $this->SendDebug(__FUNCTION__, $params);
+            $this->LogDebug(__FUNCTION__, $params);
             // Prepeare Info
-            echo $this->PrettyPrint(self::BLINK_MAP_NOTIFICATIONS, $params['notifications']);
-            $ret = self::$BLINK_SUCCESS;
+            echo $this->PrettyPrint(self::BLINK_MAP_NOTIFICATIONS, json_encode($params['notifications']));
+            $ret = true;
         } else {
             echo $this->Translate('Call was not successfull!');
         }
@@ -454,27 +574,73 @@ class BlinkHomeClient extends IPSModule
 
     /**
      * Execute a keep alive call
+     *
+     * @return void
      */
     private function Heartbeat()
     {
-        $heartbeat = $this->ReadPropertyInteger('HeartbeatInterval');
+        $heartbeat = $this->ReadPropertyBoolean('Heartbeat');
         // Safty check
-        if ($heartbeat == 0) {
+        if (!$heartbeat) {
             return;
         }
         // Buffer echo
         ob_start();
-        $return = $this->Login();
+        $return = $this->Refresh();
         $buf = ob_get_clean();
-        if ($return != self::$BLINK_SUCCESS) {
+        if ($return != self::$BLINK_LOGIN) {
             $this->LogMessage($buf, KL_ERROR);
         }
     }
 
     /**
-     * Generates a valid v4 UUID in the form of 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx' (where y is 8, 9, A, or B)
+     * Extracts the battery info form the devices an store it in the buffer
+     *
+     * @param string|false $data Response from homescreen request
+     *
+     * @return void
      */
-    private function UUIDv4()
+    private function SetBatteryStates(string|false $data): void
+    {
+        if ($data === false) return;
+        // find device
+        $devises = json_decode($data, true);
+        $states = [];
+        foreach (self::BLINK_BATTERY_DEVICES as $type) {
+            if (isset($devises[$type])) {
+                foreach ($devises[$type] as $dev) {
+                    if ($type !== 'accessories') {
+                        // battery or usb
+                        if (isset($dev['battery'])) {
+                            // if battery than signals
+                            if (isset($dev['signals'])) {
+                                if (isset($dev['signals']['battery'])) {
+                                    $states[] = ['device' => $dev['id'], 'battery' => $dev['signals']['battery']];
+                                }
+                            } else {
+                                $states[] = ['device' => $dev['id'], 'battery' => $dev['battery']];
+                            }
+
+                        }
+                    } else {
+                        foreach ($dev as $acc) {
+                            if (isset($acc['battery'])) {
+                                $states[] = ['device' => $acc['id'], 'battery' => $acc['battery']];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        $this->SetBuffer('battery', serialize($states));
+    }
+
+    /**
+     * Generates a valid v4 UUID in the form of 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx' (where y is 8, 9, A, or B)
+     *
+     * @return string Returns a valid UUID identifier.
+     */
+    private function UUIDv4(): string
     {
         return sprintf(
             '%04X%04X-%04X-%04X-%04X-%04X%04X%04X',

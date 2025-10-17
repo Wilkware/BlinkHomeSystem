@@ -1,13 +1,13 @@
 {
     "translations": {
         "de": {
-            "\nBlink Home Sync Module\n ": "\nBlink Home Sync Modul\n ",
+            "Blink Home Sync Module": "Blink Home Sync Modul",
             "This module allows you to control the motion detection of all cameras on the network.": "Mit diesem Modul können Sie die Aufzeichnung von Bewegungsereignissen für alle aktivierten Kameras im Netzwerk steuern.",
-            "Module information ...": "Modulinformationen ...",
-            "Motion events ...": "Bewegungsereignisse ...",
-            "Recordings ...": "Aufzeichnungen ...",
-            "Alert settings ...": "Alarmeinstellungen ...",
-            "Advanced settings ...": "Erweiterte Einstellungen ...",
+            "📳 Module information ...": "📳 Modulinformationen ...",
+            "🙌 Motion events ...": "🙌 Bewegungsereignisse ...",
+            "📼 Recordings ...": "📼 Aufzeichnungen ...",
+            "🚨 Alert settings ...": "🚨 Alarmeinstellungen ...",
+            "⚙️ Advanced settings ...": "⚙️ Erweiterte Einstellungen ...",
             "Arm / Disarm recording motion events!": "Starten / Stoppen der Aufzeichnung von Bewegungsereignissen!",
             "NOTE: Activating or deactivating may take some time.": "HINWEIS: Das Aktivieren bzw. Deaktivieren kann etwas Zeit beanspruchen.",
             "The schedule for start and stop the motion detection\ncan be created via the button below!": "Der Zeitplan zum Starten und Stoppen der Bewegungserkennung\nkann über die Schaltfläche unten erstellt werden!",
@@ -108,9 +108,9 @@
             "USB format compatible": "USB-Format kompatibel",
             "Backup in progress": "Laufende Sicherung",
             "Last backup result": "Letzter Sicherungslauf",
-            "Development and debug information ...": "Entwicklungs- und Debuginformationen ...",
             "Download video recordings depending on the source!": "Videoaufzeichnungen quellenabhängig herunterladen!",
-            "Source code, donation and licence ...": "Quellcode, Spende und Lizenz ...",
+            "🛟 Development and debug information ...": "🛟Entwicklungs- und Debuginformationen ...",
+            "🎗️ Source code, donation and licence ...": "🎗️ Quellcode, Spende und Lizenz ...",
             "The software is free of charge for non-commercial use, I would appreciate a donation if you like the module.": "Die Software ist für die nicht kommerzielle Nutzung kostenlos, über eine Spende bei Gefallen des Moduls würde ich mich sehr freuen."
         }
     }
