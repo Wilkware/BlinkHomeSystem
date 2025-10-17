@@ -4,7 +4,7 @@
 [![Product](https://img.shields.io/badge/Symcon%20Version-8.1-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
 [![Version](https://img.shields.io/badge/Modul%20Version-2.0.20251013-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-[![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/style.yml?branch=main&label=CheckStyle&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
+[![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
 IP-Symcon Modul für die Verwaltung alle im Netzwerk befindlichen Bilnk Geräte.
 
@@ -47,12 +47,6 @@ __Konfigurationsseite__:
 Innerhalb der Konfiguratorliste werden alle im Netzwerk verfügbaren Geräte aufgeführt.
 Man kann pro Gerät eine Instanzen anlegen und auch wieder löschen.
 Legt man eine entsprechende Zielkategorie fest, werden neu zu erstellende Instanzen unterhalb dieser Kategorie angelegt.
-
-_Einstellungsbereich:_
-
-Name                    | Beschreibung
------------------------ | ---------------------------------
-Zielkategorie           | Kategorie unter welcher neue Instanzen erzeugt werden (keine Auswahl im Root). Nur bis Version 7!
 
 _Aktionsbereich:_
 

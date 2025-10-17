@@ -4,7 +4,7 @@
 [![Product](https://img.shields.io/badge/Symcon%20Version-8.1-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
 [![Version](https://img.shields.io/badge/Modul%20Version-2.0.20251013-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-[![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/style.yml?branch=main&label=CheckStyle&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
+[![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
 IP-Symcon Modul für die zentrale Kommunikation mit den Blink Servern.
 
@@ -26,12 +26,13 @@ Dies erfolgt auf Basis der inoffizielle dokumentierten [Client-API](https://gith
 
 Derzeit unterstützt das Modul folgende Funktionalität:  
 
-* _Login_, _Verify_ (2FA) und _Logout_
+* _Login_, _Verify_ (2FA) und _Renewal_
 * Zeitliche und manuelle Erstellung von _Snapshots_
 * Aktivieren und Deaktivieren von _Motion Detection_ (Bewegungserkennung)
 * _Arm_ (Scharf) und _Disarm_ (Unscharf) stellen der Aufzeichnung bei Bewegungserkennung
 * Auslesen von gerätespezifischen Informationen (_Homescreen_)
 * Download von Videos/Clips (Cloud & Lokal)
+* Liveview (experimentell)
 
 Folgende Geräte wurden getestet:
 
@@ -72,7 +73,7 @@ Blink Account Kennwort  | Hinterlegtes Kennwort
 
 Name                    | Beschreibung
 ----------------------- | ---------------------------------
-Heartbeat-Intervall     | Zeitraum zwischen 2 automatischen Loginversuchen
+Automatisch angemeldet bleiben | Aktiviert die automatische Verlängerung des Zugriffs-Tokens
 
 _Aktionsbereich:_
 
@@ -80,7 +81,7 @@ Aktion                  | Beschreibung
 ----------------------- | ---------------------------------
 ANMELDEN                | Senden der Logindaten an Blink Server
 ÜBERPRÜFEN              | Senden eines Codes zur Verifizierung der Login-Daten
-ABMELDEN                | Abmelden vom System (Blink Server)
+AKTUALISIEREN           | Zugriffs-Token erneut anfragen, aktualisieren  und Ablaufzeit neu starten
 OPTIONEN                | Abrufen und Anzeigen der eingestellten Optionen
 
 ### 5. Statusvariablen und Profile
@@ -94,21 +95,21 @@ Es ist keine weitere Steuerung oder gesonderte Darstellung integriert.
 ### 7. PHP-Befehlsreferenz
 
 ```php
-void BHS_Login(int $InstanzID);
+int BHS_Login(int $InstanzID);
 ```
 
 Versucht den Client mit den Account-Daten an den Blink-Servern anzumelden.  
 Die Funktion liefert '0' im Fehlerfall, '1' im Erfolgsfall und '2' im Verifizierungsfall.
 
 ```php
-void BHS_Verify(int $InstanzID, string $Pin);
+int BHS_Verify(int $InstanzID, string $Pin);
 ```
 
 Sendet den per Telefon oder Mail erhaltenen Verifizierungscode an die Blink-Server.
 Die Funktion liefert '1' im Erfolgsfall, sonst '0'.
 
 ```php
-void BHS_Refresh(int $InstanzID);
+int BHS_Refresh(int $InstanzID);
 ```
 
 Erneuert den Login Status des Clients (Refresh Token).
