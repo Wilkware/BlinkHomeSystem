@@ -1,4 +1,4 @@
-# Blink Home Sync Modul
+# 🔄 Blink Home Sync Modul
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-8.1-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
@@ -46,7 +46,7 @@ __Konfigurationsseite__:
 
 Einstellungsbereich:
 
-> Modulinformationen ...
+> 📳 Modulinformationen ...
 
 Name           | Beschreibung
 -------------- | ------------------
@@ -55,7 +55,7 @@ Gerätemodell   | Modellbezeichnung (Model 1 oder 2)
 Geräte-ID      | Interne Gerätenummer
 Netwerk-ID     | Interne Netwerknummer
 
-> Bewegungsereignissen ...
+> 🙌 Bewegungsereignissen ...
 
 Name                     | Beschreibung
 ------------------------ | ------------------
@@ -64,7 +64,7 @@ Zeitplan                 | Zeitplan zum Starten und Stoppen von Aufnahmen
 ZEITPLAN HINZUFÜGEN      | Es wird ein Wochenplan mit 2 Zuständen (Aktiv & Inaktiv) angelegt und in den Einstellung hinterlegt.
 Aktualisierungsintervall | Abfrageintervall des Aktivierungszustandes (0 = AUS)
 
-> Aufzeichnungen ...
+> 📼 Aufzeichnungen ...
 
 Name           | Beschreibung
 -------------- | ------------------
@@ -74,7 +74,7 @@ Nur In-Memory-Cache verwenden (keine Speicherung auf Platte)? | Schalter für Sp
 Downloadmodus  | Von welchem Medium sollen die Aufnahmen abgeholt werden (Cloudspeicher, lokaler USB-Speicher oder Beide)
 
 
-> Alarmeinstellungen ...
+> 🚨 Alarmeinstellungen ...
 
 Name           | Beschreibung
 -------------- | ------------------
@@ -83,7 +83,7 @@ Erstelle eine Variable, um die Kamera mit der letzte erkannten Bewegung zu speic
 Kamerazuordnung | Zuordnung der Kameras zu einer virtuellen ID (Umweg über Dimmwert eines Lichtes)
 Gleichzeitiges Ausführen eines Skriptes | Hinterlegung eines Skriptes das bei Bewegungserkennung aufgerufen wird (IPS_RunScriptEX). Der Zeitstempel (Unix timestamp) wird im Array als 'TIMESTAMP' übergeben. Die ID des ausführenden Moduls wird in 'MODUL' mitgegeben. Die letze Bewegung wird als Text in 'MOTION' und die allgemeine Alarmmeldung als Bool in 'ALERT' übergeben. Ob 'MOTION' oder 'ALERT' mitgegeben wird hängt von der geschaltenen Variable ab. Beides gleichzeitig wird nicht übergeben!
 
-Aktionsbereich:
+_Aktionsbereich:_
 
 Aktion              | Beschreibung
 ------------------- | ------------------
@@ -91,7 +91,7 @@ NETZWERK            | Ausgabe der Netwerkinformationen.
 SYNC MODUL          | Ausgabe der Modulinformationen.
 SPEICHERSTATUS      | Ausgabe der Speicherinformationen.
 
-> Entwicklungs- und Debuginformationen ...
+> 🛟 Entwicklungs- und Debuginformationen ...
 
 Aktion         | Beschreibung
 -------------- | ------------------
