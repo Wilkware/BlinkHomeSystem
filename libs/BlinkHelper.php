@@ -494,7 +494,8 @@ trait BlinkHelper
         // transform value
         $state = $switch ? 'on' : 'off';
         // prepeare url
-        $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/cameras/$device/accessories/storm/$storm/lights/$state";
+        //$url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/cameras/$device/accessories/storm/$storm/lights/$state";
+        $url = "https://rest-$region.immedia-semi.com/api/v2/accounts/$account/networks/$network/cameras/$device/light_accessories/$storm/lights/$state";
         // prepeare header
         $headers = [
             'content-type: application/json',
@@ -1047,6 +1048,7 @@ trait BlinkHelper
 
         if (!$response = curl_exec($curl)) {
             $error = sprintf('Request failed for URL: %s - Error: %s', $url, curl_error($curl));
+            IPS_LogMessage('BLINK', $error);
             $this->LogDebug(__FUNCTION__, $error);
         }
         curl_close($curl);

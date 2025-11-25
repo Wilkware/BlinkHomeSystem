@@ -169,7 +169,7 @@ class BlinkHomeDevice extends IPSModuleStrict
 
         // Power supply is battery?
         $model = $this->ReadPropertyString('DeviceModel');
-        if (!in_array($model, ['mini', 'hawk', 'owl', 'hack'])) {
+        if (!in_array($model, ['mini', 'hawk', 'chickadee', 'owl', 'hack'])) {
             $form['elements'][5]['items'][1]['visible'] = true;
         }
 

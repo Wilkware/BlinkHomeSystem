@@ -25,6 +25,7 @@ Modul welches ein Zubehör (Flutlich, Halterung) repräsentiert.
 
 ## 📜 Historie
 
+- 2025-11-25: v2.1 Support von Blink Mini 2K+, Flutlichtschaltung angepasst
 - 2025-10-13: v2.0 Neue Authentifizierung, Support von Outdoor 4, 8.1 Kombatibilität, Visualisierung und Liveview
 - 2024-10-29: v1.9 Alarmeinstellungen um 'Letzte Bewegung' erweitert 
 - 2024-10-24: v1.8 Zeitversatz bei Neustart von IPS, Automatischer Reset Kommando-Stack, Aufnahme eine Clips auslösen

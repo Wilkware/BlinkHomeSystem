@@ -39,6 +39,7 @@ class BlinkHomeConfigurator extends IPSModuleStrict
         'sedona'            => 'Blink Outdoor 4',
         'owl'               => 'Blink Mini',
         'hawk'              => 'Blink Mini 2',
+        'chickadee'         => 'Blink Mini 2K+',
         'xt'                => 'Blink XT1',
         'xt2'               => 'Blink XT2',
         'lotus'             => 'Blink Doorbell',

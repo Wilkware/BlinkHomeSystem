@@ -89,6 +89,10 @@
                                     "value": "hawk"
                                 },
                                 {
+                                    "label": "Blink Mini 2K+",
+                                    "value": "chickadee"
+                                },
+                                {
                                     "label": "Blink Indoor",
                                     "value": "white"
                                 },
