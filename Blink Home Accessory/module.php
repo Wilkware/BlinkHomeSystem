@@ -13,6 +13,11 @@ class BlinkHomeAccessory extends IPSModuleStrict
     use VariableHelper;
 
     /**
+     * @var string ModulID (Blink Home Client)
+     */
+    private const BLINK_CLIENT_GUID = '{AF126D6D-83D1-44C2-6F61-96A4BB7A0E62}';
+
+    /**
      * In contrast to Construct, this function is called only once when creating the instance and starting IP-Symcon.
      * Therefore, status variables and module properties which the module requires permanently should be created here.
      *
@@ -23,8 +28,8 @@ class BlinkHomeAccessory extends IPSModuleStrict
         //Never delete this line!
         parent::Create();
         // Connect to client
-        if ((float)IPS_GetKernelVersion() < 8.2) {
-            $this->ConnectParent('{AF126D6D-83D1-44C2-6F61-96A4BB7A0E62}');
+        if ((float) IPS_GetKernelVersion() < 8.2) {
+            $this->ConnectParent(self::BLINK_CLIENT_GUID);
         }
         // CommandStatus
         $this->RegisterAttributeString('CommandID', '');

@@ -36,6 +36,11 @@ class BlinkHomeSyncModule extends IPSModuleStrict
     private const BLINK_SCHEDULE_RECORDING_IDENT = 'circuit_recording';
 
     /**
+     * @var string ModulID (Blink Home Client)
+     */
+    private const BLINK_CLIENT_GUID = '{AF126D6D-83D1-44C2-6F61-96A4BB7A0E62}';
+
+    /**
      * @var array<int,array{0:string,1:int,2:string}> Schedule recording constant ACTION (Switch)
      */
     private const BLINK_SCHEDULE_RECORDING_SWITCH = [
@@ -123,8 +128,8 @@ class BlinkHomeSyncModule extends IPSModuleStrict
         //Never delete this line!
         parent::Create();
         // Connect to client
-        if ((float)IPS_GetKernelVersion() < 8.2) {
-            $this->ConnectParent('{AF126D6D-83D1-44C2-6F61-96A4BB7A0E62}');
+        if ((float) IPS_GetKernelVersion() < 8.2) {
+            $this->ConnectParent(self::BLINK_CLIENT_GUID);
         }
         // Device
         $this->RegisterPropertyString('DeviceID', '');
