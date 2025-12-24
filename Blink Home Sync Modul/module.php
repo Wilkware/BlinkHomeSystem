@@ -123,7 +123,9 @@ class BlinkHomeSyncModule extends IPSModuleStrict
         //Never delete this line!
         parent::Create();
         // Connect to client
-        $this->ConnectParent('{AF126D6D-83D1-44C2-6F61-96A4BB7A0E62}');
+        if ((float)IPS_GetKernelVersion() < 8.2) {
+            $this->ConnectParent('{AF126D6D-83D1-44C2-6F61-96A4BB7A0E62}');
+        }
         // Device
         $this->RegisterPropertyString('DeviceID', '');
         $this->RegisterPropertyString('NetworkID', '');

@@ -78,7 +78,9 @@ class BlinkHomeConfigurator extends IPSModuleStrict
         //Never delete this line!
         parent::Create();
         // Required Parent (Blink Home Client)
-        $this->ConnectParent(self::BLINK_CLIENT_GUID);
+        if ((float)IPS_GetKernelVersion() < 8.2) {
+            $this->ConnectParent(self::BLINK_CLIENT_GUID);
+        }
         // Properties
         $this->RegisterPropertyInteger('TargetCategory', 0);
     }
