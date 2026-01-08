@@ -76,7 +76,10 @@ class BlinkHomeClient extends IPSModuleStrict
         $this->RegisterAttributeInteger('VerifyClient', self::$BLINK_LOGOUT);
         // Region where your Blink system is registered (default: prod).
         $this->RegisterAttributeString('Region', 'prod');
-
+        // The cookie file name.
+        $this->RegisterAttributeString('CookieFile', @tempnam('/tmp', 'bhs.'));
+        // The csrf & verifier for verification
+        $this->RegisterAttributeString('CSRFVerifier', '');
         // Username (email)
         $this->RegisterPropertyString('AccountUser', '');
         // Password
@@ -132,6 +135,13 @@ class BlinkHomeClient extends IPSModuleStrict
                 $form['actions'][3]['items'][0]['enabled'] = false;  // Options
                 break;
         }
+
+        // Extract Version
+        $ins = IPS_GetInstance($this->InstanceID);
+        $mod = IPS_GetModule($ins['ModuleInfo']['ModuleID']);
+        $lib = IPS_GetLibrary($mod['LibraryID']);
+        $form['actions'][5]['items'][2]['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
+
         // Debug output
         //$this->LogDebug(__FUNCTION__, $form);
         return json_encode($form);
@@ -357,39 +367,33 @@ class BlinkHomeClient extends IPSModuleStrict
         $user = $this->ReadPropertyString('AccountUser');
         $password = $this->ReadPropertyString('AccountPassword');
         $uuid = $this->ReadAttributeString('UniqueID');
-        //$this->LogDebug(__FUNCTION__, 'Username: ' . $user . ', Password: ' . (empty($password) ? 'N' : 'Y') . ', UUID: ' . $uuid);
+        $cookie = $this->ReadAttributeString('CookieFile');
+        $this->LogDebug(__FUNCTION__, 'Username: ' . $user . ', Password: ' . (empty($password) ? 'N' : 'Y') . ', UUID: ' . $uuid . ', Cookie: ' . $cookie);
 
         // Safty check
         if (empty($user)) {
             $this->SetStatus(201);
-            echo $this->Translate('Login not possible!');
+            $this->EchoMessage($this->Translate('Login not possible!'));
             return $verify;
         }
         if (empty($password)) {
             $this->SetStatus(202);
-            echo $this->Translate('Login not possible!');
+            $this->EchoMessage($this->Translate('Login not possible!'));
             return $verify;
         }
         // API call
-        $response = $this->doLogin($user, $password, $uuid, null, null);
+        $response = $this->doLogin($user, $password, $uuid, $cookie);
         // Result?
         if ($response !== false) {
-            $params = json_decode($response, true);
-            $this->LogDebug(__FUNCTION__, $params);
-            // Verification?
-            $verify = isset($params['next_time_in_secs']) ? self::$BLINK_VERIFY : self::$BLINK_LOGOUT;
-            if ($verify === self::$BLINK_VERIFY) {
-                $this->UpdateFormField('Verify', 'enabled', true);
-                $this->SetStatus(203);
-                echo $this->Translate('Login must be verified!');
-            } else {
-                $this->UpdateFormField('Verify', 'enabled', false);
-                $this->SetStatus(104);
-                echo $this->Translate('Login was not successfull!');
-            }
+            $verify = self::$BLINK_VERIFY;
+            // Safe & Inform about verification
+            $this->WriteAttributeString('CSRFVerifier', serialize($response));
+            $this->UpdateFormField('Verify', 'enabled', true);
+            $this->SetStatus(203);
+            $this->EchoMessage($this->Translate('Login must be verified!'));
         } else {
             $this->SetStatus(104);
-            echo $this->Translate('Login was not successfull!');
+            $this->EchoMessage($this->Translate('Login was not successfull!'));
         }
         // Return
         $this->WriteAttributeInteger('VerifyClient', $verify);
@@ -406,63 +410,43 @@ class BlinkHomeClient extends IPSModuleStrict
     public function Verify(string $pin): int
     {
         $verify = self::$BLINK_LOGOUT;
-        $username = $this->ReadPropertyString('AccountUser');
-        $password = $this->ReadPropertyString('AccountPassword');
         $uuid = $this->ReadAttributeString('UniqueID');
-        //$this->LogDebug(__FUNCTION__, 'Username: ' . $username . ', Password: ' . (empty($password) ? 'N' : 'Y') . ', UUID: ' . $uuid);
+        $cookie = $this->ReadAttributeString('CookieFile');
+        $csrf = unserialize($this->ReadAttributeString('CSRFVerifier'));
+        $this->LogDebug(__FUNCTION__, 'UUID: ' . $uuid . ', Cookie: ' . $cookie . ', CSRF: ' . $csrf[0] . ', Verifier: ' . $csrf[1]);
 
-        // Safty check
-        if (empty($username)) {
-            $this->SetStatus(201);
-            echo $this->Translate('Verify not possible!');
-            return $verify;
-        }
-        if (empty($password)) {
-            $this->SetStatus(202);
-            echo $this->Translate('Verify not possible!');
-            return $verify;
-        }
         if (empty($pin)) {
             $this->SetStatus(203);
-            echo $this->Translate('Verify not possible!');
+            $this->EchoMessage($this->Translate('Verify not possible!'));
             return $verify;
         }
         // API call
-        $response = $this->doLogin($username, $password, $uuid, $pin, null);
+        $response = $this->doVerify($uuid, $cookie, $pin, $csrf[0], $csrf[1]);
         // Result?
         if ($response !== false) {
-            $params = json_decode($response, true);
-            $this->LogDebug(__FUNCTION__, $params);
-            // Token?
-            $verify = isset($params['access_token']) ? self::$BLINK_LOGIN : self::$BLINK_LOGOUT;
+            $verify = self::$BLINK_LOGIN;
             $this->WriteAttributeInteger('VerifyClient', $verify);
-            if ($verify === self::$BLINK_LOGIN) {
-                $this->LogDebug(__FUNCTION__, 'Verified!');
-                // Save tokens
-                $this->WriteAttributeString('AccessToken', $params['access_token']);
-                $this->WriteAttributeString('RefreshToken', $params['refresh_token']);
-                // Start Heartbeat
-                $this->SetTimerInterval('TimerHeartbeat', $params['expires_in'] * 1000);
-                // Account/Client ID
-                $response = $this->doTier($params['access_token']);
-                if ($response !== false) {
-                    $params = json_decode($response, true);
-                    $this->LogDebug(__FUNCTION__, $params);
-                    $this->WriteAttributeString('AccountID', $params['account_id']);
-                    $this->WriteAttributeString('Region', $params['tier']);
-                }
-                $this->UpdateFormField('Refresh', 'enabled', true);
-                $this->UpdateFormField('Options', 'enabled', true);
-                $this->SetStatus(102);
-                echo $this->Translate('Verify was successfull!');
-            } else {
-                $this->LogDebug(__FUNCTION__, 'Not verified!');
-                $this->SetStatus(203);
-                echo $this->Translate('Verify was not successfull!');
+            $this->LogDebug(__FUNCTION__, 'Verified!');
+            // Save tokens
+            $this->WriteAttributeString('AccessToken', $response[0]);
+            $this->WriteAttributeString('RefreshToken', $response[1]);
+            // Start Heartbeat
+            $this->SetTimerInterval('TimerHeartbeat', intval($response[2]) * 1000);
+            // Account/Client ID
+            $response = $this->doTier($response[0]);
+            if ($response !== false) {
+                $params = json_decode($response, true);
+                $this->LogDebug(__FUNCTION__, $params);
+                $this->WriteAttributeString('AccountID', $params['account_id']);
+                $this->WriteAttributeString('Region', $params['tier']);
             }
+            $this->UpdateFormField('Refresh', 'enabled', true);
+            $this->UpdateFormField('Options', 'enabled', true);
+            $this->SetStatus(102);
+            $this->EchoMessage($this->Translate('Verify was successfull!'));
         } else {
             $this->SetStatus(203);
-            echo $this->Translate('Verify was not successfull!');
+            $this->EchoMessage($this->Translate('Verify was not successfull!'));
         }
         // Return
         return $verify;
@@ -483,7 +467,6 @@ class BlinkHomeClient extends IPSModuleStrict
         }
 
         $user = $this->ReadPropertyString('AccountUser');
-        $password = 'password'; // Do not use the password for refresh
         $token = $this->ReadAttributeString('RefreshToken');
         $uuid = $this->ReadAttributeString('UniqueID');
         $region = $this->ReadAttributeString('Region');
@@ -491,11 +474,11 @@ class BlinkHomeClient extends IPSModuleStrict
         // Safty check
         if (empty($user) || empty($token)) {
             $this->SetStatus(201);
-            echo $this->Translate('Refresh not possible!');
+            $this->EchoMessage($this->Translate('Refresh not possible!'));
             return self::$BLINK_LOGOUT;
         }
         // API call
-        $response = $this->doLogin($user, $password, $uuid, null, $token);
+        $response = $this->doRefresh($user, $uuid, $token);
         // Result?
         if ($response !== false) {
             $params = json_decode($response, true);
@@ -520,14 +503,14 @@ class BlinkHomeClient extends IPSModuleStrict
                 ]));
 
                 $this->SetStatus(102);
-                echo $this->Translate('Refresh was successfull!');
+                $this->EchoMessage($this->Translate('Refresh was successfull!'));
             } else {
                 $this->SetStatus(104);
-                echo $this->Translate('Refresh was not successfull!');
+                $this->EchoMessage($this->Translate('Refresh was not successfull!'));
             }
         } else {
             $this->SetStatus(104);
-            echo $this->Translate('Refresh was not successfull!');
+            $this->EchoMessage($this->Translate('Refresh was not successfull!'));
         }
         // Return
         $this->WriteAttributeInteger('VerifyClient', $verify);
@@ -549,7 +532,7 @@ class BlinkHomeClient extends IPSModuleStrict
         // Safty check
         $verify = $this->ReadAttributeInteger('VerifyClient');
         if (!$verify) {
-            echo $this->Translate('Logged out!');
+            $this->EchoMessage($this->Translate('Logged out!'));
             return $ret;
         }
         // Inputs
@@ -563,10 +546,10 @@ class BlinkHomeClient extends IPSModuleStrict
             $params = json_decode($response, true);
             $this->LogDebug(__FUNCTION__, $params);
             // Prepeare Info
-            echo $this->PrettyPrint(self::BLINK_MAP_NOTIFICATIONS, json_encode($params['notifications']));
+            $this->EchoMessage($this->PrettyPrint(self::BLINK_MAP_NOTIFICATIONS, json_encode($params['notifications'])));
             $ret = true;
         } else {
-            echo $this->Translate('Call was not successfull!');
+            $this->EchoMessage($this->Translate('Call was not successfull!'));
         }
         // Return
         return $ret;
@@ -661,5 +644,18 @@ class BlinkHomeClient extends IPSModuleStrict
             mt_rand(0, 0xffff),
             mt_rand(0, 0xffff)
         );
+    }
+
+    /**
+     * Show message via popup
+     *
+     * @param string $caption echo message
+     *
+     * @return void
+     */
+    private function EchoMessage(string $caption): void
+    {
+        $this->UpdateFormField('EchoMessage', 'caption', $this->Translate($caption));
+        $this->UpdateFormField('EchoPopup', 'visible', true);
     }
 }

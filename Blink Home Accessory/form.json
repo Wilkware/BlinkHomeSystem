@@ -107,9 +107,15 @@
         },
         {
             "type": "ExpansionPanel",
-            "caption": "Advanced settings ...",
-            "items": [],
-            "visible": false
+            "caption": "⚙️ Advanced settings ...",
+            "items": [
+                {
+                    "type": "CheckBox",
+                    "name": "UpdateBattery",
+                    "caption": "Create a variable to display the battery charge level!",
+                    "visible": true
+                }
+            ]
         }
     ],
     "actions": [
@@ -162,6 +168,10 @@
                             "onClick": "echo 'https://creativecommons.org/licenses/by-nc-sa/4.0/';"
                         }
                     ]
+                },
+                {
+                    "type": "Label",
+                    "color": 8421504
                 }
             ]
         }

@@ -110,34 +110,34 @@ trait BlinkHelper
     private static $BLINK_VERIFY = 2;
 
     /**
-     * @var string App version
+     * @var string App brand name
      */
-    private static $APP_VERSION = '48.1';
+    private static $APP_BRAND = 'blink';
 
     /**
-     * @var string App build number
+     * @var string App scope name
      */
-    private static $APP_BUILD = 'IOS_2509241604';
-
-    /**
-     * @var string Client name
-     */
-    private static $CLIENT_NAME = 'IPSymconBlinkModul';
+    private static $APP_SCOPE = 'client';
 
     /**
      * @var string App client type (ios | android)
      */
-    private static $CLIENT_TYPE = 'ios';
+    private static $CLIENT_ID = 'ios';
 
     /**
-     * @var string Device id name
+     * @var string Oauth redirect url
      */
-    private static $DEVICE_ID = 'IP-Symcon Modul';
+    private static $OAUTH_REDIRECT = 'immedia-blink://applinks.blink.com/signin/callback';
 
     /**
      * @var string User Agernt
      */
-    private static $USER_AGENT = 'Blink/2210311418 CFNetwork/1399 Darwin/22.1.0';
+    private static $USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X)';
+
+    /**
+     * @var string Token Agernt
+     */
+    private static $TOKEN_AGENT = 'Blink/2511191620 CFNetwork/3860.200.71 Darwin/25.1.0';
 
     /**
      * @var int Request wait time in milli seconds
@@ -587,29 +587,147 @@ trait BlinkHelper
     /**
      * Client Login/Verify to Blink Account on Blink Servers (OAuth2)
      *
+     * @param string        $username  User ID/Mail adresse
+     * @param string        $password  User account password
+     * @param string        $uuid      Unique ID
+     * @param string        $cookie    Cookie file name
+     *
+     * @return array<string>|false Response data or false on failure
+     */
+    private function doLogin(string $username, string $password, string $uuid, string $cookie): array|false
+    {
+        // Starting OAuth2 PKCE login...
+        [$verifier, $challenge] = $this->PairPKCE();
+        $this->LogDebug(__FUNCTION__, 'Verifier: ' . $verifier . ', Challenge: ' . $challenge);
+
+        $url = 'https://api.oauth.blink.com/oauth/v2/authorize?' . http_build_query([
+            'client_id'             => self::$CLIENT_ID,
+            'response_type'         => 'code',
+            'redirect_uri'          => self::$OAUTH_REDIRECT,
+            'scope'                 => self::$APP_SCOPE,
+            'code_challenge'        => $challenge,
+            'code_challenge_method' => 'S256',
+            'hardware_id'           => $uuid,
+            'app_brand'             => self::$APP_BRAND,
+        ]);
+        $this->LogDebug(__FUNCTION__, 'Auth URL: ' . $url);
+        // send oauth request
+        $headers[] = 'user-agent: ' . self::$USER_AGENT;
+        $this->OpenAuth($url, $headers, $cookie, null, 'GET');
+
+        // SignIn part
+        $url = 'https://api.oauth.blink.com/oauth/v2/signin';
+        $signin = $this->OpenAuth($url, $headers, $cookie, null, 'GET');
+        $this->LogDebug(__FUNCTION__, 'Sign In: ' . print_r($signin, true));
+        $csrf = $this->ExtractCSRF($signin['body']);
+        if (!$csrf) {
+            $this->LogDebug(__FUNCTION__, 'CSRF token not found!');
+            return false;
+        }
+
+        // Login part
+        $url = 'https://api.oauth.blink.com/oauth/v2/signin';
+        $headers[] = 'user-agent: ' . self::$USER_AGENT;
+        $headers[] = 'Content-Type: application/x-www-form-urlencoded';
+        $body = http_build_query([
+            'username'   => $username,
+            'password'   => $password,
+            'csrf-token' => $csrf
+        ]);
+        $login = $this->OpenAuth($url, $headers, $cookie, $body, 'POST');
+        $this->LogDebug(__FUNCTION__, 'Login: ' . print_r($login, true));
+
+        if ($login['status'] === 412) {
+            return [$csrf, $verifier];
+        }
+
+        return false;
+    }
+
+    /**
+     * Client Login/Verify to Blink Account on Blink Servers (OAuth2)
+     *
+     * @param string        $uuid      Unique ID
+     * @param string        $cookie    Cookie file name
+     * @param string        $pin       PIN code
+     * @param string        $csrf      CSRF Token
+     * @param string        $verifier  PKCE Verifier
+     *
+     * @return array<string>|false Response data or false on failure
+     */
+    private function doVerify(string $uuid, string $cookie, string $pin, string $csrf, string $verifier): array|false
+    {
+        // Verify code
+        $url = 'https://api.oauth.blink.com/oauth/v2/2fa/verify';
+        $headers[] = 'user-agent: ' . self::$USER_AGENT;
+        $headers[] = 'Content-Type: application/x-www-form-urlencoded';
+        $body = http_build_query([
+            '2fa_code'   => $pin,
+            'csrf-token' => $csrf
+        ]);
+        $login = $this->OpenAuth($url, $headers, $cookie, $body, 'POST');
+        $this->LogDebug(__FUNCTION__, 'Code: ' . print_r($login, true));
+
+        // Finalize OAuth2 PKCE login...
+        $url = 'https://api.oauth.blink.com/oauth/v2/authorize';
+        $headers[] = 'user-agent: ' . self::$USER_AGENT;
+        $auth = $this->OpenAuth($url, $headers, $cookie, null, 'GET');
+
+        preg_match('/code=([^&]+)/', $auth['headers'], $m);
+        $code = $m[1] ?? null;
+
+        if (!$code) {
+            $this->LogDebug(__FUNCTION__, 'Authorization code not found');
+            return false;
+        }
+
+        // Token part
+        $url = 'https://api.oauth.blink.com/oauth/token';
+        $headers[] = 'user-agent: ' . self::$TOKEN_AGENT;
+        $headers[] = 'Content-Type: application/x-www-form-urlencoded';
+        $body = http_build_query([
+            'grant_type'    => 'authorization_code',
+            'client_id'     => self::$CLIENT_ID,
+            'code'          => $code,
+            'code_verifier' => $verifier,
+            'redirect_uri'  => self::$OAUTH_REDIRECT,
+            'scope'         => self::$APP_SCOPE,
+            'hardware_id'   => $uuid
+        ]);
+        $token = $this->OpenAuth($url, $headers, $cookie, $body, 'POST');
+        $this->LogDebug(__FUNCTION__, 'Code: ' . print_r($token, true));
+
+        $data = json_decode($token['body'], true);
+
+        if (!isset($data['access_token'])) {
+            $this->LogDebug(__FUNCTION__, 'Access token not found');
+            return false;
+        }
+
+        return [$data['access_token'], $data['refresh_token'], $data['expires_in']];
+    }
+
+    /**
+     * Refresh access token (OAuth2)
+     *
      * POST https://api.oauth.blink.com/oauth/token
      *
      * Headers
      *      content-type - application/x-www-form-urlencoded',
      *      hardware_id  - Unique ID,
-     *      2fa-code     - <code> # only for verifying pin
      *
      * Body
      *      username    - Account userid/email
-     *      password    - Account password
-     *      grant_type  - 'password'
      *      client_id   - 'android',
      *      scope       - 'client',
      *
      * @param string        $username  User ID/Mail adresse
-     * @param string        $password  User account password
      * @param string        $uuid      Unique ID
-     * @param string|null   $code      PIN provided in email or sms
-     * @param string|null   $token     refresh token for re-login
+     * @param string        $token     refresh token for re-login
      *
      * @return string|false Response data or false on failure
      */
-    private function doLogin(string $username, string $password, string $uuid, ?string $code, ?string $token): string|false
+    private function doRefresh(string $username, string $uuid, string $token): string|false
     {
         // prepeare url
         $url = 'https://api.oauth.blink.com/oauth/token';
@@ -618,25 +736,14 @@ trait BlinkHelper
             'content-type: application/x-www-form-urlencoded',
             'hardware_id: ' . $uuid
         ];
-        if ($code != null) {
-            $headers[] = '2fa-code: ' . $code;
-        }
-
-        // prepeare body (Login oauth2)
+        // prepeare request (oauth2)
         $body = [
-            'username'   => $username,
-            'client_id'  => 'android',
-            'scope'      => 'client',
+            'username'      => $username,
+            'client_id'     => 'android',
+            'scope'         => 'client',
+            'grant_type'    => 'refresh_token',
+            'refresh_token' => $token
         ];
-
-        if ($token != null) {
-            $body['grant_type'] = 'refresh_token';
-            $body['refresh_token'] = $token;
-        } else {
-            $body['grant_type'] = 'password';
-            $body['password'] = $password;
-        }
-
         $request = http_build_query($body);
         // return request
         return $this->SendRequest($url, $headers, $request);
@@ -1054,5 +1161,82 @@ trait BlinkHelper
         curl_close($curl);
         $this->LogDebug(__FUNCTION__, $response);
         return $response;
+    }
+
+    /*
+     * OpenAuth - Sends the oauth request to the service
+     *
+     * If $request not null, we will send a POST request, else a GET request.
+     * Over the $method parameter can we force a POST or GET request!
+     *
+     * @param string               $url     URL to call
+     * @param array<string,string> $headers Header as key => value pairs
+     * @param string               $cookie  Cookie file name
+     * @param string|null          $request Request body or null for GET
+     * @param string               $method  HTTP method ('GET' or 'POST')
+     * @param bool                 $follow  Follow redirects
+     *
+     * @return array<string,mixed> Response data
+     * @phpstan-ignore missingType.iterableValue
+     */
+    private function OpenAuth(string $url, array $headers, string $cookie, ?string $request, string $method = 'GET', bool $follow = false): array
+    {
+        $this->LogDebug(__FUNCTION__, $url);
+        $this->LogDebug(__FUNCTION__, $headers);
+
+        $curl = curl_init($url);
+        curl_setopt_array($curl, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CUSTOMREQUEST  => $method,
+            CURLOPT_HTTPHEADER     => $headers,
+            CURLOPT_COOKIEJAR      => $cookie,
+            CURLOPT_COOKIEFILE     => $cookie,
+            CURLOPT_FOLLOWLOCATION => $follow,
+            CURLOPT_HEADER         => true,
+        ]);
+
+        if ($request !== null) {
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $request);
+        }
+
+        $response = curl_exec($curl);
+        $this->LogDebug(__FUNCTION__, curl_error($curl));
+        $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+
+        curl_close($curl);
+        return [
+            'status' => $status,
+            'headers'=> substr($response, 0, $size),
+            'body'   => substr($response, $size),
+        ];
+    }
+
+    /**
+     * Generate PKCE pair
+     *
+     * @return array<int,string> verifier & challenge
+     */
+    private function PairPKCE(): array
+    {
+        $verifier = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
+        $challenge = rtrim(strtr(base64_encode(hash('sha256', $verifier, true)), '+/', '-_'), '=');
+        return [$verifier, $challenge];
+    }
+
+    /**
+     * Extract CSRF token from HTML content
+     *
+     * @param string $html HTML content
+     *
+     * @return string|null
+     */
+    private function ExtractCSRF(string $html): ?string
+    {
+        if (preg_match('#<script[^>]*id="oauth-args"[^>]*>(.*?)</script>#s', $html, $m)) {
+            $json = json_decode($m[1], true);
+            return $json['csrf-token'] ?? null;
+        }
+        return null;
     }
 }

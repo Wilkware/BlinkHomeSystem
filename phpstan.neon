@@ -15,6 +15,8 @@ parameters:
             - %env.IPS_STUBS_PATH%/*
             
     ignoreErrors:
+        - '#Method BlinkHomeClient::OpenAuth\(\) return type has no value type specified in iterable type array#'
+
 
     # Supress ignore Errors
     reportUnmatchedIgnoredErrors: false

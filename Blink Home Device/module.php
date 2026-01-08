@@ -12,24 +12,57 @@ class BlinkHomeDevice extends IPSModuleStrict
     use DebugHelper;
     use EventHelper;
     use FormatHelper;
-    use ProfileHelper;
     use VariableHelper;
 
     /**
-     * @var array<int,array{0:int,1:string,2:string,3:int}> Profile UPDATE
+     * @var array<string,mixed> Snapshot Presentation (Switch)
      */
-    private const BLINK_PROFILE_UPDATE = [
-        [1, '►', '', 0xFF8000],
+    private const BLINK_PRESENTATION_IMAGE = [
+        'PRESENTATION' => VARIABLE_PRESENTATION_SWITCH,
+        'ICON_TRUE'    => 'image-polaroid'
     ];
 
     /**
-     * @var array<int,array{0:int,1:string,2:string,3:int}> Profile BATTERY
+     * @var array<string,mixed> Record movie Presentation (Switch)
      */
-    private const BLINK_PROFILE_BATTERY = [
-        [0, 'unknown', '', 0xFF00FF],
-        [1, 'critical', 'Battery-0', 0xFF0000],
-        [2, 'low', 'Battery-50', 0xFFFF00],
-        [3, 'ok', 'Battery-100', 0x00FF00],
+    private const BLINK_PRESENTATION_RECORD = [
+        'PRESENTATION' => VARIABLE_PRESENTATION_SWITCH,
+        'ICON_TRUE'    => 'clapperboard-play'
+    ];
+
+    /**
+     * @var array<string,mixed> Movie detection Presentation (Switch)
+     */
+    private const BLINK_PRESENTATION_MOVIE = [
+        'PRESENTATION' => VARIABLE_PRESENTATION_SWITCH,
+        'ICON_TRUE'    => 'person-running-fast'
+    ];
+
+    /**
+     * @var array<string,mixed> Battery Presentation (Value)
+     */
+    private const BLINK_PRESENTATION_BATTERY = [
+        'PRESENTATION'       => VARIABLE_PRESENTATION_VALUE_PRESENTATION,
+        'MIN'                => 0,
+        'MAX'                => 3,
+        'THOUSANDS_SEPARATOR'=> '',
+        'DISPLAY_TYPE'       => 0,
+        'ICON'               => 'battery-bolt',
+        'INTERVALS_ACTIVE'   => true,
+        'INTERVALS'          => '[
+            {"ColorDisplay":16711935,"ContentColorDisplay":-1,"IntervalMinValue":0,"IntervalMaxValue":0,"ConstantActive":true,"ConstantValue":"Unbekannt","ConversionFactor":1,"IconActive":true,"IconValue":"battery-exclamation","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16711935,"ContentColorActive":false,"ContentColorValue":-1},
+            {"ColorDisplay":16711680,"ContentColorDisplay":-1,"IntervalMinValue":1,"IntervalMaxValue":1,"ConstantActive":true,"ConstantValue":"Niedrig","ConversionFactor":1,"IconActive":true,"IconValue":"battery-low","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16711680,"ContentColorActive":false,"ContentColorValue":-1},
+            {"ColorDisplay":16776960,"ContentColorDisplay":-1,"IntervalMinValue":2,"IntervalMaxValue":2,"ConstantActive":true,"ConstantValue":"Mittel","ConversionFactor":1,"IconActive":true,"IconValue":"battery-half","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16776960,"ContentColorActive":false,"ContentColorValue":-1},
+            {"ColorDisplay":65280,"ContentColorDisplay":-1,"IntervalMinValue":3,"IntervalMaxValue":3,"ConstantActive":true,"ConstantValue":"Gut","ConversionFactor":1,"IconActive":true,"IconValue":"battery-full","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":65280,"ContentColorActive":false,"ContentColorValue":-1}
+        ]',
+        'PERCENTAGE'   => false,
+        'CONTENT_COLOR'=> -1,
+        'PREFIX'       => '',
+        'SUFFIX'       => '',
+        'COLOR'        => -1,
+        'USAGE_TYPE'   => 0,
+        'SHOW_PREVIEW' => true,
+        'PREVIEW_STYLE'=> 1
     ];
 
     /**
@@ -166,6 +199,12 @@ class BlinkHomeDevice extends IPSModuleStrict
         // Get Form
         $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
 
+        // Extract Version
+        $ins = IPS_GetInstance($this->InstanceID);
+        $mod = IPS_GetModule($ins['ModuleInfo']['ModuleID']);
+        $lib = IPS_GetLibrary($mod['LibraryID']);
+        $form['actions'][4]['items'][2]['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
+
         // Return if parent is not confiured
         if (!$this->HasActiveParent()) {
             return json_encode($form);
@@ -207,26 +246,24 @@ class BlinkHomeDevice extends IPSModuleStrict
         $battery = $this->ReadPropertyBoolean('UpdateBattery');
         $schedule = $this->ReadPropertyInteger('ImageSchedule');
         $liveview = $this->ReadPropertyBoolean('LiveViewEnable');
-        // Register Profile
-        $this->RegisterProfileInteger('BHS.Update', 'Script', '', '', 0, 0, 0, self::BLINK_PROFILE_UPDATE);
-        $this->RegisterProfileInteger('BHS.Battery', 'Battery', '', '', 0, 3, 1, self::BLINK_PROFILE_BATTERY);
+
         // Motion detection
         if ($model != 'null') {
-            $this->MaintainVariable('motion_detection', $this->Translate('Motion detection'), VARIABLETYPE_BOOLEAN, '~Switch', 1, true);
+            $this->MaintainVariable('motion_detection', $this->Translate('Motion detection'), VARIABLETYPE_BOOLEAN, self::BLINK_PRESENTATION_MOVIE, 1, true);
             $this->EnableAction('motion_detection');
         }
         // Update image
-        $this->MaintainVariable('snapshot', $this->Translate('Snapshot'), VARIABLETYPE_INTEGER, 'BHS.Update', 2, $update && $image);
+        $this->MaintainVariable('snapshot', $this->Translate('Snapshot'), VARIABLETYPE_BOOLEAN, self::BLINK_PRESENTATION_IMAGE, 2, $update && $image);
         if ($update & $image) {
-            $this->SetValueInteger('snapshot', 1);
+            $this->SetValueBoolean('snapshot', false);
             $this->EnableAction('snapshot');
         }
         // Record clip
-        $this->MaintainVariable('record', $this->Translate('Record'), VARIABLETYPE_INTEGER, 'BHS.Update', 3, true);
-        $this->SetValueInteger('record', 1);
+        $this->MaintainVariable('record', $this->Translate('Record'), VARIABLETYPE_BOOLEAN, self::BLINK_PRESENTATION_RECORD, 3, true);
+        $this->SetValueBoolean('record', false);
         $this->EnableAction('record');
         // Update battery
-        $this->MaintainVariable('battery', $this->Translate('Battery'), VARIABLETYPE_INTEGER, 'BHS.Battery', 4, $battery);
+        $this->MaintainVariable('battery', $this->Translate('Battery'), VARIABLETYPE_INTEGER, self::BLINK_PRESENTATION_BATTERY, 4, $battery);
         // Media Object
         if ($image) {
             $this->CreateMediaImage('thumbnail', $this->Translate('Image'), $device, 'jpg', $cache);

@@ -18,6 +18,44 @@ class BlinkHomeAccessory extends IPSModuleStrict
     private const BLINK_CLIENT_GUID = '{AF126D6D-83D1-44C2-6F61-96A4BB7A0E62}';
 
     /**
+     * @var array<string,mixed> Download Presentation (Switch)
+     */
+    private const BLINK_PRESENTATION_LIGHT = [
+        'PRESENTATION'   => VARIABLE_PRESENTATION_SWITCH,
+        'USE_ICON_FALSE' => true,
+        'ICON_TRUE'      => 'lightbulb-on',
+        'ICON_FALSE'     => 'lightbulb',
+        'USAGE_TYPE'     => 0
+    ];
+
+    /**
+     * @var array<string,mixed> Battery Presentation (Value)
+     */
+    private const BLINK_PRESENTATION_BATTERY = [
+        'PRESENTATION'       => VARIABLE_PRESENTATION_VALUE_PRESENTATION,
+        'MIN'                => 0,
+        'MAX'                => 3,
+        'THOUSANDS_SEPARATOR'=> '',
+        'DISPLAY_TYPE'       => 0,
+        'ICON'               => 'battery-bolt',
+        'INTERVALS_ACTIVE'   => true,
+        'INTERVALS'          => '[
+            {"ColorDisplay":16711935,"ContentColorDisplay":-1,"IntervalMinValue":0,"IntervalMaxValue":0,"ConstantActive":true,"ConstantValue":"Unbekannt","ConversionFactor":1,"IconActive":true,"IconValue":"battery-exclamation","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16711935,"ContentColorActive":false,"ContentColorValue":-1},
+            {"ColorDisplay":16711680,"ContentColorDisplay":-1,"IntervalMinValue":1,"IntervalMaxValue":1,"ConstantActive":true,"ConstantValue":"Niedrig","ConversionFactor":1,"IconActive":true,"IconValue":"battery-low","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16711680,"ContentColorActive":false,"ContentColorValue":-1},
+            {"ColorDisplay":16776960,"ContentColorDisplay":-1,"IntervalMinValue":2,"IntervalMaxValue":2,"ConstantActive":true,"ConstantValue":"Mittel","ConversionFactor":1,"IconActive":true,"IconValue":"battery-half","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16776960,"ContentColorActive":false,"ContentColorValue":-1},
+            {"ColorDisplay":65280,"ContentColorDisplay":-1,"IntervalMinValue":3,"IntervalMaxValue":3,"ConstantActive":true,"ConstantValue":"Gut","ConversionFactor":1,"IconActive":true,"IconValue":"battery-full","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":65280,"ContentColorActive":false,"ContentColorValue":-1}
+        ]',
+        'PERCENTAGE'   => false,
+        'CONTENT_COLOR'=> -1,
+        'PREFIX'       => '',
+        'SUFFIX'       => '',
+        'COLOR'        => -1,
+        'USAGE_TYPE'   => 0,
+        'SHOW_PREVIEW' => true,
+        'PREVIEW_STYLE'=> 1
+    ];
+
+    /**
      * In contrast to Construct, this function is called only once when creating the instance and starting IP-Symcon.
      * Therefore, status variables and module properties which the module requires permanently should be created here.
      *
@@ -39,6 +77,9 @@ class BlinkHomeAccessory extends IPSModuleStrict
         $this->RegisterPropertyString('DeviceID', '');
         $this->RegisterPropertyString('NetworkID', '');
         $this->RegisterPropertyString('TargetID', '');
+
+        // Variable
+        $this->RegisterPropertyBoolean('UpdateBattery', true);
     }
 
     /**
@@ -65,6 +106,12 @@ class BlinkHomeAccessory extends IPSModuleStrict
         // Get Form
         $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
 
+        // Extract Version
+        $ins = IPS_GetInstance($this->InstanceID);
+        $mod = IPS_GetModule($ins['ModuleInfo']['ModuleID']);
+        $lib = IPS_GetLibrary($mod['LibraryID']);
+        $form['actions'][2]['items'][2]['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
+
         // Return if parent is not confiured
         if (!$this->HasActiveParent()) {
             return json_encode($form);
@@ -83,8 +130,13 @@ class BlinkHomeAccessory extends IPSModuleStrict
         //Never delete this line!
         parent::ApplyChanges();
 
-        $this->MaintainVariable('switch_light', $this->Translate('Light switch'), VARIABLETYPE_BOOLEAN, '~Switch', 1, true);
+        $battery = $this->ReadPropertyBoolean('UpdateBattery');
+
+        $this->MaintainVariable('switch_light', $this->Translate('Light switch'), VARIABLETYPE_BOOLEAN, self::BLINK_PRESENTATION_LIGHT, 1, true);
         $this->EnableAction('switch_light');
+
+        // Update battery
+        $this->MaintainVariable('battery', $this->Translate('Battery'), VARIABLETYPE_INTEGER, self::BLINK_PRESENTATION_BATTERY, 2, $battery);
     }
 
     /**
@@ -124,7 +176,7 @@ class BlinkHomeAccessory extends IPSModuleStrict
             $device = $this->ReadPropertyString('DeviceID');
             foreach ($data['Battery'] as $entry) {
                 if ($entry['device'] == $device) {
-                    $this->MaintainVariable('battery', $this->Translate('Battery'), VARIABLETYPE_INTEGER, 'BHS.Battery', 2, true);
+                    $this->MaintainVariable('battery', $this->Translate('Battery'), VARIABLETYPE_INTEGER, self::BLINK_PRESENTATION_BATTERY, 2, true);
                     $this->SetValueInteger('battery', ($entry['battery'] === 'ok') ? 3 : 1);
                 }
             }

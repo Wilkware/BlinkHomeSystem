@@ -141,6 +141,20 @@
             ]
         },
         {
+            "name": "EchoPopup",
+            "type": "PopupAlert",
+            "visible": false,
+            "popup": {
+                "items": [
+                    {
+                        "type": "Label",
+                        "name": "EchoMessage",
+                        "caption": ""
+                    }
+                ]
+            }
+        },
+        {
             "type": "ExpansionPanel",
             "caption": "🎗️ Source code, donation and licence ...",
             "items": [
@@ -168,6 +182,10 @@
                             "onClick": "echo 'https://creativecommons.org/licenses/by-nc-sa/4.0/';"
                         }
                     ]
+                },
+                {
+                    "type": "Label",
+                    "color": 8421504
                 }
             ]
         }

@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-8.1-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-2.1.20251125-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
+[![Version](https://img.shields.io/badge/Modul%20Version-2.3.20260108-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
@@ -123,6 +123,18 @@ Gibt im angemeldeten Zusatnd die Benachrichtigungsoptionen aus.
 Die Funktion liefert `true` im Erfolgsfall, sonst `false`.
 
 ### 8. Versionshistorie
+
+v2.3.20260108
+
+* _NEU_: Umstellung auf wiederholt neues OAuth2 Authentifizierungsverfahren
+* _NEU_: Modulversion wird in Quellcodesektion angezeigt
+* _FIX_: Konfigurationsmeldungen auf Popup-Element umgestellt
+
+v2.2.20251224
+* _FIX_: Kombatibilität v8.1 und v8.2 korriegiert
+
+* _NEU_: Support für Blink Mini 2K+
+* _NEU_: Umstellung der Flutlichschaltung
 
 v2.1.20251125
 

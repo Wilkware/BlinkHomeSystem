@@ -12,7 +12,6 @@ class BlinkHomeSyncModule extends IPSModuleStrict
     use DebugHelper;
     use EventHelper;
     use FormatHelper;
-    use ProfileHelper;
     use VariableHelper;
 
     /**
@@ -34,6 +33,55 @@ class BlinkHomeSyncModule extends IPSModuleStrict
      * @var string Schedule recording constant IDENT
      */
     private const BLINK_SCHEDULE_RECORDING_IDENT = 'circuit_recording';
+
+    /**
+     * @var array<string,mixed> Download Presentation (Switch)
+     */
+    private const BLINK_PRESENTATION_DOWNLOAD = [
+        'PRESENTATION' => VARIABLE_PRESENTATION_SWITCH,
+        'ICON_TRUE'    => 'download'
+    ];
+
+    /**
+     * @var array<string,mixed> Recording Presentation (Enumaration)
+     */
+    private const BLINK_PRESENTATION_RECORDING = [
+        'PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION,
+        'OPTIONS'      => '[{"Value":false,"Caption":"Aus","IconValue":"camera-slash","IconActive":true,"Color":-1},{"Value":true,"Caption":"An","IconValue":"camera-cctv","IconActive":true,"Color":-1}]',
+        'LAYOUT'       => 0,
+        'ICON'         => ''
+    ];
+
+    /**
+     * @var array<string,mixed> Alert Presentation (Enumaration)
+     */
+    private const BLINK_PRESENTATION_ALERT = [
+        'PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION,
+        'OPTIONS'      => '[{"Value":false,"Caption":"OK","IconActive":false,"IconValue":"","Color":-1},{"Value":true,"Caption":"Alarm","IconActive":false,"IconValue":"","Color":16711680}]',
+        'LAYOUT'       => 0,
+        'ICON'         => 'triangle-exclamation'
+    ];
+
+    /**
+     * @var array<string,mixed> Cameras Presentation (Enumaration)
+     */
+    private const BLINK_PRESENTATION_CAMERAS = [
+        'PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION,
+        'OPTIONS'      => '[
+            {"Value":10,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
+            {"Value":20,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
+            {"Value":30,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
+            {"Value":40,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
+            {"Value":50,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
+            {"Value":60,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
+            {"Value":70,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
+            {"Value":80,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
+            {"Value":90,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
+            {"Value":100,"Caption":"-","IconActive":false,"IconValue":"","Color":-1}
+        ]',
+        'LAYOUT' => 0,
+        'ICON'   => 'person-running-fast'
+    ];
 
     /**
      * @var string ModulID (Blink Home Client)
@@ -167,6 +215,27 @@ class BlinkHomeSyncModule extends IPSModuleStrict
     }
 
     /**
+     * The content can be overwritten in order to transfer a self-created configuration page.
+     * This way, content can be generated dynamically.
+     * In this case, the "form.json" on the file system is completely ignored.
+     *
+     * @return string Content of the configuration page.
+     */
+    public function GetConfigurationForm(): string
+    {
+        // Get Form
+        $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
+
+        // Extract Version
+        $ins = IPS_GetInstance($this->InstanceID);
+        $mod = IPS_GetModule($ins['ModuleInfo']['ModuleID']);
+        $lib = IPS_GetLibrary($mod['LibraryID']);
+        $form['actions'][4]['items'][2]['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
+
+        return json_encode($form);
+    }
+
+    /**
      * Is executed when "Apply" is pressed on the configuration page and immediately after the instance has been created.
      *
      * @return void
@@ -185,15 +254,9 @@ class BlinkHomeSyncModule extends IPSModuleStrict
             $this->RegisterReference($script);
         }
 
-        // Register Profile
-        $profile = [
-            [1, '►', '', 0xFF8000],
-        ];
-        $this->RegisterProfileInteger('BHS.Download', 'Download', '', '', 0, 0, 0, $profile);
-
         // Recording variable
         $recording = $this->ReadPropertyBoolean('CheckRecording');
-        $this->MaintainVariable('recording', $this->Translate('Recording'), VARIABLETYPE_BOOLEAN, '~Switch', 0, $recording);
+        $this->MaintainVariable('recording', $this->Translate('Recording'), VARIABLETYPE_BOOLEAN, self::BLINK_PRESENTATION_RECORDING, 0, $recording);
         if ($recording) {
             $this->SetValueBoolean('recording', false);
             $this->EnableAction('recording');
@@ -203,28 +266,40 @@ class BlinkHomeSyncModule extends IPSModuleStrict
         $store = $this->ReadPropertyInteger('StorageCategory');
         $limit = $this->ReadPropertyInteger('StorageLimit');
         $download = (IPS_CategoryExists($store) && ($limit != 0));
-        $this->MaintainVariable('download', $this->Translate('Download'), VARIABLETYPE_INTEGER, 'BHS.Download', 2, $download);
+        $this->MaintainVariable('download', $this->Translate('Download'), VARIABLETYPE_BOOLEAN, self::BLINK_PRESENTATION_DOWNLOAD, 2, $download);
         if ($download) {
-            $this->SetValueInteger('download', 3);
+            $this->SetValueBoolean('download', false);
             $this->EnableAction('download');
         }
 
         // Alert variable
         $alert = $this->ReadPropertyBoolean('CheckAlert');
-        $this->MaintainVariable('alert', $this->Translate('Alert'), VARIABLETYPE_BOOLEAN, '~Alert', 1, $alert);
+        $this->MaintainVariable('alert', $this->Translate('Alert'), VARIABLETYPE_BOOLEAN, self::BLINK_PRESENTATION_ALERT, 1, $alert);
         if ($alert) {
             $this->EnableAction('alert');
         }
+
+        // Motion variable
         $motion = $this->ReadPropertyBoolean('CheckMotion');
+        // Copy new template
+        $tpl = self::BLINK_PRESENTATION_CAMERAS;
         if ($motion) {
-            $list = json_decode($this->ReadPropertyString('ListMotion'), true);
-            $asso = [];
-            foreach ($list as $entry) {
-                $asso[] = [$entry['Value'], $entry['Name'], '', -1];
+            // Extract vaules
+            $pro = json_decode($this->ReadPropertyString('ListMotion'), true);
+            $opt = json_decode($tpl['OPTIONS'], true);
+            $map = [];
+            foreach ($pro as $p) {
+                $map[$p['Value']] = $p['Name'];
             }
-            $this->RegisterProfileInteger('BHS.Cameras', 'Motion', '', '', 1, 100, 1, $asso);
+            foreach ($opt as &$o) {
+                if (isset($map[$o['Value']])) {
+                    $o['Caption'] = $map[$o['Value']];
+                }
+            }
+            unset($o);
+            $tpl['OPTIONS'] = json_encode($opt, JSON_UNESCAPED_UNICODE);
         }
-        $this->MaintainVariable('last_motion', $this->Translate('Last movement'), VARIABLETYPE_INTEGER, 'BHS.Cameras', 3, $motion);
+        $this->MaintainVariable('last_motion', $this->Translate('Last movement'), VARIABLETYPE_INTEGER, $tpl, 3, $motion);
         if ($motion) {
             $this->EnableAction('last_motion');
         }
@@ -315,7 +390,7 @@ class BlinkHomeSyncModule extends IPSModuleStrict
             //echo $this->Translate('Call was successfull!');
             return true;
         } else {
-            echo $this->Translate('Call was not successfull!');
+            $this->EchoMessage($this->Translate('Call was not successfull!'));
             return false;
         }
     }
@@ -341,7 +416,7 @@ class BlinkHomeSyncModule extends IPSModuleStrict
             //echo $this->Translate('Call was successfull!');
             return true;
         } else {
-            echo $this->Translate('Call was not successfull!');
+            $this->EchoMessage($this->Translate('Call was not successfull!'));
             return false;
         }
     }
@@ -493,7 +568,7 @@ class BlinkHomeSyncModule extends IPSModuleStrict
             }
         } else {
             if ($value) {
-                echo $this->Translate('Call was not successfull!');
+                $this->EchoMessage($this->Translate('Call was not successfull!'));
             } else {
                 $this->LogDebug(__FUNCTION__, 'No Clip Information!');
             }
@@ -553,7 +628,7 @@ class BlinkHomeSyncModule extends IPSModuleStrict
             }
         } else {
             if ($value) {
-                echo $this->Translate('Call was not successfull!');
+                $this->EchoMessage($this->Translate('Call was not successfull!'));
             } else {
                 $this->LogDebug(__FUNCTION__, 'No Event Information!');
             }
@@ -661,7 +736,7 @@ class BlinkHomeSyncModule extends IPSModuleStrict
             $this->EchoMessage($this->PrettyPrint(self::BLINK_MAP_STORAGE, $response));
         } else {
             if ($value) {
-                echo $this->Translate('Call was not successfull!');
+                $this->EchoMessage($this->Translate('Call was not successfull!'));
             } else {
                 $this->LogDebug(__FUNCTION__, 'No Local Storage Status Information!');
             }
