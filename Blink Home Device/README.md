@@ -21,9 +21,14 @@ Ermöglicht die Kommunikation mit einem Blink Endgerät, derzeit vornehmlich Kam
 
 ### 1. Funktionsumfang
 
-Derzeit kann über das Modul nur eien Momentaufnahme (Snapshot) aktiviert und angezeigt werden.  
-Es ist derzeit noch nicht absehbar, welchen Funktionsumfang das Modul endgültig umfasst.
+Das Modul ermöglicht die Integration von Blink-Kameras in Symcon und stellt zentrale Steuerungs- und Anzeigeoptionen bereit.  
+Der aktuelle Funktionsumfang umfasst:
+* Auslösen und Anzeigen von Momentaufnahmen (Snapshot)
+* Aktivieren und Deaktivieren der Bewegungserkennung
+* Live-View-Anzeige über einen Middleware-WebSocket-Service
+* Anzeige des Batterieladezustands der Geräte
 
+Das Modul wird kontinuierlich weiterentwickelt und kann künftig um zusätzliche Funktionen erweitert werden.
 ### 2. Voraussetzungen
 
 * IP-Symcon ab Version 8.1

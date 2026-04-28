@@ -21,8 +21,14 @@ IP-Symcon Modul für die Steuerung aller aktiven Kameras im gleichen Netzwerk.
 
 ### 1. Funktionsumfang
 
-Derzeit kann über das Modul nur die Aufzeichnung von Bewegungsereignissen für alle aktivierten Kameras im Netzwerk gesteuert werden.
-Es ist derzeit noch nicht absehbar, welchen Funktionsumfang das Modul endgültig umfasst.
+Das Sync-Modul ermöglicht die zentrale Steuerung und Verwaltung von Blink-Kameras innerhalb von Symcon.  
+Der aktuelle Funktionsumfang umfasst:
+
+* Steuerung der Aufzeichnung von Bewegungsereignissen für alle aktivierten Kameras im Netzwerk
+* Herunterladen von Videoclips (Cloud und/oder lokaler Speicher)
+* Signalisierung von Bewegungsalarmen (z. B. im Zusammenspiel mit Amazon Alexa)
+
+Das Modul wird kontinuierlich weiterentwickelt. Der endgültige Funktionsumfang ist derzeit noch nicht abschließend definiert und kann künftig erweitert werden.
 
 ### 2. Voraussetzungen
 
