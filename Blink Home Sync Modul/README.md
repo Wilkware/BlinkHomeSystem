@@ -14,7 +14,7 @@ IP-Symcon Modul für die Steuerung aller aktiven Kameras im gleichen Netzwerk.
 2. [Voraussetzungen](#user-content-2-voraussetzungen)
 3. [Installation](#user-content-3-installation)
 4. [Einrichten der Instanzen in IP-Symcon](#user-content-4-einrichten-der-instanzen-in-ip-symcon)
-5. [Statusvariablen und Profile](#user-content-5-statusvariablen-und-profile)
+5. [Statusvariablen und Darstellungen](#user-content-5-statusvariablen-und-darstellungen)
 6. [Visualisierung](#user-content-6-visualisierung)
 7. [PHP-Befehlsreferenz](#user-content-7-php-befehlsreferenz)
 8. [Versionshistorie](#user-content-8-versionshistorie)
@@ -108,31 +108,34 @@ CLIPS          | Versucht Aufnahmen vom lokalen USB-Medium herunterzuladen (USB 
 ALARM          | Simuliert eine eingehende Alarmmeldung
 BEWEGUNG       | Simuliert eine Bewegung mit zufälliger Kamera-ID (zwischen 10 und 100)
 
-### 5. Statusvariablen und Profile
+### 5. Statusvariablen und Darstellungen
 
 Die Statusvariablen werden automatisch angelegt. Das Löschen einzelner kann zu Fehlfunktionen führen.
 
 #### Statusvariablen
 
-Ident               | Name                  | Typ     | Profil          | Beschreibung
-------------------- | --------------------- | ------- | --------------- | -------------------
-circuit_snapshot    | Zeitplan Aufnahmen    | event   |                 | Wochenplan für Bewegungsmeldungen
-recording           | Aufzeichnung          | boolean | ~Switch         | An/Aus-Schalter für Aufzeichnungen
-alert               | Alarm                 | boolean | ~Switch         | An/Aus-Schalter für Alarmmeldungen
-download            | Herunterladen         | integer | BHS.Download    | Variable zum Herunterladen von Videoclips
+Ident               | Name                  | Typ     | Darstellung          | Beschreibung
+------------------- | --------------------- | ------- | -------------------- | -------------------
+circuit_snapshot    | Zeitplan Aufnahmen    | event   |                      | Wochenplan für Bewegungsmeldungen
+recording           | Aufzeichnung          | boolean | Schalter             | An/Aus-Schalter für Aufzeichnungen
+alert               | Alarm                 | boolean | Aufzählung           | Indikation von Alarmmeldungen
+download            | Herunterladen         | boolean | Schalter             | Variable zum Herunterladen von Videoclips
+last_motion         | Letzte Bewegung       | integer | Aufzählung           | Hinterlegung der Kamerazuordnung für Bewegungsmeldungen
 
-#### Profile
+#### Darstellungen
 
-Folgendes Profil wird angelegt:
+Folgende Dartsellungen werden hinterlegt:
 
-Name           | Typ       | Beschreibung
--------------- | --------- | ----------------
-BHS.Download   | Integer   | Download Profil (1: '►')
-BHS.Cameras    | Integer   | Kamera Namen (max. 10 Stück), Profil wird dynamisch erzeugt
+Template-Name            | Typ           | Beschreibung
+------------------------ | ------------- | ----------------
+\<direkte Assoziazion\>  | Schalter      | An-/Ausschalter
+\<direkte Assoziazion\>  | Aufzählung    | OK oder Alarm
+\<direkte Assoziazion\>  | Schalter      | Download-Button
+\<direkte Assoziazion\>  | Aufzählung    | Zuordnung in zehnerschritten Nummer zu Kameraname
 
 ### 6. Visualisierung
 
-Man kann die Statusvariablen direkt im WF verlinken.
+Man kann die Statusvariablen direkt in der Visualisierung verlinken.
 
 ### 7. PHP-Befehlsreferenz
 

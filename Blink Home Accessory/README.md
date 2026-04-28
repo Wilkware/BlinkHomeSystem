@@ -14,7 +14,7 @@ Mit diesem Modul können Sie spezifische Funktionen des Zubehörs nutzen und ste
 2. [Voraussetzungen](#user-content-2-voraussetzungen)
 3. [Installation](#user-content-3-installation)
 4. [Einrichten der Instanzen in IP-Symcon](#user-content-4-einrichten-der-instanzen-in-ip-symcon)
-5. [Statusvariablen und Profile](#user-content-5-statusvariablen-und-profile)
+5. [Statusvariablen und Darstellungen](#user-content-5-statusvariablen-und-darstellungen)
 6. [Visualisierung](#user-content-6-visualisierung)
 7. [PHP-Befehlsreferenz](#user-content-7-php-befehlsreferenz)
 8. [Versionshistorie](#user-content-8-versionshistorie)
@@ -61,28 +61,29 @@ Aktion              | Beschreibung
 AN                  | Schaltet Flutlicht an (Blink Floodlight Mount)
 AUS                 | Schaltet Flutlicht aus (Blink Floodlight Mount)
 
-### 5. Statusvariablen und Profile
+### 5. Statusvariablen und Darstellungen
 
 Die Statusvariablen werden automatisch angelegt. Das Löschen einzelner kann zu Fehlfunktionen führen.
 
 #### Statusvariablen
 
-Ident               | Name               | Typ     | Profil     | Beschreibung
-------------------- | ------------------ | ------- | ---------- | -------------------
-switch_light        | Lichtschalter      | boolean | ~Switch    | Variable zum an- und ausschalten des Flutlichtes
-battery             | Batterie           | integer | BHS.Battery| Variable zur Anzeige des Ladezustands
+Ident               | Name               | Typ     | Darstellung   | Beschreibung
+------------------- | ------------------ | ------- | ------------- | -------------------
+switch_light        | Lichtschalter      | boolean | Schalter      | Variable zum an- und ausschalten des Flutlichtes
+battery             | Batterie           | integer | Wertanzeige   | Variable zur Anzeige des Ladezustands
 
-#### Profile
+#### Darstellungen
 
-Folgendes Profil wird angelegt:
+Folgende Dartsellungen werden hinterlegt:
 
-Name           | Typ       | Beschreibung
--------------- | --------- | ----------------
-BHS.Battery    | Integer   | Batterieladezustandsanzeige (0 ... 3)
+Template-Name            | Typ           | Beschreibung
+------------------------ | ------------- | ----------------
+\<direkte Assoziazion\>  | Schalter      | An-/Ausschalter
+\<direkte Assoziazion\>  | Wertanzeige   | Farbliche Batterieladezustandsanzeige von 0 (Unbekannt) bis 3 (Gut)
 
 ### 6. Visualisierung
 
-Man kann die Statusvariablen direkt im WF verlinken.
+Man kann die Statusvariablen direkt in der Visualisierung verlinken.
 
 ### 7. PHP-Befehlsreferenz
 

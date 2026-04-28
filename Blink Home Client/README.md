@@ -14,7 +14,7 @@ IP-Symcon Modul für die zentrale Kommunikation mit den Blink Servern.
 2. [Voraussetzungen](#user-content-2-voraussetzungen)
 3. [Installation](#user-content-3-installation)
 4. [Einrichten der Instanzen in IP-Symcon](#user-content-4-einrichten-der-instanzen-in-ip-symcon)
-5. [Statusvariablen und Profile](#user-content-5-statusvariablen-und-profile)
+5. [Statusvariablen und Darstellungen](#user-content-5-statusvariablen-und-darstellungen)
 6. [Visualisierung](#user-content-6-visualisierung)
 7. [PHP-Befehlsreferenz](#user-content-7-php-befehlsreferenz)
 8. [Versionshistorie](#user-content-8-versionshistorie)
@@ -84,9 +84,9 @@ ANMELDEN                | Senden der Logindaten an Blink Server
 AKTUALISIEREN           | Zugriffs-Token erneut anfragen, aktualisieren  und Ablaufzeit neu starten
 OPTIONEN                | Abrufen und Anzeigen der eingestellten Optionen
 
-### 5. Statusvariablen und Profile
+### 5. Statusvariablen und Darstellungen
 
-Es werden keine zusätzlichen Statusvariablen oder Profile benötigt.
+Es werden keine zusätzlichen Statusvariablen oder Darstellungen benötigt.
 
 ### 6. Visualisierung
 

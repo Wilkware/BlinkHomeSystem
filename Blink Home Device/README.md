@@ -14,7 +14,7 @@ Ermöglicht die Kommunikation mit einem Blink Endgerät, derzeit vornehmlich Kam
 2. [Voraussetzungen](#user-content-2-voraussetzungen)
 3. [Installation](#user-content-3-installation)
 4. [Einrichten der Instanzen in IP-Symcon](#user-content-4-einrichten-der-instanzen-in-ip-symcon)
-5. [Statusvariablen und Profile](#user-content-5-statusvariablen-und-profile)
+5. [Statusvariablen und Darstellungen](#user-content-5-statusvariablen-und-darstellungen)
 6. [Visualisierung](#user-content-6-visualisierung)
 7. [PHP-Befehlsreferenz](#user-content-7-php-befehlsreferenz)
 8. [Versionshistorie](#user-content-8-versionshistorie)
@@ -104,34 +104,37 @@ KONFIGURATION       | Anzeige der Geräte-Konfigurationsdaten
 SIGNALE             | Anzeige von verschiedenen Signalen (WiFi usw.)
 ZURÜCKSETZEN        | Reset des Kommando-Stacks um Kommunikation wieder zu synchronisieren.
 
-### 5. Statusvariablen und Profile
+### 5. Statusvariablen und Darstellungen
 
 Die Statusvariablen werden automatisch angelegt. Das Löschen einzelner kann zu Fehlfunktionen führen.
 
 #### Statusvariablen
 
-Ident               | Name               | Typ     | Profil     | Beschreibung
-------------------- | ------------------ | ------- | ---------- | -------------------
-circuit_snapshot    | Zeitplan Snapshot  | event   |            | Wochenplan für Momentaufnahmen
-thumbnail           | Bild               | media   |            | Medienobject zum Speichern der Aufnahme
-motion_detection    | Bewegungserkennung | boolean | ~Switch    | Variable zum an- und ausschalten der Bewegungserkennung
-snapshot            | Auslöser           | integer | BHS.Update | Variable zum Auslösen einer Momentaufnahme
-battery             | Batterie           | integer | BHS.Battery| Variable zur Anzeige des Ladezustands (nur wenn batteriebetrieben)
+Ident               | Name               | Typ     | Darstellung     | Beschreibung
+------------------- | ------------------ | ------- | --------------- | -------------------
+circuit_snapshot    | Zeitplan Snapshot  | event   |                 | Wochenplan für Momentaufnahmen
+thumbnail           | Bild               | media   |                 | Medienobject zum Speichern der Aufnahme
+motion_detection    | Bewegungserkennung | boolean | Schalter        | Variable zum an- und ausschalten der Bewegungserkennung
+snapshot            | Auslöser           | integer | Schalter        | Variable zum Auslösen einer Momentaufnahme
+battery             | Batterie           | integer | Wertanzeige     | Variable zur Anzeige des Ladezustands (nur wenn batteriebetrieben)
 
-#### Profile
+#### Darstellungen
 
-Folgendes Profil wird angelegt:
+Folgende Dartsellungen werden hinterlegt:
 
-Name           | Typ       | Beschreibung
--------------- | --------- | ----------------
-BHS.Update     | Integer   | Auslöser Profil (1: '►')
-BHS.Battery    | Integer   | Batterieladezustandsanzeige (0 ... 3)
+Template-Name            | Typ           | Beschreibung
+------------------------ | ------------- | ----------------
+\<direkte Assoziazion\>  | Schalter      | An-/Ausschalter
+\<direkte Assoziazion\>  | Wertanzeige   | Farbliche Batterieladezustandsanzeige von 0 (Unbekannt) bis 3 (Gut)
 
 ### 6. Visualisierung
 
-Man kann die Statusvariablen direkt im WF verlinken.
+Man kann sowohl das gesamte Modul (HTML-SDK Support) als auch nur die Statusvariablen direkt in der Visualisierung verlinken.
 
-Wenn Die Option "Liveview" aktiviert 
+Wird das ganze Modul verlinkt, dann wird die letzte Momentaufnahme vollflächig in der Kachel angezeigt.
+In der rechten unteren Ecke werden Buttons für das Aktivieren der Bewegungserkennung und das Auslösen eines neuen Snapshots eingeblendet.  
+Wenn Die Option "Liveview" aktiviert ist, wird zusätzlich ein Play/Stop-Button kurz in der Mitte des Bildes eingeblendet.
+Dieser kann durch einfachen Mouseklick auf die Kachel wieder angezeigt werden. Über diesen lässt sich dann der LiveView starten bzw. wieder stoppen.
 
 
 ### 7. PHP-Befehlsreferenz
