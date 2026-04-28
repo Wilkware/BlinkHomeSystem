@@ -48,10 +48,11 @@ trait EventHelper
      * @param string $ident  Internal identifier.
      * @param array<int,array{0:string,1:int,2:string}> $data Array with switch states.
      * @param int    $pos    Position (sort order).
+     * @param string $icon   Icon name.
      *
      * @return int ID of the existing schedule or of the new created schedule.
      */
-    protected function CreateWeeklySchedule(int $id, string $name, string $ident, array $data, int $pos = 0): int
+    protected function CreateWeeklySchedule(int $id, string $name, string $ident, array $data, int $pos = 0, string $icon = 'calendar-clock'): int
     {
         $eid = @IPS_GetObjectIDByIdent($ident, $id);
         if ($eid === false) {
@@ -60,6 +61,7 @@ trait EventHelper
             IPS_SetIdent($eid, $ident);
             IPS_SetParent($eid, $id);
             IPS_SetPosition($eid, $pos);
+            IPS_SetIcon($eid, $icon);
             foreach ($data as $key => $value) {
                 IPS_SetEventScheduleAction($eid, $key, $this->Translate($value[0]), $value[1], $value[2]);
             }

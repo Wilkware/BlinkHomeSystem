@@ -75,6 +75,24 @@
             display: none;
         }
 
+        #error-overlay {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            font-family: sans-serif;
+            font-size: 13px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-align: center;
+            z-index: 20;
+            max-width: 80%;
+            cursor: pointer;
+        }
+
         #actions {
             position: absolute;
             bottom: 16px;
@@ -114,48 +132,80 @@
 </head>
 
 <body>
-    <!-- <p id="debug"></p> -->
     <div id="container">
         <video id="player" autoplay muted disablePictureInPicture controlsList="nodownload"></video>
+
         <div id="button">
             <div id="spinner" style="display: none;"></div>
             <i id="begin" class="fa-light fa-play" title="Play"></i>
             <i id="halt" class="fa-light fa-pause" title="Pause"></i>
         </div>
+
+        <!-- Fehleranzeige -->
+        <div id="error-overlay"></div>
+
         <div id="actions">
-            <!-- Motion Toggle Button -->
             <div id="motion" class="half" onclick="requestAction('motion_detection', on.style.display == 'none')">
-                <!-- Motion ON -->
                 <i id="on" class="fa-light fa-person-running-fast" title="Motion detection"></i>
-                <!-- Motion OFF -->
                 <i id="off" class="fa-light fa-person-running" title="Motion detection"></i>
             </div>
-            <!-- Snapshot Button -->
-            <div id="snapshot" class="half" onclick="requestAction('snapshot',true)">
-                <!-- Kamera-Icon -->
+            <div id="snapshot" class="half" onclick="requestAction('snapshot', true)">
                 <i class="fa-light fa-camera" title="Snapshot"></i>
             </div>
         </div>
     </div>
+
     <script>
         let webSocket = null;
         let mediaSource = null;
         let sourceBuffer = null;
         let queue = [];
         let playing = false;
+        let stopped = false;
         let receivedFrame = false;
         let liveData = null;
         let webSocketUrl = null;
         let liveView = false;
         let snapShot = false;
 
-        // This is where the data is processed by the module.
+
+        // ── Hilfsfunktionen ────────────────────────────────────────────────
+
+        function showError(msg) {
+            const el = document.getElementById('error-overlay');
+            el.textContent = msg;
+            el.style.display = 'block';
+            spinner.style.display = 'none';
+
+            // Auto-hide nach 5s
+            clearTimeout(el._hideTimer);
+            el._hideTimer = setTimeout(() => {
+                hideError();
+                if (!playing && liveView) showButton();
+            }, 5000);
+        }
+
+        function hideError() {
+            document.getElementById('error-overlay').style.display = 'none';
+        }
+
+        function hideButton() {
+            button.style.opacity = 0;
+            button.style.pointerEvents = 'none';
+            button.style.cursor = 'default';
+        }
+
+        function showButton() {
+            button.style.opacity = 1;
+            button.style.pointerEvents = 'auto';
+            button.style.cursor = 'pointer';
+        }
+
+        // ── handleMessage: Daten vom übergeordneten System ─────────────────
+
         function handleMessage(data) {
-            //console.log('Rohdaten:', data);
             const decodedData = JSON.parse(data);
-            //console.log('Decodierte Daten:', decodedData);
             for (const parameter in decodedData) {
-                var root = document.documentElement;
                 console.log('Blink Home Device:', parameter, 'Wert:', decodedData[parameter]);
                 switch (parameter) {
                     case 'client':
@@ -167,7 +217,7 @@
                                 account_id: String(decodedData.client.account),
                                 network_id: String(decodedData.client.network),
                                 camera_id: String(decodedData.client.device),
-                                camera_type: decodedData.client.type === 'owls' ? 'owl' : decodedData.client.type === 'doorbells' ? 'doorbell' : 'camera'
+                                camera_type: String(decodedData.client.type)
                             }
                         };
                         break;
@@ -188,28 +238,15 @@
                         break;
                     case 'live':
                         liveView = !!decodedData.live;
-                        // Play-Button nur zeigen, wenn live aktiv ist und MediaSource unterstützt wird
                         if (liveView && 'MediaSource' in window) {
-                            button.style.opacity = 1;
-                            button.style.pointerEvents = 'auto';
-                            button.style.cursor = 'pointer';
-                            setTimeout(() => {
-                                if (!playing) {
-                                    button.style.opacity = 0;
-                                    button.style.pointerEvents = 'none';
-                                    button.style.cursor = 'default';
-                                }
-                            }, 3000);
+                            showButton();
+                            setTimeout(() => { if (!playing) hideButton(); }, 3000);
                         } else {
-                            button.style.opacity = 0;
-                            button.style.pointerEvents = 'none';
-                            button.style.cursor = 'default';
+                            hideButton();
                         }
                         break;
-
                     case 'snapshot':
                         snapShot = !!decodedData.snapshot;
-                        // Snapshot-Button aktivieren/deaktivieren
                         snapshot.style.opacity = snapShot ? 1 : 0.5;
                         snapshot.style.pointerEvents = snapShot ? 'auto' : 'none';
                         break;
@@ -220,126 +257,248 @@
             }
         }
 
+        // ── MediaSource initialisieren ─────────────────────────────────────
+
         function initMediaSource() {
+            // Alten Blob sauber freigeben
+            if (player.src.startsWith("blob:")) {
+                URL.revokeObjectURL(player.src);
+                player.src = "";
+                player.load();
+            }
+
             mediaSource = new MediaSource();
+            sourceBuffer = null;
+            queue = [];
+
             player.src = URL.createObjectURL(mediaSource);
+
             mediaSource.addEventListener("sourceopen", () => {
-                if (!mediaSource.sourceBuffers.length) {
+                if (mediaSource.sourceBuffers.length) return;
+
+                try {
                     sourceBuffer = mediaSource.addSourceBuffer('video/mp4; codecs="avc1.640029,mp4a.40.2"');
                     sourceBuffer.mode = "segments";
+
                     sourceBuffer.addEventListener("updateend", () => {
-                        if (queue.length > 0 && !sourceBuffer.updating) {
-                            sourceBuffer.appendBuffer(queue.shift());
+                        if (queue.length > 0 && !sourceBuffer.updating && mediaSource.readyState === "open") {
+                            try {
+                                sourceBuffer.appendBuffer(queue.shift());
+                            } catch (e) {
+                                console.warn("appendBuffer (updateend):", e.message);
+                            }
                         }
                     });
+
+                    sourceBuffer.addEventListener("error", (e) => {
+                        console.error("sourceBuffer error:", e);
+                    });
+
+                } catch (e) {
+                    console.error("addSourceBuffer error:", e.message);
+                    showError("Video-Format wird nicht unterstützt.");
                 }
+            });
+
+            mediaSource.addEventListener("error", (e) => {
+                console.error("mediaSource error:", e);
+                showError("MediaSource Fehler.");
             });
         }
 
+        // ── Stream starten ─────────────────────────────────────────────────
+
         function startStream() {
             if (webSocket) return;
+            if (!webSocketUrl) { showError("Kein Server konfiguriert."); return; }
+            if (!liveData) { showError("Keine Kamera-Daten vorhanden."); return; }
 
+            hideError();
             initMediaSource();
             spinner.style.display = "block";
+            receivedFrame = false;
 
-            webSocket = new WebSocket(webSocketUrl);
+            try {
+                webSocket = new WebSocket(webSocketUrl);
+            } catch (e) {
+                showError("WebSocket-Verbindung fehlgeschlagen.");
+                resetPlayingState();
+                return;
+            }
+
             webSocket.binaryType = "arraybuffer";
 
+            // Verbindungs-Timeout: falls der Service nicht antwortet
+            const connectTimeout = setTimeout(() => {
+                if (webSocket && webSocket.readyState !== WebSocket.OPEN) {
+                    showError("Service nicht erreichbar.");
+                    webSocket.close();
+                    resetPlayingState();
+                }
+            }, 8000);
+
             webSocket.onopen = () => {
+                clearTimeout(connectTimeout);
                 webSocket.send(JSON.stringify(liveData));
             };
 
             webSocket.onmessage = (evt) => {
                 if (evt.data instanceof ArrayBuffer) {
-                    queue.push(new Uint8Array(evt.data));
-                    if (sourceBuffer && !sourceBuffer.updating) {
-                        sourceBuffer.appendBuffer(queue.shift());
+                    // Nur anhängen wenn MediaSource bereit ist
+                    if (!sourceBuffer || mediaSource.readyState !== "open") {
+                        queue.push(new Uint8Array(evt.data));
+                        return;
                     }
-                    // Erstes Mal Daten empfangen → Button verzögert ausblenden
-                    if (!receivedFrame && evt.data.byteLength == 8192) {
-                        receivedFrame = true;
-                        spinner.style.display = "none";
-                        setTimeout(() => {
-                            if (playing) {
-                                button.style.opacity = 0;
-                                button.style.pointerEvents = 'none';
-                                button.style.cursor = 'default';
-                            }
-                        }, 3000);
+                    queue.push(new Uint8Array(evt.data));
+                    if (!sourceBuffer.updating) {
+                        try {
+                            sourceBuffer.appendBuffer(queue.shift());
+                        } catch (e) {
+                            console.warn("appendBuffer:", e.message);
+                        }
                     }
                     return;
                 }
 
-                const msg = JSON.parse(evt.data);
-                if (msg?.command === "liveview:stop") player.pause();
-                else if (msg?.command === "liveview:start") player.play();
+                try {
+                    const msg = JSON.parse(evt.data);
+                    if (msg?.command === "liveview:stop") {
+                        const errMsg = msg.error ? `Stream beendet: ${msg.error}` : null;
+                        if (errMsg) showError(errMsg);
+                        stopStream();
+                    } else if (msg?.command === "liveview:start") {
+                        // Server bestätigt — Video-Player starten
+                        // Spinner bleibt bis player "playing" Event feuert
+                        player.play().catch(() => { });
+                    }
+                } catch (e) {
+                    console.warn("JSON parse error:", e.message);
+                }
             };
-            webSocket.onclose = () => { webSocket = null; };
-            webSocket.onerror = (e) => { console.error("webSocket ERROR", e); };
+
+            webSocket.onclose = (evt) => {
+                clearTimeout(connectTimeout);
+                console.log("WebSocket closed:", evt.code, evt.reason);
+                const intentional = webSocket?._intentionalClose ?? false;
+                webSocket = null;
+                if (playing && !intentional) {
+                    // Unerwartet geschlossen
+                    showError("Verbindung unterbrochen.");
+                    resetPlayingState();
+                }
+            };
+
+            webSocket.onerror = () => {
+                clearTimeout(connectTimeout);
+                showError("Service nicht erreichbar.");
+                resetPlayingState();
+            };
         }
 
-        function stopStream() {
-            spinner.style.display = "none";
-            if (!webSocket) return;
+        // ── Stream stoppen ─────────────────────────────────────────────────
 
-            webSocket.send(JSON.stringify({ command: "liveview:stop", data: {} }));
-            webSocket.close();
+        function stopStream() {
+            stopped = true;       // ← Flag setzen VOR src = ""
+            spinner.style.display = "none";
+            if (!webSocket) {
+                stopped = false;  // ← Flag zurücksetzen
+                return;
+            }
+
+            webSocket._intentionalClose = true;  // ← Flag setzen
+
+            try {
+                webSocket.send(JSON.stringify({ command: "liveview:stop", data: {} }));
+                webSocket.close();
+            } catch (e) { /* ignore */ }
+
             webSocket = null;
             receivedFrame = false;
 
-            // MediaSource verwerfen, Poster wieder anzeigen
+            // Video-Error-Listener kurz stumm schalten
+            player.removeEventListener("error", onPlayerError);
+
             if (player.src.startsWith("blob:")) {
+                URL.revokeObjectURL(player.src);
                 player.src = "";
                 player.load();
             }
+
+            // Flag nach Event-Loop zurücksetzen
+            setTimeout(() => { stopped = false; }, 100);
         }
 
-        // Event Listener
+        function onPlayerError() {
+            if (stopped) return;  // ← gewollter Stop, ignorieren
+            showError("Video-Fehler aufgetreten.");
+            stopStream();
+            resetPlayingState();
+        }
+
+        function resetPlayingState() {
+            playing = false;
+            spinner.style.display = "none";
+            begin.style.display = "block";
+            halt.style.display = "none";
+            if (liveView) showButton();
+        }
+
+
+
+        // ── Video-Events: Spinner & Button timing ──────────────────────────
+
+        // Button/Spinner erst ausblenden wenn Video wirklich läuft
+        player.addEventListener("playing", () => {
+            if (!playing) return;
+            spinner.style.display = "none";
+            setTimeout(() => {
+                if (playing) hideButton();
+            }, 1500);
+        });
+
+        // Beim Buffern Spinner wieder zeigen
+        player.addEventListener("waiting", () => {
+            if (playing) spinner.style.display = "block";
+        });
+
+        player.addEventListener("stalled", () => {
+            if (playing) spinner.style.display = "block";
+        });
+
+        player.addEventListener("error", onPlayerError);
+
+        // ── Button-Klick ───────────────────────────────────────────────────
+
         button.addEventListener("click", () => {
             if (!liveView || !('MediaSource' in window)) return;
 
             if (!playing) {
-                startStream();
-                player.play();
+                playing = true;
                 begin.style.display = "none";
                 halt.style.display = "block";
-            } else if (playing) {
+                spinner.style.display = "block";
+                startStream();
+            } else {
                 stopStream();
-                player.pause();
+                playing = false;
                 begin.style.display = "block";
                 halt.style.display = "none";
-
-                // Button wieder einblenden, falls Player geklickt wird
-                setTimeout(() => {
-                    button.style.opacity = 0;
-                    button.style.pointerEvents = 'none';
-                    button.style.cursor = 'default';
-                }, 3000);
+                setTimeout(hideButton, 3000);
             }
-
-            playing = !playing;
-
-            // Spinner anzeigen, wenn gerade gestartet
-            spinner.style.display = playing ? "block" : "none";
         });
 
-        // Wieder einblenden des Buttons bei Klick
+        // Button bei Klick auf Video kurz einblenden
         player.addEventListener("click", () => {
-            if (liveView && 'MediaSource' in window) {
-                button.style.opacity = 1;
-                button.style.pointerEvents = 'auto';
-                button.style.cursor = 'pointer';
-
-                if (!playing) {
-                    setTimeout(() => {
-                        if (!playing) {
-                            button.style.opacity = 0;
-                            button.style.pointerEvents = 'none';
-                            button.style.cursor = 'default';
-                        }
-                    }, 3000);
-                }
+            if (!liveView || !('MediaSource' in window)) return;
+            showButton();
+            if (!playing) {
+                setTimeout(() => { if (!playing) hideButton(); }, 3000);
             }
+        });
+
+        document.getElementById('error-overlay').addEventListener('click', () => {
+            hideError();
+            if (!playing) showButton();
         });
     </script>
 </body>

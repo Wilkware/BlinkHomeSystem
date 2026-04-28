@@ -343,7 +343,6 @@ class BlinkHomeDevice extends IPSModuleStrict
      * all child instances. Data can be sent using the SendDataToChildren function.
      *
      * @param string $json Data package in JSON format
-     *
      * @return string Optional response to the parent instance
      */
     public function ReceiveData(string $json): string
@@ -384,9 +383,9 @@ class BlinkHomeDevice extends IPSModuleStrict
     /**
      * Generate a message that updates all elements in the HTML display.
      *
-     * @return String JSON encoded message information
+     * @return string JSON encoded message information
      */
-    private function GetFullUpdateMessage()
+    private function GetFullUpdateMessage(): string
     {
         // dataset variable
         $result = [
@@ -395,8 +394,7 @@ class BlinkHomeDevice extends IPSModuleStrict
                 [
                     'device'  => $this->ReadPropertyString('DeviceID'),
                     'network' => $this->ReadPropertyString('NetworkID'),
-                    'type'    => $this->ReadPropertyString('DeviceType'),
-                    'model'   => $this->ReadPropertyString('DeviceModel')
+                    'type'    => $this->ReadPropertyString('DeviceType')
                 ]
             ),
             'server'    => $this->ReadPropertyString('LiveViewServer'),
@@ -487,7 +485,7 @@ class BlinkHomeDevice extends IPSModuleStrict
             // Start Trigger
             $this->SetTimerInterval('TimerCommand', self::BLINK_COMMAND_TIMER_INTERVAL);
         } else {
-            $this->LogMessage('[' . IPS_GetName($this->InstanceID) . '] ' . $command['message'], KL_ERROR);
+            $this->LogMessage('[' . IPS_GetName($this->InstanceID) . '] ' . print_r($command, true), KL_ERROR);
         }
     }
 
@@ -755,7 +753,7 @@ class BlinkHomeDevice extends IPSModuleStrict
             return;
         }
         $command = json_decode($response, true);
-        if ($command['complete'] == true) {
+        if (isset($command['complete']) && ($command['complete'] == true)) {
             $this->LogDebug(__FUNCTION__, $command);
             $this->WriteAttributeString('CommandID', '');
             if ($command['status'] == 0) {
@@ -764,6 +762,7 @@ class BlinkHomeDevice extends IPSModuleStrict
                 $this->LogMessage('[' . IPS_GetName($this->InstanceID) . '] ' . $command['status_msg'] . ': ' . $command['status'], KL_WARNING);
             }
         } else {
+            $this->LogDebug(__FUNCTION__, $command);
             $this->SetTimerInterval('TimerCommand', self::BLINK_COMMAND_TIMER_INTERVAL);
         }
     }

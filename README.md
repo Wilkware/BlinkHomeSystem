@@ -25,6 +25,7 @@ Modul welches ein Zubehör (Flutlich, Halterung) repräsentiert.
 
 ## 📜 Historie
 
+- 2026-04-28: v2.4 Liveview via eigenem NodeJS WebSocket Service
 - 2026-01-08: v2.3 Neue Authentifizierung, Umstellung auf Darstellungen
 - 2025-12-24: v2.2 Fix für Kombatibilität 8.1 und 8.2
 - 2025-11-25: v2.1 Support von Blink Mini 2K+, Flutlichtschaltung angepasst

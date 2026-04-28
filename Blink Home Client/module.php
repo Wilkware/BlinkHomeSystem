@@ -470,6 +470,7 @@ class BlinkHomeClient extends IPSModuleStrict
         $token = $this->ReadAttributeString('RefreshToken');
         $uuid = $this->ReadAttributeString('UniqueID');
         $region = $this->ReadAttributeString('Region');
+        $account = $this->ReadAttributeString('AccountID');
 
         // Safty check
         if (empty($user) || empty($token)) {
@@ -495,7 +496,7 @@ class BlinkHomeClient extends IPSModuleStrict
                 $this->SendDataToChildren(json_encode([
                     'DataID'    => self::BLINK_CHILDS_GUID,
                     'AuthData'  => [
-                        'account'   => $user,
+                        'account'   => $account,
                         'region'    => $region,
                         'token'     => $params['access_token']
                     ],
