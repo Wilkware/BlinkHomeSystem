@@ -32,6 +32,7 @@ class BlinkHomeConfigurator extends IPSModuleStrict
         'null'              => '<unknown>',
         'sm1'               => 'Blink Sync Module 1',
         'sm2'               => 'Blink Sync Module 2',
+        'kalahari'          => 'Blink Sync Module Core',
         'mini'              => 'Blink Mini',
         'white'             => 'Blink Indoor',
         'catalina_indoor'   => 'Blink Indoor',

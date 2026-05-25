@@ -61,6 +61,10 @@
                                     "value": "null"
                                 },
                                 {
+                                    "label": "Blink Sync Modul Core",
+                                    "value": "kalahari"
+                                },
+                                {
                                     "label": "Blink Sync Modul 1",
                                     "value": "sm1"
                                 },

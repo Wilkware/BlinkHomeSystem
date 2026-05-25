@@ -390,7 +390,7 @@ class BlinkHomeDevice extends IPSModuleStrict
         // dataset variable
         $result = [
             'client' => array_merge(
-                unserialize($this->ReadAttributeString('AuthData')),
+                is_array($tmp = @unserialize($this->ReadAttributeString('AuthData'))) ? $tmp : [],
                 [
                     'device'  => $this->ReadPropertyString('DeviceID'),
                     'network' => $this->ReadPropertyString('NetworkID'),

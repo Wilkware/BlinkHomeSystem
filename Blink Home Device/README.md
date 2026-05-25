@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-8.1-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-2.4.20260428-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
+[![Version](https://img.shields.io/badge/Modul%20Version-2.5.20260525-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
@@ -142,6 +142,10 @@ Dieser kann durch einfachen Mouseklick auf die Kachel wieder angezeigt werden. Ã
 Ein direkter Aufruf von Ã¶ffentlichen Funktionen ist nicht notwendig!
 
 ### 8. Versionshistorie
+
+v2.5.20260525
+
+* _FIX_: Kleinere Anpassungen in Bibliotheken
 
 v2.4.20260428
 
