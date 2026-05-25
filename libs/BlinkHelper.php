@@ -1120,19 +1120,18 @@ trait BlinkHelper
         return $this->SendRequest($url, $headers, null);
     }
 
-    /*
+    /**
      * SendRequest - Sends the request to the device
      *
      * If $request not null, we will send a POST request, else a GET request.
      * Over the $method parameter can we force a POST or GET request!
      *
      * @param string               $url     URL to call
-     * @param array<string,string> $headers Header as key => value pairs
+     * @param array<int,string> $headers Header as key => value pairs
      * @param string|null          $request Request body or null for GET
      * @param string               $method  HTTP method ('GET' or 'POST')
      *
      * @return string|false Response data or false on failure
-     * @phpstan-ignore missingType.iterableValue
      */
     private function SendRequest(string $url, array $headers, ?string $request, string $method = 'GET'): string|false
     {
@@ -1163,21 +1162,20 @@ trait BlinkHelper
         return $response;
     }
 
-    /*
+    /**
      * OpenAuth - Sends the oauth request to the service
      *
      * If $request not null, we will send a POST request, else a GET request.
      * Over the $method parameter can we force a POST or GET request!
      *
      * @param string               $url     URL to call
-     * @param array<string,string> $headers Header as key => value pairs
+     * @param array<int,string>    $headers Header as key => value pairs
      * @param string               $cookie  Cookie file name
      * @param string|null          $request Request body or null for GET
      * @param string               $method  HTTP method ('GET' or 'POST')
      * @param bool                 $follow  Follow redirects
      *
      * @return array<string,mixed> Response data
-     * @phpstan-ignore missingType.iterableValue
      */
     private function OpenAuth(string $url, array $headers, string $cookie, ?string $request, string $method = 'GET', bool $follow = false): array
     {
