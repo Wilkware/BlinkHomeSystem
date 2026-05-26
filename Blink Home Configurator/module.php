@@ -184,9 +184,9 @@ class BlinkHomeConfigurator extends IPSModuleStrict
                     'firmware'      => $device['firmware'],
                     'network'       => $device['network'],
                     'create'        => [
-                            'moduleID'      => $device['guid'],
-                            'configuration' => ['DeviceID' => strval($device['id']), 'NetworkID' => strval($device['network']), 'DeviceType' => $device['type'], 'DeviceModel' => $device['model']],
-                            'location'      => ($version < 7) ? $location : [],
+                        'moduleID'      => $device['guid'],
+                        'configuration' => ['DeviceID' => strval($device['id']), 'NetworkID' => strval($device['network']), 'DeviceType' => $device['type'], 'DeviceModel' => $device['model']],
+                        'location'      => ($version < 7) ? $location : [],
                     ],
                 ];
             }
