@@ -25,6 +25,7 @@ Modul welches ein Zubehör (Flutlich, Halterung) repräsentiert.
 
 ## 📜 Historie
 
+- 2026-05-25: v2.6 Fix für Login und Lievview Endpoint, Konfiguration vereinheitlicht
 - 2026-05-25: v2.5 Support von Blink Sync Modul Core, Kleinere Anpassungen in Bibliotheken
 - 2026-04-28: v2.4 Liveview via eigenem NodeJS WebSocket Service
 - 2026-01-08: v2.3 Neue Authentifizierung, Umstellung auf Darstellungen

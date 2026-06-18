@@ -2,18 +2,29 @@
 
 declare(strict_types=1);
 
-// Generell funktions
+/** Generell funktions */
 require_once __DIR__ . '/../libs/_traits.php';
 
-// Blink Home Configurator
+/**
+ * Class BlinkHomeConfigurator
+ *
+ * Discovers available Blink Home accessories and
+ * provides them for creation and configuration
+ * within IP-Symcon.
+ */
 class BlinkHomeConfigurator extends IPSModuleStrict
 {
-    // Helper Traits
+    // -------------------------------------------------------------------------
+    // Traits
+    // -------------------------------------------------------------------------
+
     use DebugHelper;
 
-    /**
-     * @var array<string,string> Blink Device Types (up to now)
-     */
+    // -------------------------------------------------------------------------
+    // Constants
+    // -------------------------------------------------------------------------
+
+    /**  @var array<string,string> Blink Device Types (up to now) */
     private const BLINK_DEVICE_TYPE = [
         'null'              => '<unknown>',
         'cameras'           => 'Camera',
@@ -25,9 +36,7 @@ class BlinkHomeConfigurator extends IPSModuleStrict
         'accessories'       => 'Accessorie',
     ];
 
-    /**
-     * @var array<string,string> Blink Device Models (up to now)
-     */
+    /**  @var array<string,string> Blink Device Models (up to now) */
     private const BLINK_DEVICE_MODEL = [
         'null'              => '<unknown>',
         'sm1'               => 'Blink Sync Module 1',
@@ -48,25 +57,25 @@ class BlinkHomeConfigurator extends IPSModuleStrict
         'rosie'             => 'Blink Pan-Tilt Mount',
     ];
 
-    /**
-     * @var string ModulID (Blink Home Client)
-     */
+    // -------------------------------------------------------------------------
+    // GUIDs
+    // -------------------------------------------------------------------------
+
+    /** @var string ModulID (Blink Home Client) */
     private const BLINK_CLIENT_GUID = '{AF126D6D-83D1-44C2-6F61-96A4BB7A0E62}';
 
-    /**
-     * @var string ModulID (Blink Home Sync Modul)
-     */
+    /** @var string ModulID (Blink Home Sync Modul) */
     private const BLINK_MODULE_GUID = '{3E3F3E1C-899C-2E17-E95E-6803DB5E95FE}';
 
-    /**
-     * @var string ModulID (Blink Home Device)
-     */
+    /** @var string ModulID (Blink Home Device) */
     private const BLINK_DEVICE_GUID = '{7D2B8EFA-23D0-D29C-DBEE-E81F1FC2DBDC}';
 
-    /**
-     * @var string ModulID (Blink Home Accessory)
-     */
+    /** @var string ModulID (Blink Home Accessory) */
     private const BLINK_ACCESSORY_GUID = '{1D064E05-B3D7-54C6-F37D-D0068AEF7B89}';
+
+    // -------------------------------------------------------------------------
+    // Methods
+    // -------------------------------------------------------------------------
 
     /**
      * In contrast to Construct, this function is called only once when creating the instance and starting IP-Symcon.

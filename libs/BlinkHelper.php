@@ -94,60 +94,38 @@ declare(strict_types=1);
  */
 trait BlinkHelper
 {
-    /**
-     * @var int Logged out indicator value
-     */
-    private static $BLINK_LOGOUT = 0;
+    /** @var int Logged out indicator value */
+    private static int $BLINK_LOGOUT = 0;
 
-    /**
-     * @var int Loggeg in indicator value
-     */
-    private static $BLINK_LOGIN = 1;
+    /** @var int Logged in indicator value */
+    private static int $BLINK_LOGIN = 1;
 
-    /**
-     * @var int Verfiy indicator value
-     */
-    private static $BLINK_VERIFY = 2;
+    /** @var int Verify indicator value */
+    private static int $BLINK_VERIFY = 2;
 
-    /**
-     * @var string App brand name
-     */
-    private static $APP_BRAND = 'blink';
+    /** @var string App brand name */
+    private static string $APP_BRAND = 'blink';
 
-    /**
-     * @var string App scope name
-     */
-    private static $APP_SCOPE = 'client';
+    /** @var string App scope name */
+    private static string $APP_SCOPE = 'client';
 
-    /**
-     * @var string App client type (ios | android)
-     */
-    private static $CLIENT_ID = 'ios';
+    /** @var string App client type (ios | android) */
+    private static string $CLIENT_ID = 'ios';
 
-    /**
-     * @var string Oauth redirect url
-     */
-    private static $OAUTH_REDIRECT = 'immedia-blink://applinks.blink.com/signin/callback';
+    /** @var string Oauth redirect url */
+    private static string $OAUTH_REDIRECT = 'immedia-blink://applinks.blink.com/signin/callback';
 
-    /**
-     * @var string User Agernt
-     */
-    private static $USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X)';
+    /** @var string User Agent */
+    private static string $USER_AGENT = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X)';
 
-    /**
-     * @var string Token Agernt
-     */
-    private static $TOKEN_AGENT = 'Blink/2511191620 CFNetwork/3860.200.71 Darwin/25.1.0';
+    /** @var string Token Agent */
+    private static string $TOKEN_AGENT = 'Blink/2511191620 CFNetwork/3860.200.71 Darwin/25.1.0';
 
-    /**
-     * @var int Request wait time in milli seconds
-     */
-    private static $REQUEST_WAIT = 1000;
+    /** @var int Request wait time in milli seconds */
+    private static int $REQUEST_WAIT = 1000;
 
-    /**
-     * @var int Request retry (5 trys by default)
-     */
-    private static $REQUEST_RETRY = 5;
+    /** @var int Request retry (5 trys by default) */
+    private static int $REQUEST_RETRY = 5;
 
     /**
      * Arm the given network - that is, start recording/reporting motion events for enabled cameras.
@@ -443,11 +421,11 @@ trait BlinkHelper
     {
         // prepeare url
         if ($type == 'owls') {
-            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/owls/$device/liveview";
+            $url = "https://rest-$region.immedia-semi.com/api/v2/accounts/$account/networks/$network/owls/$device/liveview";
         } elseif ($type == 'doorbells') {
-            $url = "https://rest-$region.immedia-semi.com/api/v1/accounts/$account/networks/$network/doorbells/$device/liveview";
+            $url = "https://rest-$region.immedia-semi.com/api/v2/accounts/$account/networks/$network/doorbells/$device/liveview";
         } else {
-            $url = "https://rest-$region.immedia-semi.com/api/v5/accounts/$account/networks/$network/cameras/$device/liveview";
+            $url = "https://rest-$region.immedia-semi.com/api/v6/accounts/$account/networks/$network/cameras/$device/liveview";
         }
         // prepeare header
         $headers = [
@@ -592,7 +570,7 @@ trait BlinkHelper
      * @param string        $uuid      Unique ID
      * @param string        $cookie    Cookie file name
      *
-     * @return array<string>|false Response data or false on failure
+     * @return array{0:string,1:string}|false Response data or false on failure
      */
     private function doLogin(string $username, string $password, string $uuid, string $cookie): array|false
     {
@@ -637,7 +615,7 @@ trait BlinkHelper
         $login = $this->OpenAuth($url, $headers, $cookie, $body, 'POST');
         $this->LogDebug(__FUNCTION__, 'Login: ' . print_r($login, true));
 
-        if ($login['status'] === 412) {
+        if (($login['status'] === 202) || ($login['status'] === 412)) {
             return [$csrf, $verifier];
         }
 
@@ -647,13 +625,13 @@ trait BlinkHelper
     /**
      * Client Login/Verify to Blink Account on Blink Servers (OAuth2)
      *
-     * @param string        $uuid      Unique ID
-     * @param string        $cookie    Cookie file name
-     * @param string        $pin       PIN code
-     * @param string        $csrf      CSRF Token
-     * @param string        $verifier  PKCE Verifier
+     * @param string $uuid      Unique ID
+     * @param string $cookie    Cookie file name
+     * @param string $pin       PIN code
+     * @param string $csrf      CSRF Token
+     * @param string $verifier  PKCE Verifier
      *
-     * @return array<string>|false Response data or false on failure
+     * @return array{mixed,mixed,mixed}|false Response data or false on failure
      */
     private function doVerify(string $uuid, string $cookie, string $pin, string $csrf, string $verifier): array|false
     {
@@ -1127,7 +1105,7 @@ trait BlinkHelper
      * Over the $method parameter can we force a POST or GET request!
      *
      * @param string               $url     URL to call
-     * @param array<int,string> $headers Header as key => value pairs
+     * @param list<string>         $headers Header as key => value pairs
      * @param string|null          $request Request body or null for GET
      * @param string               $method  HTTP method ('GET' or 'POST')
      *
@@ -1169,7 +1147,7 @@ trait BlinkHelper
      * Over the $method parameter can we force a POST or GET request!
      *
      * @param string               $url     URL to call
-     * @param array<int,string>    $headers Header as key => value pairs
+     * @param list<string>         $headers Header as key => value pairs
      * @param string               $cookie  Cookie file name
      * @param string|null          $request Request body or null for GET
      * @param string               $method  HTTP method ('GET' or 'POST')
@@ -1213,7 +1191,7 @@ trait BlinkHelper
     /**
      * Generate PKCE pair
      *
-     * @return array<int,string> verifier & challenge
+     * @return array{0:string,1:string} verifier & challenge
      */
     private function PairPKCE(): array
     {

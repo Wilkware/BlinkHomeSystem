@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-8.1-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-2.5.20260526-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
+[![Version](https://img.shields.io/badge/Modul%20Version-2.6.20260617-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
@@ -77,6 +77,7 @@ Name                     | Beschreibung
 ------------------------ | ------------------
 Aktualisierungsintervall | Zeit zwischen 2 Aufnahmen (Standard 60 Minuten), 0 deaktiviert die Aufnahmen. ACHTUNG: zu kurzes Intervall geht auf die Lebensdauer der Batterie!
 Zeitplan                 | Zeitraum in dem Aufnahmen im angeegebenen Intervall erfolgen sollen.
+ZEITPLAN HINZUFÜGEN      | Es wird ein Wochenplan mit 2 Zuständen (Aktiv & Inaktiv) angelegt und in den Einstellung hinterlegt.
 
 > 🎥 Liveansicht ...
 
@@ -95,13 +96,20 @@ Automatisches Zurücksetzen des Kommando-Stacks! | Automatisches Zurücksetzen d
 
 _Aktionsbereich:_
 
+> 🚀 Aktion ausführen ...
+
 Aktion              | Beschreibung
 ------------------- | ------------------
-ZEITPLAN HINZUFÜGEN | Es wird ein Wochenplan mit 2 Zuständen (Aktiv & Inaktiv) angelegt und in den Einstellung hinterlegt.
-SNAPSHOT            | Löst eine Momentaufnahme(Snapshot) aus.
+AUSLÖSER            | Löst eine Momentaufnahme(Snapshot) aus.
+AUFNEHMEN           | Löst eine manuelle Live-Aufnahme (Clip) aus.
+
+> 🛟Entwicklungs- und Debuginformationen ...
+
+Aktion              | Beschreibung
+------------------- | ------------------
 LIVEVIEW            | Anzeige der LiveView Anfrageantwort
-KONFIGURATION       | Anzeige der Geräte-Konfigurationsdaten
 SIGNALE             | Anzeige von verschiedenen Signalen (WiFi usw.)
+KONFIGURATION       | Anzeige der Geräte-Konfigurationsdaten
 ZURÜCKSETZEN        | Reset des Kommando-Stacks um Kommunikation wieder zu synchronisieren.
 
 ### 5. Statusvariablen und Darstellungen
@@ -136,12 +144,19 @@ In der rechten unteren Ecke werden Buttons für das Aktivieren der Bewegungserke
 Wenn Die Option "Liveview" aktiviert ist, wird zusätzlich ein Play/Stop-Button kurz in der Mitte des Bildes eingeblendet.
 Dieser kann durch einfachen Mouseklick auf die Kachel wieder angezeigt werden. Über diesen lässt sich dann der LiveView starten bzw. wieder stoppen.
 
-
 ### 7. PHP-Befehlsreferenz
 
 Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 
 ### 8. Versionshistorie
+
+v2.6.20260526
+
+* _NEU_: Konfiguration vereinheitlicht
+* _NEU_: Darstellungen werden jetzt lokalisiert
+* _FIX_: Liveview API Endpoint 
+* _FIX_: Kleinere Übersetzungsfehler korriegiert
+* _FIX_: Dokumentation korriegiert
 
 v2.5.20260526
 

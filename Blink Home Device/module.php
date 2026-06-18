@@ -2,45 +2,78 @@
 
 declare(strict_types=1);
 
-// Generell funktions
+/** Generell funktions */
 require_once __DIR__ . '/../libs/_traits.php';
 
-// Blink Home Device
+/**
+ * Class BlinkHomeDevice
+ *
+ * Represents a Blink Home device and encapsulates
+ * its state, properties and control functionality.
+ */
 class BlinkHomeDevice extends IPSModuleStrict
 {
-    // Helper Traits
+    // -------------------------------------------------------------------------
+    // Traits
+    // -------------------------------------------------------------------------
+
     use DebugHelper;
     use EventHelper;
     use FormatHelper;
     use VariableHelper;
 
-    /**
-     * @var array<string,mixed> Snapshot Presentation (Switch)
-     */
+    // -------------------------------------------------------------------------
+    // GUIDs
+    // -------------------------------------------------------------------------
+
+    /** @var string ModulID (Blink Home Client) */
+    private const BLINK_CLIENT_GUID = '{AF126D6D-83D1-44C2-6F61-96A4BB7A0E62}';
+
+    // -------------------------------------------------------------------------
+    // Constants
+    // -------------------------------------------------------------------------
+
+    /** @var int Schedule snapshot constant OFF */
+    private const BLINK_SCHEDULE_SNAPSHOT_OFF = 1;
+
+    /** @var int Schedule snapshot constant ON */
+    private const BLINK_SCHEDULE_SNAPSHOT_ON = 2;
+
+    /** @var string Schedule snapshot constant IDENT */
+    private const BLINK_SCHEDULE_SNAPSHOT_IDENT = 'circuit_snapshot';
+
+    /** @var int Command Call Interval */
+    private const BLINK_COMMAND_TIMER_INTERVAL = 2000;
+
+    /** @var array<int,array{0:string,1:int,2:string}> Schedule snapshot constant ACTION (Switch) */
+    private const BLINK_SCHEDULE_SNAPSHOT_SWITCH = [
+        self::BLINK_SCHEDULE_SNAPSHOT_OFF => ['Inaktive', 0xFF0000, "IPS_RequestAction(\$_IPS['TARGET'], 'schedule_snapshot', \$_IPS['ACTION']);"],
+        self::BLINK_SCHEDULE_SNAPSHOT_ON  => ['Aktive', 0x00FF00, "IPS_RequestAction(\$_IPS['TARGET'], 'schedule_snapshot', \$_IPS['ACTION']);"],
+    ];
+
+    // -------------------------------------------------------------------------
+    // Presentations
+    // -------------------------------------------------------------------------
+
+    /** @var array<string,mixed> Snapshot Presentation (Switch) */
     private const BLINK_PRESENTATION_IMAGE = [
         'PRESENTATION' => VARIABLE_PRESENTATION_SWITCH,
         'ICON_TRUE'    => 'image-polaroid'
     ];
 
-    /**
-     * @var array<string,mixed> Record movie Presentation (Switch)
-     */
+    /** @var array<string,mixed> Record movie Presentation (Switch) */
     private const BLINK_PRESENTATION_RECORD = [
         'PRESENTATION' => VARIABLE_PRESENTATION_SWITCH,
         'ICON_TRUE'    => 'clapperboard-play'
     ];
 
-    /**
-     * @var array<string,mixed> Movie detection Presentation (Switch)
-     */
+    /** @var array<string,mixed> Movie detection Presentation (Switch) */
     private const BLINK_PRESENTATION_MOVIE = [
         'PRESENTATION' => VARIABLE_PRESENTATION_SWITCH,
         'ICON_TRUE'    => 'person-running-fast'
     ];
 
-    /**
-     * @var array<string,mixed> Battery Presentation (Value)
-     */
+    /** @var array<string,mixed> Battery Presentation (Value) */
     private const BLINK_PRESENTATION_BATTERY = [
         'PRESENTATION'       => VARIABLE_PRESENTATION_VALUE_PRESENTATION,
         'MIN'                => 0,
@@ -50,10 +83,10 @@ class BlinkHomeDevice extends IPSModuleStrict
         'ICON'               => 'battery-bolt',
         'INTERVALS_ACTIVE'   => true,
         'INTERVALS'          => '[
-            {"ColorDisplay":16711935,"ContentColorDisplay":-1,"IntervalMinValue":0,"IntervalMaxValue":0,"ConstantActive":true,"ConstantValue":"Unbekannt","ConversionFactor":1,"IconActive":true,"IconValue":"battery-exclamation","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16711935,"ContentColorActive":false,"ContentColorValue":-1},
-            {"ColorDisplay":16711680,"ContentColorDisplay":-1,"IntervalMinValue":1,"IntervalMaxValue":1,"ConstantActive":true,"ConstantValue":"Niedrig","ConversionFactor":1,"IconActive":true,"IconValue":"battery-low","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16711680,"ContentColorActive":false,"ContentColorValue":-1},
-            {"ColorDisplay":16776960,"ContentColorDisplay":-1,"IntervalMinValue":2,"IntervalMaxValue":2,"ConstantActive":true,"ConstantValue":"Mittel","ConversionFactor":1,"IconActive":true,"IconValue":"battery-half","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16776960,"ContentColorActive":false,"ContentColorValue":-1},
-            {"ColorDisplay":65280,"ContentColorDisplay":-1,"IntervalMinValue":3,"IntervalMaxValue":3,"ConstantActive":true,"ConstantValue":"Gut","ConversionFactor":1,"IconActive":true,"IconValue":"battery-full","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":65280,"ContentColorActive":false,"ContentColorValue":-1}
+            {"ColorDisplay":16711935,"ContentColorDisplay":-1,"IntervalMinValue":0,"IntervalMaxValue":0,"ConstantActive":true,"ConstantValue":"unknown","ConversionFactor":1,"IconActive":true,"IconValue":"battery-exclamation","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16711935,"ContentColorActive":false,"ContentColorValue":-1},
+            {"ColorDisplay":16711680,"ContentColorDisplay":-1,"IntervalMinValue":1,"IntervalMaxValue":1,"ConstantActive":true,"ConstantValue":"critical","ConversionFactor":1,"IconActive":true,"IconValue":"battery-low","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16711680,"ContentColorActive":false,"ContentColorValue":-1},
+            {"ColorDisplay":16776960,"ContentColorDisplay":-1,"IntervalMinValue":2,"IntervalMaxValue":2,"ConstantActive":true,"ConstantValue":"low","ConversionFactor":1,"IconActive":true,"IconValue":"battery-half","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16776960,"ContentColorActive":false,"ContentColorValue":-1},
+            {"ColorDisplay":65280,"ContentColorDisplay":-1,"IntervalMinValue":3,"IntervalMaxValue":3,"ConstantActive":true,"ConstantValue":"ok","ConversionFactor":1,"IconActive":true,"IconValue":"battery-full","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":65280,"ContentColorActive":false,"ContentColorValue":-1}
         ]',
         'PERCENTAGE'   => false,
         'CONTENT_COLOR'=> -1,
@@ -65,9 +98,11 @@ class BlinkHomeDevice extends IPSModuleStrict
         'PREVIEW_STYLE'=> 1
     ];
 
-    /**
-     * @var array<int,array{0:string,1:string,2:int,3:?string}> Echo map LIVEVIEW
-     */
+    // -------------------------------------------------------------------------
+    // Echo Maps
+    // -------------------------------------------------------------------------
+
+    /** @var array<int,array{0:string,1:string,2:int,3:?string}> Echo map LIVEVIEW */
     private const BLINK_MAP_LIVEVIEW = [
         ['command_id', 'Command ID', 1, null],
         ['join_available', 'Join available', 0, null],
@@ -80,9 +115,7 @@ class BlinkHomeDevice extends IPSModuleStrict
         ['polling_interval', 'Polling interval', 1, null],
     ];
 
-    /**
-     * @var array<int,array{0:string,1:string,2:int,3:?string}> Echo map SIGNALS
-     */
+    /** @var array<int,array{0:string,1:string,2:int,3:?string}> Echo map SIGNALS */
     private const BLINK_MAP_SIGNALS = [
         ['power', 'Power supply', 3, null],
         ['lfr', 'Sync signal strength', 1, null],
@@ -91,37 +124,9 @@ class BlinkHomeDevice extends IPSModuleStrict
         ['battery', 'Battery', 1, null],
     ];
 
-    /**
-     * @var int Schedule snapshot constant OFF
-     */
-    private const BLINK_SCHEDULE_SNAPSHOT_OFF = 1;
-    /**
-     * @var int Schedule snapshot constant ON
-     */
-    private const BLINK_SCHEDULE_SNAPSHOT_ON = 2;
-
-    /**
-     * @var string Schedule snapshot constant IDENT
-     */
-    private const BLINK_SCHEDULE_SNAPSHOT_IDENT = 'circuit_snapshot';
-
-    /**
-     * @var array<int,array{0:string,1:int,2:string}> Schedule snapshot constant ACTION (Switch)
-     */
-    private const BLINK_SCHEDULE_SNAPSHOT_SWITCH = [
-        self::BLINK_SCHEDULE_SNAPSHOT_OFF => ['Inaktive', 0xFF0000, "IPS_RequestAction(\$_IPS['TARGET'], 'schedule_snapshot', \$_IPS['ACTION']);"],
-        self::BLINK_SCHEDULE_SNAPSHOT_ON  => ['Aktive', 0x00FF00, "IPS_RequestAction(\$_IPS['TARGET'], 'schedule_snapshot', \$_IPS['ACTION']);"],
-    ];
-
-    /**
-     * @var int Command Call Interval
-     */
-    private const BLINK_COMMAND_TIMER_INTERVAL = 2000;
-
-    /**
-     * @var string ModulID (Blink Home Client)
-     */
-    private const BLINK_CLIENT_GUID = '{AF126D6D-83D1-44C2-6F61-96A4BB7A0E62}';
+    // -------------------------------------------------------------------------
+    // Methods
+    // -------------------------------------------------------------------------
 
     /**
      * In contrast to Construct, this function is called only once when creating the instance and starting IP-Symcon.
@@ -203,7 +208,7 @@ class BlinkHomeDevice extends IPSModuleStrict
         $ins = IPS_GetInstance($this->InstanceID);
         $mod = IPS_GetModule($ins['ModuleInfo']['ModuleID']);
         $lib = IPS_GetLibrary($mod['LibraryID']);
-        $form['actions'][4]['items'][2]['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
+        $form['actions'][3]['items'][2]['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
 
         // Return if parent is not confiured
         if (!$this->HasActiveParent()) {
@@ -220,7 +225,7 @@ class BlinkHomeDevice extends IPSModuleStrict
         }
 
         // Buttons?
-        $form['actions'][1]['items'][0]['enabled'] = $snapshot;
+        $form['actions'][0]['items'][0]['items'][0]['enabled'] = $snapshot;
 
         // Debug output
         //$this->LogDebug(__FUNCTION__, $form);
@@ -263,7 +268,8 @@ class BlinkHomeDevice extends IPSModuleStrict
         $this->SetValueBoolean('record', false);
         $this->EnableAction('record');
         // Update battery
-        $this->MaintainVariable('battery', $this->Translate('Battery'), VARIABLETYPE_INTEGER, self::BLINK_PRESENTATION_BATTERY, 4, $battery);
+        $presents = $this->TranslatePresentation(self::BLINK_PRESENTATION_BATTERY, 'INTERVALS', 'ConstantValue');
+        $this->MaintainVariable('battery', $this->Translate('Battery'), VARIABLETYPE_INTEGER, $presents, 4, $battery);
         // Media Object
         if ($image) {
             $this->CreateMediaImage('thumbnail', $this->Translate('Image'), $device, 'jpg', $cache);

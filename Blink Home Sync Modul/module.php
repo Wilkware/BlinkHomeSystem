@@ -2,103 +2,122 @@
 
 declare(strict_types=1);
 
-// Generell funktions
+/** Generell funktions */
 require_once __DIR__ . '/../libs/_traits.php';
 
-// Blink Home Sync Modul
+/**
+ * Class BlinkHomeSyncModule
+ *
+ * Synchronizes Blink network data with IP-Symcon.
+ *
+ * Responsibilities include:
+ * - Device synchronization
+ * - State updates
+ * - Configuration sync
+ */
 class BlinkHomeSyncModule extends IPSModuleStrict
 {
-    // Helper Traits
+    // -------------------------------------------------------------------------
+    // Traits
+    // -------------------------------------------------------------------------
     use DebugHelper;
     use EventHelper;
     use FormatHelper;
     use VariableHelper;
 
-    /**
-     * @var int Max clip size
-     */
-    private const BLINK_SYNC_SIZE = 1000;
+    // -------------------------------------------------------------------------
+    // GUIDs
+    // -------------------------------------------------------------------------
 
-    /**
-     * @var int Schedule recording constant OFF
-     */
-    private const BLINK_SCHEDULE_RECORDING_OFF = 1;
-
-    /**
-     * @var int Schedule recording constant ON
-     */
-    private const BLINK_SCHEDULE_RECORDING_ON = 2;
-
-    /**
-     * @var string Schedule recording constant IDENT
-     */
-    private const BLINK_SCHEDULE_RECORDING_IDENT = 'circuit_recording';
-
-    /**
-     * @var array<string,mixed> Download Presentation (Switch)
-     */
-    private const BLINK_PRESENTATION_DOWNLOAD = [
-        'PRESENTATION' => VARIABLE_PRESENTATION_SWITCH,
-        'ICON_TRUE'    => 'download'
-    ];
-
-    /**
-     * @var array<string,mixed> Recording Presentation (Enumaration)
-     */
-    private const BLINK_PRESENTATION_RECORDING = [
-        'PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION,
-        'OPTIONS'      => '[{"Value":false,"Caption":"Aus","IconValue":"camera-slash","IconActive":true,"Color":-1},{"Value":true,"Caption":"An","IconValue":"camera-cctv","IconActive":true,"Color":-1}]',
-        'LAYOUT'       => 0,
-        'ICON'         => ''
-    ];
-
-    /**
-     * @var array<string,mixed> Alert Presentation (Enumaration)
-     */
-    private const BLINK_PRESENTATION_ALERT = [
-        'PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION,
-        'OPTIONS'      => '[{"Value":false,"Caption":"OK","IconActive":false,"IconValue":"","Color":-1},{"Value":true,"Caption":"Alarm","IconActive":false,"IconValue":"","Color":16711680}]',
-        'LAYOUT'       => 0,
-        'ICON'         => 'triangle-exclamation'
-    ];
-
-    /**
-     * @var array<string,mixed> Cameras Presentation (Enumaration)
-     */
-    private const BLINK_PRESENTATION_CAMERAS = [
-        'PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION,
-        'OPTIONS'      => '[
-            {"Value":10,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
-            {"Value":20,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
-            {"Value":30,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
-            {"Value":40,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
-            {"Value":50,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
-            {"Value":60,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
-            {"Value":70,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
-            {"Value":80,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
-            {"Value":90,"Caption":"-","IconActive":false,"IconValue":"","Color":-1},
-            {"Value":100,"Caption":"-","IconActive":false,"IconValue":"","Color":-1}
-        ]',
-        'LAYOUT' => 0,
-        'ICON'   => 'person-running-fast'
-    ];
-
-    /**
-     * @var string ModulID (Blink Home Client)
-     */
+    /** @var string ModulID (Blink Home Client) */
     private const BLINK_CLIENT_GUID = '{AF126D6D-83D1-44C2-6F61-96A4BB7A0E62}';
 
-    /**
-     * @var array<int,array{0:string,1:int,2:string}> Schedule recording constant ACTION (Switch)
-     */
+    // -------------------------------------------------------------------------
+    // Constants
+    // -------------------------------------------------------------------------
+
+    /** @var int Schedule recording constant OFF */
+    private const BLINK_SCHEDULE_RECORDING_OFF = 1;
+
+    /** @var int Schedule recording constant ON */
+    private const BLINK_SCHEDULE_RECORDING_ON = 2;
+
+    /** @var string Schedule recording constant IDENT */
+    private const BLINK_SCHEDULE_RECORDING_IDENT = 'circuit_recording';
+
+    /** @var array<int,array{0:string,1:int,2:string}> Schedule recording constant ACTION (Switch) */
     private const BLINK_SCHEDULE_RECORDING_SWITCH = [
         self::BLINK_SCHEDULE_RECORDING_OFF => ['Inaktive', 0xFF0000, "IPS_RequestAction(\$_IPS['TARGET'], 'schedule_recording', \$_IPS['ACTION']);"],
         self::BLINK_SCHEDULE_RECORDING_ON  => ['Aktive', 0x00FF00, "IPS_RequestAction(\$_IPS['TARGET'], 'schedule_recording', \$_IPS['ACTION']);"],
     ];
 
-    /**
-     * @var array<int,array{0:string,1:string,2:int,3:?string}> Storage information map
-     */
+    // -------------------------------------------------------------------------
+    // Presentations
+    // -------------------------------------------------------------------------
+
+    /** @var array<string,mixed> Download Presentation (Switch) */
+    private const BLINK_PRESENTATION_DOWNLOAD = [
+        'PRESENTATION' => VARIABLE_PRESENTATION_SWITCH,
+        'ICON_TRUE'    => 'download'
+    ];
+
+    /** @var array<string,mixed> Recording Presentation (Enumaration) */
+    private const BLINK_PRESENTATION_RECORDING = [
+        'PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION,
+        'OPTIONS'      => '[
+            {"Value":false,"Caption":"Off","IconValue":"camera-slash","IconActive":true,"Color":-1},
+            {"Value":true,"Caption":"On","IconValue":"camera-cctv","IconActive":true,"Color":-1}]',
+        'LAYOUT'       => 0,
+        'ICON'         => ''
+    ];
+
+    /** @var array<string,mixed> Alert Presentation (Enumaration) */
+    private const BLINK_PRESENTATION_ALERT = [
+        'PRESENTATION' => VARIABLE_PRESENTATION_ENUMERATION,
+        'OPTIONS'      => '[
+            {"Value":false,"Caption":"OK","IconActive":false,"IconValue":"","Color":-1},
+            {"Value":true,"Caption":"Alarm","IconActive":false,"IconValue":"","Color":16711680}]',
+        'LAYOUT'       => 0,
+        'ICON'         => 'triangle-exclamation'
+    ];
+
+    /**  @var array<string,mixed> Cameras Presentation (Slider) */
+    private const BLINK_PRESENTATION_CAMERAS = [
+        'PRESENTATION'        => VARIABLE_PRESENTATION_SLIDER,
+        'USAGE_TYPE'          => 5,
+        'THOUSANDS_SEPARATOR' => '',
+        'DECIMAL_SEPARATOR'   => 'Client',
+        'PERCENTAGE'          => false,
+        'DIGITS'              => 0,
+        'INTERVALS'           => '[
+            {"IntervalMinValue":0,"IntervalMaxValue":9,"ConstantActive":true,"ConstantValue":"-","ConversionFactor":1,"PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"IconActive":false,"IconValue":""},
+            {"IntervalMinValue":10,"IntervalMaxValue":19,"ConstantActive":true,"ConstantValue":"Blink 1","ConversionFactor":1,"PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"IconActive":false,"IconValue":""},
+            {"IntervalMinValue":20,"IntervalMaxValue":29,"ConstantActive":true,"ConstantValue":"Blink 2","ConversionFactor":1,"PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"IconActive":false,"IconValue":""},
+            {"IntervalMinValue":30,"IntervalMaxValue":39,"ConstantActive":true,"ConstantValue":"Blink 3","ConversionFactor":1,"PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"IconActive":false,"IconValue":""},
+            {"IntervalMinValue":40,"IntervalMaxValue":49,"ConstantActive":true,"ConstantValue":"Blink 4","ConversionFactor":1,"PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"IconActive":false,"IconValue":""},
+            {"IntervalMinValue":50,"IntervalMaxValue":59,"ConstantActive":true,"ConstantValue":"Blink 5","ConversionFactor":1,"PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"IconActive":false,"IconValue":""},
+            {"IntervalMinValue":60,"IntervalMaxValue":69,"ConstantActive":true,"ConstantValue":"Blink 6","ConversionFactor":1,"PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"IconActive":false,"IconValue":""},
+            {"IntervalMinValue":70,"IntervalMaxValue":79,"ConstantActive":true,"ConstantValue":"Blink 7","ConversionFactor":1,"PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"IconActive":false,"IconValue":""},
+            {"IntervalMinValue":80,"IntervalMaxValue":89,"ConstantActive":true,"ConstantValue":"Blink 8","ConversionFactor":1,"PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"IconActive":false,"IconValue":""},
+            {"IntervalMinValue":90,"IntervalMaxValue":99,"ConstantActive":true,"ConstantValue":"Blink 9","ConversionFactor":1,"PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"IconActive":false,"IconValue":""},
+            {"IntervalMinValue":100,"IntervalMaxValue":100,"ConstantActive":true,"ConstantValue":"Blink 10","ConversionFactor":1,"PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"IconActive":false,"IconValue":""}
+        ]',
+        'ICON'                => 'person-running-fast',
+        'INTERVALS_ACTIVE'    => true,
+        'MAX'                 => 100,
+        'GRADIENT_TYPE'       => 0,
+        'MIN'                 => 0,
+        'CUSTOM_GRADIENT'     => '[]',
+        'PREFIX'              => '',
+        'STEP_SIZE'           => 10.0,
+        'SUFFIX'              => '',
+    ];
+
+    // -------------------------------------------------------------------------
+    // Echo Maps
+    // -------------------------------------------------------------------------
+
+    /** @var array<int,array{0:string,1:string,2:int,3:?string}> Storage information map */
     private const BLINK_MAP_STORAGE = [
         ['local_storage_enabled', 'Local save', 5, null],
         ['usb_state', 'USB status', 3, null],
@@ -112,9 +131,7 @@ class BlinkHomeSyncModule extends IPSModuleStrict
         ['last_backup_result', 'Last backup result', 3, null],
     ];
 
-    /**
-     * @var array<int,array{0:string,1:string,2:int,3:?string}> Ntework information map
-     */
+    /** @var array<int,array{0:string,1:string,2:int,3:?string}> Network information map */
     private const BLINK_MAP_NETWORK = [
         ['name', 'Name', 3, null],
         ['description', 'Description', 3, null],
@@ -143,9 +160,7 @@ class BlinkHomeSyncModule extends IPSModuleStrict
         ['updated_at', 'Updated at', 4, null],
     ];
 
-    /**
-     * @var array<int,array{0:string,1:string,2:int,3:?string}> Symc modul information map
-     */
+    /** @var array<int,array{0:string,1:string,2:int,3:?string}> Sync module information map */
     private const BLINK_MAP_SYNCMODUL = [
         ['name', 'Name', 3, null],
         ['status', 'Status', 3, null],
@@ -164,6 +179,10 @@ class BlinkHomeSyncModule extends IPSModuleStrict
         ['created_at', 'Created at', 4, null],
         ['updated_at', 'Updated at', 4, null],
     ];
+
+    // -------------------------------------------------------------------------
+    // Methods
+    // -------------------------------------------------------------------------
 
     /**
      * In contrast to Construct, this function is called only once when creating the instance and starting IP-Symcon.
@@ -191,6 +210,7 @@ class BlinkHomeSyncModule extends IPSModuleStrict
         // Recording
         $this->RegisterPropertyInteger('StorageCategory', 0);
         $this->RegisterPropertyInteger('StorageLimit', 10);
+        $this->RegisterPropertyInteger('StorageSize', 1000);
         $this->RegisterPropertyBoolean('OnlyCache', true);
         $this->RegisterPropertyInteger('DownloadMode', 0);
         // Alerts
@@ -230,7 +250,7 @@ class BlinkHomeSyncModule extends IPSModuleStrict
         $ins = IPS_GetInstance($this->InstanceID);
         $mod = IPS_GetModule($ins['ModuleInfo']['ModuleID']);
         $lib = IPS_GetLibrary($mod['LibraryID']);
-        $form['actions'][4]['items'][2]['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
+        $form['actions'][3]['items'][2]['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
 
         return json_encode($form);
     }
@@ -256,7 +276,8 @@ class BlinkHomeSyncModule extends IPSModuleStrict
 
         // Recording variable
         $recording = $this->ReadPropertyBoolean('CheckRecording');
-        $this->MaintainVariable('recording', $this->Translate('Recording'), VARIABLETYPE_BOOLEAN, self::BLINK_PRESENTATION_RECORDING, 0, $recording);
+        $presents = $this->TranslatePresentation(self::BLINK_PRESENTATION_RECORDING, 'OPTIONS', 'Caption');
+        $this->MaintainVariable('recording', $this->Translate('Recording'), VARIABLETYPE_BOOLEAN, $presents, 0, $recording);
         if ($recording) {
             $this->SetValueBoolean('recording', false);
             $this->EnableAction('recording');
@@ -286,18 +307,18 @@ class BlinkHomeSyncModule extends IPSModuleStrict
         if ($motion) {
             // Extract vaules
             $pro = json_decode($this->ReadPropertyString('ListMotion'), true);
-            $opt = json_decode($tpl['OPTIONS'], true);
+            $val = json_decode($tpl['INTERVALS'], true);
             $map = [];
             foreach ($pro as $p) {
                 $map[$p['Value']] = $p['Name'];
             }
-            foreach ($opt as &$o) {
-                if (isset($map[$o['Value']])) {
-                    $o['Caption'] = $map[$o['Value']];
+            foreach ($val as &$v) {
+                if (isset($map[$v['IntervalMinValue']])) {
+                    $v['ConstantValue'] = $map[$v['IntervalMinValue']];
                 }
             }
-            unset($o);
-            $tpl['OPTIONS'] = json_encode($opt, JSON_UNESCAPED_UNICODE);
+            unset($v);
+            $tpl['INTERVALS'] = json_encode($val, JSON_UNESCAPED_UNICODE);
         }
         $this->MaintainVariable('last_motion', $this->Translate('Last movement'), VARIABLETYPE_INTEGER, $tpl, 3, $motion);
         if ($motion) {
@@ -462,10 +483,16 @@ class BlinkHomeSyncModule extends IPSModuleStrict
         $script = $this->ReadPropertyInteger('AlertScript');
         if ($value && $script != 0) {
             if (IPS_ScriptExists($script)) {
-                $id = @$this->GetIDForIdent('last_motion');
-                $ca = GetValueFormatted($id);
-                $rs = IPS_RunScriptEx($script, ['MODUL' => $this->InstanceID, 'MOTION' => $ca, 'TIMESTAMP' => time()]);
-                $this->LogDebug(__FUNCTION__, 'Script #' . $script . ' executed! Return Value: ' . $rs);
+                $motion = strval($value);
+                $mapping = json_decode($this->ReadPropertyString('ListMotion'), true);
+                foreach ($mapping as $map) {
+                    if ($map['Value'] == $value) {
+                        $motion = $map['Name'];
+                        break;
+                    }
+                }
+                $ret = IPS_RunScriptEx($script, ['MODUL' => $this->InstanceID, 'MOTION' => $motion, 'TIMESTAMP' => time()]);
+                $this->LogDebug(__FUNCTION__, 'Script #' . $script . ' executed! Return Value: ' . $ret);
             } else {
                 $this->LogDebug(__FUNCTION__, 'Script #' . $script . ' does not exist!');
             }
@@ -506,6 +533,7 @@ class BlinkHomeSyncModule extends IPSModuleStrict
     {
         $store = $this->ReadPropertyInteger('StorageCategory');
         $limit = $this->ReadPropertyInteger('StorageLimit');
+        $size = $this->ReadPropertyInteger('StorageSize');
         $cache = $this->ReadPropertyBoolean('OnlyCache');
         $media = [];
         if (IPS_CategoryExists($store)) {
@@ -532,7 +560,7 @@ class BlinkHomeSyncModule extends IPSModuleStrict
                 // Limit result set - $clips = array_slice($clips, 0, $limit);
                 $filtered = [];
                 foreach ($clips as $clip) {
-                    if (isset($clip['size']) && $clip['size'] < self::BLINK_SYNC_SIZE) {
+                    if (isset($clip['size']) && $clip['size'] < $size) {
                         $filtered[] = $clip;
                         if (count($filtered) >= $limit) {
                             break;
@@ -552,7 +580,7 @@ class BlinkHomeSyncModule extends IPSModuleStrict
                         // check for {"message":"Media not found","code":700}
                         $length = strlen($response);
                         $error = ($length === 40);
-                        $this->LogDebug(__FUNCTION__, 'Length-Check: ' . $length . ' => ' . boolval($error));
+                        $this->LogDebug(__FUNCTION__, 'Length-Check: ' . $length . ' => ' . var_export($error, true));
                         if ($error) {
                             $this->LogMessage($response);
                             IPS_Sleep(1000);

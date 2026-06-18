@@ -110,7 +110,7 @@
                     "type": "SelectEvent",
                     "name": "RecordingSchedule",
                     "caption": "Schedule:",
-                    "width": "450px"
+                    "width": "508px"
                 },
                 {
                     "type": "RowLayout",
@@ -138,7 +138,7 @@
                     "suffix": "minutes",
                     "minimum": 0,
                     "maximum": 60,
-                    "width": "300px"
+                    "width": "250px"
                 }
             ]
         },
@@ -150,16 +150,30 @@
                     "type": "SelectCategory",
                     "name": "StorageCategory",
                     "caption": "Storage location:",
-                    "width": "450px"
+                    "width": "508px"
                 },
                 {
-                    "type": "NumberSpinner",
-                    "name": "StorageLimit",
-                    "caption": "Storage limit:",
-                    "suffix": "videos",
-                    "minimum": 0,
-                    "maximum": 25,
-                    "width": "300px"
+                    "type": "RowLayout",
+                    "items": [
+                        {
+                            "type": "NumberSpinner",
+                            "name": "StorageLimit",
+                            "caption": "Storage limit (max):",
+                            "suffix": "videos",
+                            "minimum": 0,
+                            "maximum": 25,
+                            "width": "250px"
+                        },
+                        {
+                            "type": "NumberSpinner",
+                            "name": "StorageSize",
+                            "caption": "Storage size (max):",
+                            "suffix": "KB",
+                            "minimum": 500,
+                            "maximum": 5000,
+                            "width": "250px"
+                        }
+                    ]
                 },
                 {
                     "type": "CheckBox",
@@ -173,7 +187,7 @@
                             "type": "Select",
                             "name": "DownloadMode",
                             "caption": "Download mode:",
-                            "width": "300px",
+                            "width": "350px",
                             "options": [
                                 {
                                     "label": "Cloud (Blink Subscription)",
@@ -193,7 +207,7 @@
                             "type": "Button",
                             "name": "Download",
                             "caption": "Download",
-                            "width": "142px",
+                            "width": "150px",
                             "onClick": "IPS_RequestAction($id, 'get_videos', $DownloadMode);"
                         }
                     ]
@@ -255,36 +269,38 @@
                     "type": "SelectScript",
                     "name": "AlertScript",
                     "caption": "Simultaneous execution of a script:",
-                    "width": "450px"
+                    "width": "508px"
                 }
             ]
         }
     ],
     "actions": [
         {
-            "type": "Label",
-            "caption": "Use the buttons to obtain information about the network, module or local storage ..."
-        },
-        {
-            "type": "RowLayout",
+            "type": "ExpansionPanel",
+            "caption": "❓ Query from ...",
             "items": [
                 {
-                    "type": "Button",
-                    "name": "Network",
-                    "caption": "Network",
-                    "onClick": "IPS_RequestAction($id,'network', true);"
-                },
-                {
-                    "type": "Button",
-                    "name": "SyncModul",
-                    "caption": "Sync Module",
-                    "onClick": "IPS_RequestAction($id,'sync_module', true);"
-                },
-                {
-                    "type": "Button",
-                    "name": "StorageStatus",
-                    "caption": "Storage Status",
-                    "onClick": "IPS_RequestAction($id,'local_storage_status', true);"
+                    "type": "RowLayout",
+                    "items": [
+                        {
+                            "type": "Button",
+                            "name": "Network",
+                            "caption": "Network",
+                            "onClick": "IPS_RequestAction($id,'network', true);"
+                        },
+                        {
+                            "type": "Button",
+                            "name": "SyncModul",
+                            "caption": "Sync Module",
+                            "onClick": "IPS_RequestAction($id,'sync_module', true);"
+                        },
+                        {
+                            "type": "Button",
+                            "name": "StorageStatus",
+                            "caption": "Storage Status",
+                            "onClick": "IPS_RequestAction($id,'local_storage_status', true);"
+                        }
+                    ]
                 }
             ]
         },
@@ -308,33 +324,6 @@
             "items": [
                 {
                     "type": "Label",
-                    "label": "Arm / Disarm recording motion events!"
-                },
-                {
-                    "type": "RowLayout",
-                    "items": [
-                        {
-                            "type": "Button",
-                            "name": "Arm",
-                            "caption": "Arm",
-                            "onClick": "BHS_Arm($id);"
-                        },
-                        {
-                            "type": "Button",
-                            "name": "Disarm",
-                            "caption": "Disarm",
-                            "onClick": "BHS_Disarm($id);"
-                        },
-                        {
-                            "type": "Label",
-                            "label": "NOTE: Activating or deactivating may take some time.",
-                            "italic": true,
-                            "color": 16711680
-                        }
-                    ]
-                },
-                {
-                    "type": "Label",
                     "caption": "Download video recordings depending on the source!"
                 },
                 {
@@ -343,8 +332,7 @@
                         {
                             "type": "Button",
                             "caption": "Events",
-                            "onClick": "IPS_RequestAction($id,'get_video_events', true);",
-                            "enabled": true
+                            "onClick": "IPS_RequestAction($id,'get_video_events', true);"
                         },
                         {
                             "type": "Button",

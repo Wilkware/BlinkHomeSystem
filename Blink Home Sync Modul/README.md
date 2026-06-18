@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-8.1-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-2.5.20260526-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
+[![Version](https://img.shields.io/badge/Modul%20Version-2.6.20260617-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
@@ -72,13 +72,15 @@ Aktualisierungsintervall | Abfrageintervall des Aktivierungszustandes (0 = AUS)
 
 > 📼 Aufzeichnungen ...
 
-Name           | Beschreibung
--------------- | ------------------
-Speicherort    | Kategorie (Ordner) wo die Aufnahmen (Clips) abgelegt werden sollen
-Speicherlimit  | Maximale Anzahl an zu speichernden Aufnahmen (max. letzten 25 Aufnahmen)
+Name                     | Beschreibung
+------------------------ | ------------------
+Speicherort              | Kategorie (Ordner) wo die Aufnahmen (Clips) abgelegt werden sollen
+Speicherlimit (max)      | Maximale Anzahl an zu speichernden Aufnahmen (max. letzten 25 Aufnahmen)
+Speichergröße (max)      | Maximale Größe pro Clib/Video in KB (max. 5000 KB)
 Nur In-Memory-Cache verwenden (keine Speicherung auf Platte)? | Schalter für Speichermodus
 Downloadmodus  | Von welchem Medium sollen die Aufnahmen abgeholt werden (Cloudspeicher, lokaler USB-Speicher oder Beide)
 
+_HINWEIS:_ Um mehr als 1000 KB Clips herunterzuladen muss der Spezialschalter *ScriptOutputBufferLimit* entsprechend erhöht werden!
 
 > 🚨 Alarmeinstellungen ...
 
@@ -91,6 +93,8 @@ Gleichzeitiges Ausführen eines Skriptes | Hinterlegung eines Skriptes das bei B
 
 _Aktionsbereich:_
 
+> ❓ Abfrage von ...
+
 Aktion              | Beschreibung
 ------------------- | ------------------
 NETZWERK            | Ausgabe der Netwerkinformationen.
@@ -99,14 +103,12 @@ SPEICHERSTATUS      | Ausgabe der Speicherinformationen.
 
 > 🛟 Entwicklungs- und Debuginformationen ...
 
-Aktion         | Beschreibung
--------------- | ------------------
-STARTEN        | Schalter für direktes scharf Stellen der Aufnahme
-STOPPEN        | Schalter zum direkten Stoppen von Aufnahmen
-EVENTS         | Versucht Aufnahmen von der Cloud herunterzuladen (Abo notwendig)
-CLIPS          | Versucht Aufnahmen vom lokalen USB-Medium herunterzuladen (USB Stick am Modul notwendig)
-ALARM          | Simuliert eine eingehende Alarmmeldung
-BEWEGUNG       | Simuliert eine Bewegung mit zufälliger Kamera-ID (zwischen 10 und 100)
+Aktion              | Beschreibung
+------------------- | ------------------
+EVENTS              | Versucht Aufnahmen von der Cloud herunterzuladen (Abo notwendig)
+CLIPS               | Versucht Aufnahmen vom lokalen USB-Medium herunterzuladen (USB Stick am Modul notwendig)
+ALARM               | Simuliert eine eingehende Alarmmeldung
+BEWEGUNG            | Simuliert eine Bewegung mit zufälliger Kamera-ID (zwischen 10 und 100)
 
 ### 5. Statusvariablen und Darstellungen
 
@@ -120,7 +122,7 @@ circuit_snapshot    | Zeitplan Aufnahmen    | event   |                      | W
 recording           | Aufzeichnung          | boolean | Schalter             | An/Aus-Schalter für Aufzeichnungen
 alert               | Alarm                 | boolean | Aufzählung           | Indikation von Alarmmeldungen
 download            | Herunterladen         | boolean | Schalter             | Variable zum Herunterladen von Videoclips
-last_motion         | Letzte Bewegung       | integer | Aufzählung           | Hinterlegung der Kamerazuordnung für Bewegungsmeldungen
+last_motion         | Letzte Bewegung       | integer | Schieberegler        | Hinterlegung der Kamerazuordnung für Bewegungsmeldungen
 
 #### Darstellungen
 
@@ -131,7 +133,7 @@ Template-Name            | Typ           | Beschreibung
 \<direkte Assoziazion\>  | Schalter      | An-/Ausschalter
 \<direkte Assoziazion\>  | Aufzählung    | OK oder Alarm
 \<direkte Assoziazion\>  | Schalter      | Download-Button
-\<direkte Assoziazion\>  | Aufzählung    | Zuordnung in zehnerschritten Nummer zu Kameraname
+\<direkte Assoziazion\>  | Schieberegler | Dynamische Zuordnung in zehnerschritten - Nummer zu Kameraname
 
 ### 6. Visualisierung
 
@@ -156,6 +158,14 @@ Schaltet alle im Netwerk befindlichen Kameras unscharf.
 __Beispiel__: `BHS_Disarm(12345);`
 
 ### 8. Versionshistorie
+
+v2.6.20260526
+
+* _NEU_: Speicherlgröße von Clips/Videos einstellbar
+* _NEU_: Konfiguration vereinheitlicht
+* _NEU_: Darstellungen werden jetzt lokalisiert
+* _FIX_: 'Letzte Bewegung' auf Slider mit Intervallen umgestellt wegen Alexa Inkompatibilität
+* _FIX_: Kleinere Übersetzungsfehler korriegiert
 
 v2.5.20260526
 

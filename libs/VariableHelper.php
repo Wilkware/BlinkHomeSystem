@@ -142,4 +142,23 @@ trait VariableHelper
 
         return $ident;
     }
+
+    /**
+     * Translate all specific values recursively inside a configuration array.
+     *
+     * @param array<string,mixed> $configuration Configuration structure
+     * @param string              $index         Index of the configuration array to translate
+     * @param string              $key           Key of the configuration array to translate
+     *
+     * @return array<string,mixed> Modified configuration array
+     */
+    protected function TranslatePresentation(array $configuration, string $index, string $key): array
+    {
+        $template = json_decode($configuration[$index], true);
+        foreach ($template as &$a) {
+            $a[$key] = $this->Translate($a[$key]);
+        }
+        $configuration[$index] = json_encode($template, JSON_UNESCAPED_UNICODE);
+        return $configuration;
+    }
 }

@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/Symcon-PHP--Modul-red.svg?style=flat-square)](https://www.symcon.de/service/dokumentation/entwicklerbereich/sdk-tools/sdk-php/)
 [![Product](https://img.shields.io/badge/Symcon%20Version-8.1-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
-[![Version](https://img.shields.io/badge/Modul%20Version-2.5.20260526-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
+[![Version](https://img.shields.io/badge/Modul%20Version-2.6.20260617-orange.svg?style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem)
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
@@ -77,12 +77,19 @@ Automatisch angemeldet bleiben | Aktiviert die automatische Verlängerung des Zu
 
 _Aktionsbereich:_
 
-Aktion                  | Beschreibung
------------------------ | ---------------------------------
-ANMELDEN                | Senden der Logindaten an Blink Server
-ÜBERPRÜFEN              | Senden eines Codes zur Verifizierung der Login-Daten
-AKTUALISIEREN           | Zugriffs-Token erneut anfragen, aktualisieren  und Ablaufzeit neu starten
-OPTIONEN                | Abrufen und Anzeigen der eingestellten Optionen
+> 🗝️ Anmelden und verifizieren am Blink Server ...
+
+Aktion                    | Beschreibung
+------------------------- | ---------------------------------
+ANMELDEN                  | Senden der Logindaten an Blink Server
+ÜBERPRÜFEN                | Senden eines Codes zur Verifizierung der Login-Daten
+AKTUALISIEREN             | Zugriffs-Token erneut anfragen, aktualisieren  und Ablaufzeit neu starten
+
+> ❓ Abfrage von ...
+
+Aktion                    | Beschreibung
+------------------------- | ---------------------------------
+Benachrichtigungsoptionen | Abrufen und Anzeigen der eingestellten Optionen
 
 ### 5. Statusvariablen und Darstellungen
 
@@ -123,6 +130,13 @@ Gibt im angemeldeten Zusatnd die Benachrichtigungsoptionen aus.
 Die Funktion liefert `true` im Erfolgsfall, sonst `false`.
 
 ### 8. Versionshistorie
+
+v2.6.20260526
+
+* _NEU_: Konfiguration vereinheitlicht
+* _FIX_: Login Status Code angepasst
+* _FIX_: Liveview API Endpoint 
+* _FIX_: Kleinere Übersetzungsfehler korriegiert
 
 v2.5.20260526
 

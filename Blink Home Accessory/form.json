@@ -120,23 +120,25 @@
     ],
     "actions": [
         {
-            "type": "Label",
-            "label": "Switching the floodlight on or off ..."
-        },
-        {
-            "type": "RowLayout",
+            "type": "ExpansionPanel",
+            "caption": "🔦 Switching the floodlight ...",
             "items": [
                 {
-                    "type": "Button",
-                    "caption": "On",
-                    "onClick": "IPS_RequestAction($id,'switch_light',true);",
-                    "enabled": true
-                },
-                {
-                    "type": "Button",
-                    "caption": "Off",
-                    "onClick": "IPS_RequestAction($id,'switch_light',false);",
-                    "enabled": true
+                    "type": "RowLayout",
+                    "items": [
+                        {
+                            "type": "Button",
+                            "caption": "On",
+                            "onClick": "IPS_RequestAction($id,'switch_light',true);",
+                            "enabled": true
+                        },
+                        {
+                            "type": "Button",
+                            "caption": "Off",
+                            "onClick": "IPS_RequestAction($id,'switch_light',false);",
+                            "enabled": true
+                        }
+                    ]
                 }
             ]
         },

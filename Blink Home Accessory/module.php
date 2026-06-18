@@ -2,24 +2,36 @@
 
 declare(strict_types=1);
 
-// Generell funktions
+/** Generell funktions */
 require_once __DIR__ . '/../libs/_traits.php';
 
-// Blink Home Accessory
+/**
+ * Class BlinkHomeAccessory
+ *
+ * Represents a Blink Home accessory and provides
+ * functionality to control its state.
+ */
 class BlinkHomeAccessory extends IPSModuleStrict
 {
-    // Helper Traits
+    // -------------------------------------------------------------------------
+    // Traits
+    // -------------------------------------------------------------------------
+
     use DebugHelper;
     use VariableHelper;
 
-    /**
-     * @var string ModulID (Blink Home Client)
-     */
+    // -------------------------------------------------------------------------
+    // GUIDs
+    // -------------------------------------------------------------------------
+
+    /** @var string ModulID (Blink Home Client) */
     private const BLINK_CLIENT_GUID = '{AF126D6D-83D1-44C2-6F61-96A4BB7A0E62}';
 
-    /**
-     * @var array<string,mixed> Download Presentation (Switch)
-     */
+    // -------------------------------------------------------------------------
+    // Presentations
+    // -------------------------------------------------------------------------
+
+    /** @var array<string,mixed> Download Presentation (Switch) */
     private const BLINK_PRESENTATION_LIGHT = [
         'PRESENTATION'   => VARIABLE_PRESENTATION_SWITCH,
         'USE_ICON_FALSE' => true,
@@ -28,9 +40,7 @@ class BlinkHomeAccessory extends IPSModuleStrict
         'USAGE_TYPE'     => 0
     ];
 
-    /**
-     * @var array<string,mixed> Battery Presentation (Value)
-     */
+    /** @var array<string,mixed> Battery Presentation (Value) */
     private const BLINK_PRESENTATION_BATTERY = [
         'PRESENTATION'       => VARIABLE_PRESENTATION_VALUE_PRESENTATION,
         'MIN'                => 0,
@@ -40,10 +50,10 @@ class BlinkHomeAccessory extends IPSModuleStrict
         'ICON'               => 'battery-bolt',
         'INTERVALS_ACTIVE'   => true,
         'INTERVALS'          => '[
-            {"ColorDisplay":16711935,"ContentColorDisplay":-1,"IntervalMinValue":0,"IntervalMaxValue":0,"ConstantActive":true,"ConstantValue":"Unbekannt","ConversionFactor":1,"IconActive":true,"IconValue":"battery-exclamation","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16711935,"ContentColorActive":false,"ContentColorValue":-1},
-            {"ColorDisplay":16711680,"ContentColorDisplay":-1,"IntervalMinValue":1,"IntervalMaxValue":1,"ConstantActive":true,"ConstantValue":"Niedrig","ConversionFactor":1,"IconActive":true,"IconValue":"battery-low","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16711680,"ContentColorActive":false,"ContentColorValue":-1},
-            {"ColorDisplay":16776960,"ContentColorDisplay":-1,"IntervalMinValue":2,"IntervalMaxValue":2,"ConstantActive":true,"ConstantValue":"Mittel","ConversionFactor":1,"IconActive":true,"IconValue":"battery-half","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16776960,"ContentColorActive":false,"ContentColorValue":-1},
-            {"ColorDisplay":65280,"ContentColorDisplay":-1,"IntervalMinValue":3,"IntervalMaxValue":3,"ConstantActive":true,"ConstantValue":"Gut","ConversionFactor":1,"IconActive":true,"IconValue":"battery-full","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":65280,"ContentColorActive":false,"ContentColorValue":-1}
+            {"ColorDisplay":16711935,"ContentColorDisplay":-1,"IntervalMinValue":0,"IntervalMaxValue":0,"ConstantActive":true,"ConstantValue":"unknown","ConversionFactor":1,"IconActive":true,"IconValue":"battery-exclamation","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16711935,"ContentColorActive":false,"ContentColorValue":-1},
+            {"ColorDisplay":16711680,"ContentColorDisplay":-1,"IntervalMinValue":1,"IntervalMaxValue":1,"ConstantActive":true,"ConstantValue":"critical","ConversionFactor":1,"IconActive":true,"IconValue":"battery-low","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16711680,"ContentColorActive":false,"ContentColorValue":-1},
+            {"ColorDisplay":16776960,"ContentColorDisplay":-1,"IntervalMinValue":2,"IntervalMaxValue":2,"ConstantActive":true,"ConstantValue":"low","ConversionFactor":1,"IconActive":true,"IconValue":"battery-half","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16776960,"ContentColorActive":false,"ContentColorValue":-1},
+            {"ColorDisplay":65280,"ContentColorDisplay":-1,"IntervalMinValue":3,"IntervalMaxValue":3,"ConstantActive":true,"ConstantValue":"ok","ConversionFactor":1,"IconActive":true,"IconValue":"battery-full","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":65280,"ContentColorActive":false,"ContentColorValue":-1}
         ]',
         'PERCENTAGE'   => false,
         'CONTENT_COLOR'=> -1,
@@ -54,6 +64,10 @@ class BlinkHomeAccessory extends IPSModuleStrict
         'SHOW_PREVIEW' => true,
         'PREVIEW_STYLE'=> 1
     ];
+
+    // -------------------------------------------------------------------------
+    // Methods
+    // -------------------------------------------------------------------------
 
     /**
      * In contrast to Construct, this function is called only once when creating the instance and starting IP-Symcon.
@@ -110,7 +124,7 @@ class BlinkHomeAccessory extends IPSModuleStrict
         $ins = IPS_GetInstance($this->InstanceID);
         $mod = IPS_GetModule($ins['ModuleInfo']['ModuleID']);
         $lib = IPS_GetLibrary($mod['LibraryID']);
-        $form['actions'][2]['items'][2]['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
+        $form['actions'][1]['items'][2]['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
 
         // Return if parent is not confiured
         if (!$this->HasActiveParent()) {
@@ -136,7 +150,8 @@ class BlinkHomeAccessory extends IPSModuleStrict
         $this->EnableAction('switch_light');
 
         // Update battery
-        $this->MaintainVariable('battery', $this->Translate('Battery'), VARIABLETYPE_INTEGER, self::BLINK_PRESENTATION_BATTERY, 2, $battery);
+        $presents = $this->TranslatePresentation(self::BLINK_PRESENTATION_BATTERY, 'INTERVALS', 'ConstantValue');
+        $this->MaintainVariable('battery', $this->Translate('Battery'), VARIABLETYPE_INTEGER, $presents, 2, $battery);
     }
 
     /**

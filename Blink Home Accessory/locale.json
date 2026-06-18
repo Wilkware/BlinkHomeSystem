@@ -19,7 +19,7 @@
             "usb": "USB",
             "On": "An",
             "Off": "Aus",
-            "Switching the floodlight on or off ...": "An- oder Ausschalten des Flutlichtes ...",
+            "🔦 Switching the floodlight ...": "🔦 Schalten des Flutlichtes ...",
             "Light switch": "Lichtschalter",
             "⚙️ Advanced settings ...": "⚙️ Erweiterte Einstellungen ...",
             "Create a variable to display the battery charge level!": "Erstellen einer Variable zur Anzeige des Ladezustands der Batterie!",

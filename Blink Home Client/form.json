@@ -74,69 +74,73 @@
     ],
     "actions": [
         {
-            "type": "Label",
-            "caption": "Log in and verify on the Blink Server ..."
-        },
-        {
-            "type": "RowLayout",
+            "type": "ExpansionPanel",
+            "caption": "🗝️ Log in and verify on the Blink Server ...",
             "items": [
                 {
-                    "type": "Button",
-                    "name": "Login",
-                    "caption": "Login",
-                    "onClick": "IPS_RequestAction($id, 'login',true);"
-                },
-                {
-                    "type": "PopupButton",
-                    "name": "Verify",
-                    "caption": "Verify",
-                    "popup": {
-                        "caption": "Confirm registration ...",
-                        "items": [
-                            {
-                                "type": "Label",
-                                "caption": "Verify Client with PIN provided in an email or sms."
-                            },
-                            {
-                                "type": "RowLayout",
+                    "type": "RowLayout",
+                    "items": [
+                        {
+                            "type": "Button",
+                            "name": "Login",
+                            "caption": "Login",
+                            "onClick": "IPS_RequestAction($id, 'login',true);"
+                        },
+                        {
+                            "type": "PopupButton",
+                            "name": "Verify",
+                            "caption": "Verify",
+                            "popup": {
+                                "caption": "Confirm registration ...",
                                 "items": [
                                     {
-                                        "type": "ValidationTextBox",
-                                        "name": "Pin",
-                                        "caption": "PIN:",
-                                        "validate": "^[0-9]+$"
+                                        "type": "Label",
+                                        "caption": "Verify Client with PIN provided in an email or sms."
                                     },
                                     {
-                                        "type": "Button",
-                                        "caption": "Send",
-                                        "onClick": "IPS_RequestAction($id, 'verify', $Pin);"
+                                        "type": "RowLayout",
+                                        "items": [
+                                            {
+                                                "type": "ValidationTextBox",
+                                                "name": "Pin",
+                                                "caption": "PIN:",
+                                                "validate": "^[0-9]+$"
+                                            },
+                                            {
+                                                "type": "Button",
+                                                "caption": "Send",
+                                                "onClick": "IPS_RequestAction($id, 'verify', $Pin);"
+                                            }
+                                        ]
                                     }
                                 ]
                             }
-                        ]
-                    }
-                },
-                {
-                    "type": "Button",
-                    "name": "Refresh",
-                    "caption": "Refresh",
-                    "confirm": "Are you sure you want to try updating your login?",
-                    "onClick": "IPS_RequestAction($id, 'refresh', true);"
+                        },
+                        {
+                            "type": "Button",
+                            "name": "Refresh",
+                            "caption": "Refresh",
+                            "confirm": "Are you sure you want to try updating your login?",
+                            "onClick": "IPS_RequestAction($id, 'refresh', true);"
+                        }
+                    ]
                 }
             ]
         },
         {
-            "type": "Label",
-            "caption": "Use this button to access all notification flags ..."
-        },
-        {
-            "type": "RowLayout",
+            "type": "ExpansionPanel",
+            "caption": "❓ Query from ...",
             "items": [
                 {
-                    "type": "Button",
-                    "name": "Options",
-                    "caption": "Options",
-                    "onClick": "BHS_Notification($id);"
+                    "type": "RowLayout",
+                    "items": [
+                        {
+                            "type": "Button",
+                            "name": "Options",
+                            "caption": "Notification flags",
+                            "onClick": "BHS_Notification($id);"
+                        }
+                    ]
                 }
             ]
         },

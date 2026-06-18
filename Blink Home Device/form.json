@@ -339,23 +339,25 @@
     ],
     "actions": [
         {
-            "type": "Label",
-            "caption": "Taking a ..."
-        },
-        {
-            "type": "RowLayout",
+            "type": "ExpansionPanel",
+            "caption": "🚀 Execute action ...",
             "items": [
                 {
-                    "type": "Button",
-                    "caption": "Snapshot",
-                    "onClick": "IPS_RequestAction($id,'snapshot',$id);",
-                    "enabled": false
-                },
-                {
-                    "type": "Button",
-                    "caption": "Record",
-                    "onClick": "IPS_RequestAction($id,'record',$id);",
-                    "enabled": true
+                    "type": "RowLayout",
+                    "items": [
+                        {
+                            "type": "Button",
+                            "caption": "Snapshot",
+                            "onClick": "IPS_RequestAction($id,'snapshot',$id);",
+                            "enabled": false
+                        },
+                        {
+                            "type": "Button",
+                            "caption": "Record",
+                            "onClick": "IPS_RequestAction($id,'record',$id);",
+                            "enabled": true
+                        }
+                    ]
                 }
             ]
         },

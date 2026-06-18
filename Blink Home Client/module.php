@@ -2,26 +2,44 @@
 
 declare(strict_types=1);
 
-// Generell funktions
+/** Generell funktions */
 require_once __DIR__ . '/../libs/_traits.php';
 
-// Blink Home Client (I/O)
+/**
+ * class BlinkHomeClient (I/O)
+ *
+ * Provides the communication layer between IP-Symcon
+ * and the Blink Home API.
+ *
+ * Responsibilities include:
+ * - Authentication
+ * - API requests
+ * - Response processing
+ * - Device and accessory interaction
+ */
 class BlinkHomeClient extends IPSModuleStrict
 {
-    // Helper Traits
+    // -------------------------------------------------------------------------
+    // Traits
+    // -------------------------------------------------------------------------
+
     use BlinkHelper;
     use DebugHelper;
     use EventHelper;
     use FormatHelper;
 
-    /**
-     * @var string Childs GUID
-     */
+    // -------------------------------------------------------------------------
+    // GUIDs
+    // -------------------------------------------------------------------------
+
+    /** @var string Childs GUID */
     private const BLINK_CHILDS_GUID = '{7DD36C8D-6581-25FE-9FEA-98024108BED6}';
 
-    /**
-     * @var array<int,string> Blink Battery Device Types (up to now)
-     */
+    // -------------------------------------------------------------------------
+    // Constants
+    // -------------------------------------------------------------------------
+
+    /**  @var array<int,string> Blink Battery Device Types (up to now) */
     private const BLINK_BATTERY_DEVICES = [
         'cameras',
         'sirens',
@@ -29,6 +47,10 @@ class BlinkHomeClient extends IPSModuleStrict
         'doorbell_buttons',
         'accessories',
     ];
+
+    // -------------------------------------------------------------------------
+    // Echo Maps
+    // -------------------------------------------------------------------------
 
     /**
      * @var array<int,array{0:string,1:string,2:int,3:?string}> Echo map NOTIFICATIONS
@@ -52,6 +74,10 @@ class BlinkHomeClient extends IPSModuleStrict
         ['accessory_low_battery', 'Accessory low battery', 5, null],
         ['general', 'System offline', 5, null],
     ];
+
+    // -------------------------------------------------------------------------
+    // Methods
+    // -------------------------------------------------------------------------
 
     /**
      * In contrast to Construct, this function is called only once when creating the instance and starting IP-Symcon.
@@ -116,23 +142,24 @@ class BlinkHomeClient extends IPSModuleStrict
         $this->LogDebug(__FUNCTION__, ' Verify: ' . $verify);
         // Get Form
         $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
+        $this->LogDebug(__FUNCTION__, $form);
         // LoggedIn?
         switch ($verify) {
             case self::$BLINK_VERIFY:
-                $form['actions'][1]['items'][1]['enabled'] = true;  // Verify
-                $form['actions'][1]['items'][2]['enabled'] = false; // Refresh
-                $form['actions'][3]['items'][0]['enabled'] = false; // Options
+                $form['actions'][0]['items'][0]['items'][1]['enabled'] = true;  // Verify
+                $form['actions'][0]['items'][0]['items'][2]['enabled'] = false; // Refresh
+                $form['actions'][1]['items'][0]['items'][0]['enabled'] = false; // Options
                 break;
             case self::$BLINK_LOGIN:
-                $form['actions'][1]['items'][1]['enabled'] = false; // Verify
-                $form['actions'][1]['items'][2]['enabled'] = true;  // Refresh
-                $form['actions'][3]['items'][0]['enabled'] = true;  // Options
+                $form['actions'][0]['items'][0]['items'][1]['enabled'] = false; // Verify
+                $form['actions'][0]['items'][0]['items'][2]['enabled'] = true;  // Refresh
+                $form['actions'][1]['items'][0]['items'][0]['enabled'] = true;  // Options
                 break;
             case self::$BLINK_LOGOUT:
             default:
-                $form['actions'][1]['items'][1]['enabled'] = false;  // Verify
-                $form['actions'][1]['items'][2]['enabled'] = false;  // Refresh
-                $form['actions'][3]['items'][0]['enabled'] = false;  // Options
+                $form['actions'][0]['items'][0]['items'][1]['enabled'] = false;  // Verify
+                $form['actions'][0]['items'][0]['items'][2]['enabled'] = false;  // Refresh
+                $form['actions'][1]['items'][0]['items'][0]['enabled'] = false;  // Options
                 break;
         }
 
@@ -140,7 +167,7 @@ class BlinkHomeClient extends IPSModuleStrict
         $ins = IPS_GetInstance($this->InstanceID);
         $mod = IPS_GetModule($ins['ModuleInfo']['ModuleID']);
         $lib = IPS_GetLibrary($mod['LibraryID']);
-        $form['actions'][5]['items'][2]['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
+        $form['actions'][3]['items'][2]['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
 
         // Debug output
         //$this->LogDebug(__FUNCTION__, $form);
