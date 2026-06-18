@@ -155,8 +155,8 @@ v2.6.20260526
 * _NEU_: Konfiguration vereinheitlicht
 * _NEU_: Darstellungen werden jetzt lokalisiert
 * _FIX_: Liveview API Endpoint 
-* _FIX_: Kleinere Übersetzungsfehler korriegiert
-* _FIX_: Dokumentation korriegiert
+* _FIX_: Kleinere Übersetzungsfehler korrigiert
+* _FIX_: Dokumentation korrigiert
 
 v2.5.20260526
 

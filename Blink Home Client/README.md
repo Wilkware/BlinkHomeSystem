@@ -136,7 +136,7 @@ v2.6.20260526
 * _NEU_: Konfiguration vereinheitlicht
 * _FIX_: Login Status Code angepasst
 * _FIX_: Liveview API Endpoint 
-* _FIX_: Kleinere Übersetzungsfehler korriegiert
+* _FIX_: Kleinere Übersetzungsfehler korrigiert
 
 v2.5.20260526
 

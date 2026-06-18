@@ -165,7 +165,7 @@ v2.6.20260526
 * _NEU_: Konfiguration vereinheitlicht
 * _NEU_: Darstellungen werden jetzt lokalisiert
 * _FIX_: 'Letzte Bewegung' auf Slider mit Intervallen umgestellt wegen Alexa Inkompatibilität
-* _FIX_: Kleinere Übersetzungsfehler korriegiert
+* _FIX_: Kleinere Übersetzungsfehler korrigiert
 
 v2.5.20260526
 

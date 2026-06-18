@@ -70,7 +70,7 @@ Das Modul bietet keine direkten Funktionsaufrufe.
 
 v2.6.20260526
 
-* _FIX_: Kleinere Übersetzungsfehler korriegiert
+* _FIX_: Kleinere Übersetzungsfehler korrigiert
 
 v2.5.20260526
 
