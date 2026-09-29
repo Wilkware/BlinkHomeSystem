@@ -3,7 +3,7 @@
 /**
  * DebugHelper.php
  *
- * Part of the Trait-Libraray for IP-Symcon Modules.
+ * Part of the Trait-Libraray for Symcon Modules.
  *
  * @package       traits
  * @author        Heiko Wilknitz <heiko@wilkware.de>
@@ -13,6 +13,10 @@
  */
 
 declare(strict_types=1);
+
+/** @symcon-namespace */
+
+namespace Wilkware\BlinkHomeSystem;
 
 /**
  * Helper class for the debug output.

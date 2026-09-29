@@ -89,6 +89,10 @@
 
 declare(strict_types=1);
 
+/** @symcon-namespace */
+
+namespace Wilkware\BlinkHomeSystem;
+
 /**
  * Helper class for the debug output.
  */

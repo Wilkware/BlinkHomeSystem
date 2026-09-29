@@ -5,6 +5,13 @@ declare(strict_types=1);
 /** Generell funktions */
 require_once __DIR__ . '/../libs/_traits.php';
 
+/** Namespaced traits */
+use Wilkware\BlinkHomeSystem\DebugHelper;
+use Wilkware\BlinkHomeSystem\EventHelper;
+use Wilkware\BlinkHomeSystem\FormatHelper;
+use Wilkware\BlinkHomeSystem\FormHelper;
+use Wilkware\BlinkHomeSystem\VariableHelper;
+
 /**
  * Class BlinkHomeSyncModule
  *
@@ -22,6 +29,7 @@ class BlinkHomeSyncModule extends IPSModuleStrict
     // -------------------------------------------------------------------------
     use DebugHelper;
     use EventHelper;
+    use FormHelper;
     use FormatHelper;
     use VariableHelper;
 
@@ -109,7 +117,7 @@ class BlinkHomeSyncModule extends IPSModuleStrict
         'MIN'                 => 0,
         'CUSTOM_GRADIENT'     => '[]',
         'PREFIX'              => '',
-        'STEP_SIZE'           => 10.0,
+        'STEP_SIZE'           => 10,
         'SUFFIX'              => '',
     ];
 
@@ -246,11 +254,16 @@ class BlinkHomeSyncModule extends IPSModuleStrict
         // Get Form
         $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
 
-        // Extract Version
-        $ins = IPS_GetInstance($this->InstanceID);
-        $mod = IPS_GetModule($ins['ModuleInfo']['ModuleID']);
-        $lib = IPS_GetLibrary($mod['LibraryID']);
-        $form['actions'][3]['items'][2]['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
+        // Update Version in form
+        $this->ModifyFormElement($form['actions'], 'Version', function (array &$element)
+        {
+            // Extract Version
+            $ins = IPS_GetInstance($this->InstanceID);
+            $mod = IPS_GetModule($ins['ModuleInfo']['ModuleID']);
+            $lib = IPS_GetLibrary($mod['LibraryID']);
+
+            $element['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
+        });
 
         return json_encode($form);
     }

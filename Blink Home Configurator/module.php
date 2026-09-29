@@ -5,6 +5,10 @@ declare(strict_types=1);
 /** Generell funktions */
 require_once __DIR__ . '/../libs/_traits.php';
 
+/** Namespaced traits */
+use Wilkware\BlinkHomeSystem\DebugHelper;
+use Wilkware\BlinkHomeSystem\FormHelper;
+
 /**
  * Class BlinkHomeConfigurator
  *
@@ -19,6 +23,7 @@ class BlinkHomeConfigurator extends IPSModuleStrict
     // -------------------------------------------------------------------------
 
     use DebugHelper;
+    use FormHelper;
 
     // -------------------------------------------------------------------------
     // Constants
@@ -47,6 +52,7 @@ class BlinkHomeConfigurator extends IPSModuleStrict
         'catalina_indoor'   => 'Blink Indoor',
         'catalina'          => 'Blink Outdoor',
         'sedona'            => 'Blink Outdoor 4',
+        'sonoran'           => 'Blink Outdoor 2K+',
         'owl'               => 'Blink Mini',
         'hawk'              => 'Blink Mini 2',
         'chickadee'         => 'Blink Mini 2K+',
@@ -118,11 +124,16 @@ class BlinkHomeConfigurator extends IPSModuleStrict
     {
         $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
 
-        // Extract Version
-        $ins = IPS_GetInstance($this->InstanceID);
-        $mod = IPS_GetModule($ins['ModuleInfo']['ModuleID']);
-        $lib = IPS_GetLibrary($mod['LibraryID']);
-        $form['actions'][2]['items'][2]['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
+        // Update Version in form
+        $this->ModifyFormElement($form['actions'], 'Version', function (array &$element)
+        {
+            // Extract Version
+            $ins = IPS_GetInstance($this->InstanceID);
+            $mod = IPS_GetModule($ins['ModuleInfo']['ModuleID']);
+            $lib = IPS_GetLibrary($mod['LibraryID']);
+
+            $element['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
+        });
 
         // Return if parent is not confiured
         if (!$this->HasActiveParent()) {

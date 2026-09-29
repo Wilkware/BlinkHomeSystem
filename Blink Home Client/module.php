@@ -5,6 +5,14 @@ declare(strict_types=1);
 /** Generell funktions */
 require_once __DIR__ . '/../libs/_traits.php';
 
+/** Namespaced traits */
+use Wilkware\BlinkHomeSystem\BlinkHelper;
+use Wilkware\BlinkHomeSystem\DebugHelper;
+use Wilkware\BlinkHomeSystem\EventHelper;
+use Wilkware\BlinkHomeSystem\FormatHelper;
+use Wilkware\BlinkHomeSystem\FormHelper;
+use Wilkware\BlinkHomeSystem\VariableHelper;
+
 /**
  * class BlinkHomeClient (I/O)
  *
@@ -26,7 +34,9 @@ class BlinkHomeClient extends IPSModuleStrict
     use BlinkHelper;
     use DebugHelper;
     use EventHelper;
+    use FormHelper;
     use FormatHelper;
+    use VariableHelper;
 
     // -------------------------------------------------------------------------
     // GUIDs
@@ -163,11 +173,16 @@ class BlinkHomeClient extends IPSModuleStrict
                 break;
         }
 
-        // Extract Version
-        $ins = IPS_GetInstance($this->InstanceID);
-        $mod = IPS_GetModule($ins['ModuleInfo']['ModuleID']);
-        $lib = IPS_GetLibrary($mod['LibraryID']);
-        $form['actions'][3]['items'][2]['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
+        // Update Version in form
+        $this->ModifyFormElement($form['actions'], 'Version', function (array &$element)
+        {
+            // Extract Version
+            $ins = IPS_GetInstance($this->InstanceID);
+            $mod = IPS_GetModule($ins['ModuleInfo']['ModuleID']);
+            $lib = IPS_GetLibrary($mod['LibraryID']);
+
+            $element['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
+        });
 
         // Debug output
         //$this->LogDebug(__FUNCTION__, $form);
@@ -527,7 +542,7 @@ class BlinkHomeClient extends IPSModuleStrict
                         'region'    => $region,
                         'token'     => $params['access_token']
                     ],
-                    'Battery'   => unserialize($this->GetBuffer('battery'))
+                    'Battery'   => is_array($bat = @unserialize($this->GetBuffer('battery'))) ? $bat : []
                 ]));
 
                 $this->SetStatus(102);

@@ -109,6 +109,10 @@
                                     "value": "sedona"
                                 },
                                 {
+                                    "label": "Blink Outdoor 2K+",
+                                    "value": "sonoran"
+                                },
+                                {
                                     "label": "Blink Doorbell",
                                     "value": "lotus"
                                 },
@@ -441,6 +445,7 @@
                 },
                 {
                     "type": "Label",
+                    "name": "Version",
                     "color": 8421504
                 }
             ]

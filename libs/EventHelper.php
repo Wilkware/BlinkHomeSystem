@@ -3,7 +3,7 @@
 /**
  * EventHelper.php
  *
- * Part of the Trait-Libraray for IP-Symcon Modules.
+ * Part of the Trait-Libraray for Symcon Modules.
  *
  * @package       traits
  * @author        Heiko Wilknitz <heiko@wilkware.de>
@@ -13,6 +13,10 @@
  */
 
 declare(strict_types=1);
+
+/** @symcon-namespace */
+
+namespace Wilkware\BlinkHomeSystem;
 
 /**
  * Helper trait to create timer and events.
@@ -31,8 +35,8 @@ trait EventHelper
      */
     protected function UpdateTimerInterval(string $ident, int $hour, int $minute, int $second): void
     {
-        $now = new DateTime();
-        $target = new DateTime();
+        $now = new \DateTime();
+        $target = new \DateTime();
         $target->modify('+1 day');
         $target->setTime($hour, $minute, $second);
         $diff = $target->getTimestamp() - $now->getTimestamp();

@@ -5,6 +5,13 @@ declare(strict_types=1);
 /** Generell funktions */
 require_once __DIR__ . '/../libs/_traits.php';
 
+/** Namespaced traits */
+use Wilkware\BlinkHomeSystem\DebugHelper;
+use Wilkware\BlinkHomeSystem\EventHelper;
+use Wilkware\BlinkHomeSystem\FormatHelper;
+use Wilkware\BlinkHomeSystem\FormHelper;
+use Wilkware\BlinkHomeSystem\VariableHelper;
+
 /**
  * Class BlinkHomeDevice
  *
@@ -19,6 +26,7 @@ class BlinkHomeDevice extends IPSModuleStrict
 
     use DebugHelper;
     use EventHelper;
+    use FormHelper;
     use FormatHelper;
     use VariableHelper;
 
@@ -75,27 +83,27 @@ class BlinkHomeDevice extends IPSModuleStrict
 
     /** @var array<string,mixed> Battery Presentation (Value) */
     private const BLINK_PRESENTATION_BATTERY = [
-        'PRESENTATION'       => VARIABLE_PRESENTATION_VALUE_PRESENTATION,
-        'MIN'                => 0,
-        'MAX'                => 3,
-        'THOUSANDS_SEPARATOR'=> '',
-        'DISPLAY_TYPE'       => 0,
-        'ICON'               => 'battery-bolt',
-        'INTERVALS_ACTIVE'   => true,
-        'INTERVALS'          => '[
-            {"ColorDisplay":16711935,"ContentColorDisplay":-1,"IntervalMinValue":0,"IntervalMaxValue":0,"ConstantActive":true,"ConstantValue":"unknown","ConversionFactor":1,"IconActive":true,"IconValue":"battery-exclamation","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16711935,"ContentColorActive":false,"ContentColorValue":-1},
-            {"ColorDisplay":16711680,"ContentColorDisplay":-1,"IntervalMinValue":1,"IntervalMaxValue":1,"ConstantActive":true,"ConstantValue":"critical","ConversionFactor":1,"IconActive":true,"IconValue":"battery-low","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16711680,"ContentColorActive":false,"ContentColorValue":-1},
-            {"ColorDisplay":16776960,"ContentColorDisplay":-1,"IntervalMinValue":2,"IntervalMaxValue":2,"ConstantActive":true,"ConstantValue":"low","ConversionFactor":1,"IconActive":true,"IconValue":"battery-half","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16776960,"ContentColorActive":false,"ContentColorValue":-1},
-            {"ColorDisplay":65280,"ContentColorDisplay":-1,"IntervalMinValue":3,"IntervalMaxValue":3,"ConstantActive":true,"ConstantValue":"ok","ConversionFactor":1,"IconActive":true,"IconValue":"battery-full","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":65280,"ContentColorActive":false,"ContentColorValue":-1}
-        ]',
-        'PERCENTAGE'   => false,
-        'CONTENT_COLOR'=> -1,
-        'PREFIX'       => '',
-        'SUFFIX'       => '',
-        'COLOR'        => -1,
-        'USAGE_TYPE'   => 0,
-        'SHOW_PREVIEW' => true,
-        'PREVIEW_STYLE'=> 1
+        'PRESENTATION'        => VARIABLE_PRESENTATION_VALUE_PRESENTATION,
+        'MIN'                 => 0,
+        'MAX'                 => 3,
+        'DIGITS'              => 0,
+        'DECIMAL_SEPARATOR'   => 'Client',
+        'THOUSANDS_SEPARATOR' => '',
+        'DISPLAY_TYPE'        => 0,
+        'ICON'                => 'battery-bolt',
+        'INTERVALS_ACTIVE'    => true,
+        'INTERVALS'           => '[{"IntervalMinValue":0,"IntervalMaxValue":0,"ConstantActive":true,"ConstantValue":"unknown","ConversionFactor":1,"IconActive":true,"IconValue":"battery-exclamation","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16711935,"ContentColorActive":false,"ContentColorValue":-1},'
+                               . '{"IntervalMinValue":1,"IntervalMaxValue":1,"ConstantActive":true,"ConstantValue":"critical","ConversionFactor":1,"IconActive":true,"IconValue":"battery-low","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16711680,"ContentColorActive":false,"ContentColorValue":-1},'
+                               . '{"IntervalMinValue":2,"IntervalMaxValue":2,"ConstantActive":true,"ConstantValue":"low","ConversionFactor":1,"IconActive":true,"IconValue":"battery-half","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":16776960,"ContentColorActive":false,"ContentColorValue":-1},'
+                               . '{"IntervalMinValue":3,"IntervalMaxValue":3,"ConstantActive":true,"ConstantValue":"ok","ConversionFactor":1,"IconActive":true,"IconValue":"battery-full","PrefixActive":false,"PrefixValue":"","SuffixActive":false,"SuffixValue":"","DigitsActive":false,"DigitsValue":0,"ColorActive":true,"ColorValue":65280,"ContentColorActive":false,"ContentColorValue":-1}]',
+        'PERCENTAGE'          => false,
+        'CONTENT_COLOR'       => -1,
+        'PREFIX'              => '',
+        'SUFFIX'              => '',
+        'COLOR'               => -1,
+        'USAGE_TYPE'          => 0,
+        'SHOW_PREVIEW'        => true,
+        'PREVIEW_STYLE'       => 1
     ];
 
     // -------------------------------------------------------------------------
@@ -204,11 +212,16 @@ class BlinkHomeDevice extends IPSModuleStrict
         // Get Form
         $form = json_decode(file_get_contents(__DIR__ . '/form.json'), true);
 
-        // Extract Version
-        $ins = IPS_GetInstance($this->InstanceID);
-        $mod = IPS_GetModule($ins['ModuleInfo']['ModuleID']);
-        $lib = IPS_GetLibrary($mod['LibraryID']);
-        $form['actions'][3]['items'][2]['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
+        // Update Version in form
+        $this->ModifyFormElement($form['actions'], 'Version', function (array &$element)
+        {
+            // Extract Version
+            $ins = IPS_GetInstance($this->InstanceID);
+            $mod = IPS_GetModule($ins['ModuleInfo']['ModuleID']);
+            $lib = IPS_GetLibrary($mod['LibraryID']);
+
+            $element['caption'] = sprintf('v%s.%d', $lib['Version'], $lib['Build']);
+        });
 
         // Return if parent is not confiured
         if (!$this->HasActiveParent()) {
@@ -358,11 +371,13 @@ class BlinkHomeDevice extends IPSModuleStrict
         if (isset($data['AuthData'])) {
             $this->WriteAttributeString('AuthData', serialize($data['AuthData']));
         }
-        if (isset($data['Battery'])) {
+        if (isset($data['Battery']) && is_array($data['Battery']) && $this->ReadPropertyBoolean('UpdateBattery')) {
             $device = $this->ReadPropertyString('DeviceID');
             foreach ($data['Battery'] as $entry) {
                 if ($entry['device'] == $device) {
-                    $this->SetValueInteger('battery', $entry['battery']);
+                    // signals.battery (int 0..3) or battery state as string ('ok', 'low')
+                    $value = is_int($entry['battery']) ? $entry['battery'] : (($entry['battery'] === 'ok') ? 3 : 1);
+                    $this->SetValueInteger('battery', $value);
                 }
             }
         }
