@@ -4,7 +4,7 @@
 [![Product](https://img.shields.io/badge/Symcon%20Version-8.1-blue.svg?style=flat-square)](https://www.symcon.de/produkt/)
 [![Licence](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-IP-Symcon Modulbibliothek für die Einbindung und Verwaltung des drahtlosen HD-Heimüberwachungs- und Alarmsystem von Blink.
+Symcon Modulbibliothek für die Einbindung und Verwaltung des drahtlosen HD-Heimüberwachungs- und Alarmsystem von Blink.
 
 Folgende Module beinhaltet diese Bibliothek:
 
@@ -46,7 +46,7 @@ Modul welches ein Zubehör (Flutlich, Halterung) repräsentiert.
 
 ## 👨‍💻 Entwickler
 
-Seit nunmehr über 10 Jahren fasziniert mich das Thema Haussteuerung. In den letzten Jahren betätige ich mich auch intensiv in der IP-Symcon Community und steuere dort verschiedenste Skript und Module bei. Ihr findet mich dort unter dem Namen @pitti ;-)
+Seit nunmehr über 10 Jahren fasziniert mich das Thema Haussteuerung. In den letzten Jahren betätige ich mich auch intensiv in der Symcon Community und steuere dort verschiedenste Skript und Module bei. Ihr findet mich dort unter dem Namen @pitti ;-)
 
 [![GitHub](https://img.shields.io/badge/GitHub-@wilkware-181717.svg?style=for-the-badge&logo=github)](https://wilkware.github.io/)
 

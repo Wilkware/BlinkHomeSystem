@@ -13,11 +13,12 @@ Ermöglicht die Kommunikation mit einem Blink Endgerät, derzeit vornehmlich Kam
 1. [Funktionsumfang](#user-content-1-funktionsumfang)
 2. [Voraussetzungen](#user-content-2-voraussetzungen)
 3. [Installation](#user-content-3-installation)
-4. [Einrichten der Instanzen in IP-Symcon](#user-content-4-einrichten-der-instanzen-in-ip-symcon)
-5. [Statusvariablen und Darstellungen](#user-content-5-statusvariablen-und-darstellungen)
-6. [Visualisierung](#user-content-6-visualisierung)
-7. [PHP-Befehlsreferenz](#user-content-7-php-befehlsreferenz)
-8. [Versionshistorie](#user-content-8-versionshistorie)
+4. [Einrichtung](#user-content-4-einrichtung)
+5. [Statusvariablen](#user-content-5-statusvariablen)
+6. [Darstellungen](#user-content-6-darstellungen)
+7. [Visualisierung](#user-content-7-visualisierung)
+8. [Befehlsreferenz](#user-content-8-befehlsreferenz)
+9. [Versionshistorie](#user-content-9-versionshistorie)
 
 ### 1. Funktionsumfang
 
@@ -31,18 +32,18 @@ Der aktuelle Funktionsumfang umfasst:
 Das Modul wird kontinuierlich weiterentwickelt und kann künftig um zusätzliche Funktionen erweitert werden.
 ### 2. Voraussetzungen
 
-* IP-Symcon ab Version 8.1
+* Symcon ab Version 8.1
 
 ### 3. Installation
 
-* Über den Module Store das 'Blink Home System'-Modul installieren.
-* Alternativ über das Module Control folgende URL hinzufügen  
+* Über den Modul Store die Bibliothek _Blink Home System_ installieren.
+* Alternativ über das Modul Control folgende URL hinzufügen.  
 `https://github.com/Wilkware/BlinkHomeSystem` oder `git://github.com/Wilkware/BlinkHomeSystem.git`
 
-### 4. Einrichten der Instanzen in IP-Symcon
+### 4. Einrichtung
 
-* Unter "Instanz hinzufügen" ist das _'Blink Home Device'_-Modul unter dem Hersteller _'Amazon'_ aufgeführt.
-* Über den _'Blink Home Configurator'_ kann eine einfache Installation vorgenommen werden.  
+* Unter 'Instanz hinzufügen' ist das _Blink Home Gerät_-Modul unter dem Hersteller 'Amazon' aufgeführt.
+* Über den _Blink Home Konfigurator_ kann eine einfache Installation vorgenommen werden.  
 Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)
 
 __Konfigurationsseite__:
@@ -56,7 +57,7 @@ Name           | Beschreibung
 Gerätetyp      | Typbezeichnung (Kamera)
 Gerätemodell   | Modellbezeichnung
 Geräte-ID      | Interne Gerätenummer
-Netwerk-ID     | Interne Netwerknummer
+Netzwerk-ID    | Interne Netzwerknummer
 
 > 🖼️ Bilder ...
 
@@ -86,11 +87,11 @@ Name                     | Beschreibung
 Live-Ansicht über Middleware-Server aktivieren! | Dadurch wird eine spezielle Kachel-Darstellung aktiviert, welche das Starten und Stoppen der Live-Ansicht in der Visualisierung ermöglicht
 Url des Middleware-Servers (IP:PORT) | Url (IP-Adresse + eingestellten Port) zum Server
 
-> ⚙️ Erweiterte Einstellungen  ...
+> ⚙️ Erweiterte Einstellungen ...
 
 Name           | Beschreibung
 -------------- | ------------------
-Anlegen einer Variabel zur Auslösung einer Momentaufnahme der aktuellen Ansicht der Kamera! | Variable für's Webfront zum Auslösen einer Aufnahme
+Anlegen einer Variable zur Auslösung einer Momentaufnahme der aktuellen Ansicht der Kamera! | Variable für's Webfront zum Auslösen einer Aufnahme
 Erstellen einer Variable zur Anzeige des Ladezustands der Batterie! | Variable für's Webfront zum Anzeigen des Ladezustandes
 Automatisches Zurücksetzen des Kommando-Stacks! | Automatisches Zurücksetzen der Kommando ID beim auftretten von Fehlern.
 
@@ -103,7 +104,7 @@ Aktion              | Beschreibung
 AUSLÖSER            | Löst eine Momentaufnahme(Snapshot) aus.
 AUFNEHMEN           | Löst eine manuelle Live-Aufnahme (Clip) aus.
 
-> 🛟Entwicklungs- und Debuginformationen ...
+> 🛟 Entwicklungs- und Debuginformationen ...
 
 Aktion              | Beschreibung
 ------------------- | ------------------
@@ -112,30 +113,31 @@ SIGNALE             | Anzeige von verschiedenen Signalen (WiFi usw.)
 KONFIGURATION       | Anzeige der Geräte-Konfigurationsdaten
 ZURÜCKSETZEN        | Reset des Kommando-Stacks um Kommunikation wieder zu synchronisieren.
 
-### 5. Statusvariablen und Darstellungen
+### 5. Statusvariablen
 
 Die Statusvariablen werden automatisch angelegt. Das Löschen einzelner kann zu Fehlfunktionen führen.
 
-#### Statusvariablen
+Name                 | Typ     | Beschreibung
+-------------------- | ------- | ------------------------------
+Bewegungserkennung   | Boolean | Variable zum An- und Ausschalten der Bewegungserkennung
+Auslöser             | Boolean | Variable zum Auslösen einer Momentaufnahme
+Aufnehmen            | Boolean | Variable zum Auslösen einer manuellen Aufnahme (Clip)
+Batterie             | Integer | Variable zur Anzeige des Ladezustands (nur wenn batteriebetrieben)
 
-Ident               | Name               | Typ     | Darstellung     | Beschreibung
-------------------- | ------------------ | ------- | --------------- | -------------------
-circuit_snapshot    | Zeitplan Snapshot  | event   |                 | Wochenplan für Momentaufnahmen
-thumbnail           | Bild               | media   |                 | Medienobject zum Speichern der Aufnahme
-motion_detection    | Bewegungserkennung | boolean | Schalter        | Variable zum an- und ausschalten der Bewegungserkennung
-snapshot            | Auslöser           | integer | Schalter        | Variable zum Auslösen einer Momentaufnahme
-battery             | Batterie           | integer | Wertanzeige     | Variable zur Anzeige des Ladezustands (nur wenn batteriebetrieben)
+_Hinweis:_ Zusätzlich werden der Wochenplan _Zeitplan Snapshot_ (Zeitplan für Momentaufnahmen) und das Medienobjekt _Bild_ (Speichern der Aufnahme) angelegt.
 
-#### Darstellungen
+### 6. Darstellungen
 
-Folgende Dartsellungen werden hinterlegt:
+Die Darstellungen werden direkt an den Statusvariablen hinterlegt, es werden keine Profile angelegt.
 
-Template-Name            | Typ           | Beschreibung
------------------------- | ------------- | ----------------
-\<direkte Assoziazion\>  | Schalter      | An-/Ausschalter
-\<direkte Assoziazion\>  | Wertanzeige   | Farbliche Batterieladezustandsanzeige von 0 (Unbekannt) bis 3 (Gut)
+Variable             | Darstellung   | Werte
+-------------------- | ------------- | ------------------------------
+Bewegungserkennung   | Schalter      | An / Aus
+Auslöser             | Schalter      | An / Aus
+Aufnehmen            | Schalter      | An / Aus
+Batterie             | Wertanzeige   | Unbekannt (0), Niedrig (1), Mittel (2), Gut (3)
 
-### 6. Visualisierung
+### 7. Visualisierung
 
 Man kann sowohl das gesamte Modul (HTML-SDK Support) als auch nur die Statusvariablen direkt in der Visualisierung verlinken.
 
@@ -144,11 +146,11 @@ In der rechten unteren Ecke werden Buttons für das Aktivieren der Bewegungserke
 Wenn Die Option "Liveview" aktiviert ist, wird zusätzlich ein Play/Stop-Button kurz in der Mitte des Bildes eingeblendet.
 Dieser kann durch einfachen Mouseklick auf die Kachel wieder angezeigt werden. Über diesen lässt sich dann der LiveView starten bzw. wieder stoppen.
 
-### 7. PHP-Befehlsreferenz
+### 8. Befehlsreferenz
 
 Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 
-### 8. Versionshistorie
+### 9. Versionshistorie
 
 v2.7.20260929
 
@@ -257,7 +259,7 @@ v1.0.20220110
 
 ## Entwickler
 
-Seit nunmehr über 10 Jahren fasziniert mich das Thema Haussteuerung. In den letzten Jahren betätige ich mich auch intensiv in der IP-Symcon Community und steuere dort verschiedenste Skript und Module bei. Ihr findet mich dort unter dem Namen @pitti ;-)
+Seit nunmehr über 10 Jahren fasziniert mich das Thema Haussteuerung. In den letzten Jahren betätige ich mich auch intensiv in der Symcon Community und steuere dort verschiedenste Skript und Module bei. Ihr findet mich dort unter dem Namen @pitti ;-)
 
 [![GitHub](https://img.shields.io/badge/GitHub-@wilkware-181717.svg?style=for-the-badge&logo=github)](https://wilkware.github.io/)
 

@@ -6,18 +6,19 @@
 [![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-green.svg?style=flat-square)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![Actions](https://img.shields.io/github/actions/workflow/status/wilkware/BlinkHomeSystem/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/Wilkware/BlinkHomeSystem/actions)
 
-IP-Symcon Modul für die Steuerung aller aktiven Kameras im gleichen Netzwerk.
+Symcon Modul für die Steuerung aller aktiven Kameras im gleichen Netzwerk.
 
 ## Inhaltverzeichnis
 
 1. [Funktionsumfang](#user-content-1-funktionsumfang)
 2. [Voraussetzungen](#user-content-2-voraussetzungen)
 3. [Installation](#user-content-3-installation)
-4. [Einrichten der Instanzen in IP-Symcon](#user-content-4-einrichten-der-instanzen-in-ip-symcon)
-5. [Statusvariablen und Darstellungen](#user-content-5-statusvariablen-und-darstellungen)
-6. [Visualisierung](#user-content-6-visualisierung)
-7. [PHP-Befehlsreferenz](#user-content-7-php-befehlsreferenz)
-8. [Versionshistorie](#user-content-8-versionshistorie)
+4. [Einrichtung](#user-content-4-einrichtung)
+5. [Statusvariablen](#user-content-5-statusvariablen)
+6. [Darstellungen](#user-content-6-darstellungen)
+7. [Visualisierung](#user-content-7-visualisierung)
+8. [Befehlsreferenz](#user-content-8-befehlsreferenz)
+9. [Versionshistorie](#user-content-9-versionshistorie)
 
 ### 1. Funktionsumfang
 
@@ -32,18 +33,18 @@ Das Modul wird kontinuierlich weiterentwickelt. Der endgültige Funktionsumfang 
 
 ### 2. Voraussetzungen
 
-* IP-Symcon ab Version 8.1
+* Symcon ab Version 8.1
 
 ### 3. Installation
 
-* Über den Module Store das 'Blink Home System'-Modul installieren.
-* Alternativ über das Module Control folgende URL hinzufügen  
+* Über den Modul Store die Bibliothek _Blink Home System_ installieren.
+* Alternativ über das Modul Control folgende URL hinzufügen.  
 `https://github.com/Wilkware/BlinkHomeSystem` oder `git://github.com/Wilkware/BlinkHomeSystem.git`
 
-### 4. Einrichten der Instanzen in IP-Symcon
+### 4. Einrichtung
 
-* Unter "Instanz hinzufügen" ist das _'Blink Home Sync Modul'_-Modul unter dem Hersteller _'Amazon'_ aufgeführt.
-* Über den _'Blink Home Configurator'_ kann eine einfache Installation vorgenommen werden  
+* Unter 'Instanz hinzufügen' ist das _Blink Home Sync Modul_-Modul unter dem Hersteller 'Amazon' aufgeführt.
+* Über den _Blink Home Konfigurator_ kann eine einfache Installation vorgenommen werden  
 Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)
 
 * Wie man die Meldungen von Bewegungen bzw. Alarmen via Amazon Alexa einstellt ist im [Forum](https://community.symcon.de/t/modul-blink-home-system/127808/197?u=pitti) beschrieben.
@@ -59,9 +60,9 @@ Name           | Beschreibung
 Gerätetyp      | Typbezeichnung (Sync Modul)
 Gerätemodell   | Modellbezeichnung (Model 1 oder 2)
 Geräte-ID      | Interne Gerätenummer
-Netwerk-ID     | Interne Netwerknummer
+Netzwerk-ID    | Interne Netzwerknummer
 
-> 🙌 Bewegungsereignissen ...
+> 🙌 Bewegungsereignisse ...
 
 Name                     | Beschreibung
 ------------------------ | ------------------
@@ -86,7 +87,7 @@ _HINWEIS:_ Um mehr als 1000 KB Clips herunterzuladen muss der Spezialschalter *S
 
 Name           | Beschreibung
 -------------- | ------------------
-Anlegen einer Variabel zum Anzeigen einer erfassten Bewegung! | Legt einen Schalter für Alarm (EIN/AUS) an
+Anlegen einer Variable zum Anzeigen einer erfassten Bewegung! | Legt einen Schalter für Alarm (EIN/AUS) an
 Erstelle eine Variable, um die Kamera mit der letzte erkannten Bewegung zu speichern! | Legt ein Variable zum erfassen der Kamera wo die letzte Bewegung staffand an
 Kamerazuordnung | Zuordnung der Kameras zu einer virtuellen ID (Umweg über Dimmwert eines Lichtes)
 Gleichzeitiges Ausführen eines Skriptes | Hinterlegung eines Skriptes das bei Bewegungserkennung aufgerufen wird (IPS_RunScriptEX). Der Zeitstempel (Unix timestamp) wird im Array als 'TIMESTAMP' übergeben. Die ID des ausführenden Moduls wird in 'MODUL' mitgegeben. Die letze Bewegung wird als Text in 'MOTION' und die allgemeine Alarmmeldung als Bool in 'ALERT' übergeben. Ob 'MOTION' oder 'ALERT' mitgegeben wird hängt von der geschaltenen Variable ab. Beides gleichzeitig wird nicht übergeben!
@@ -97,7 +98,7 @@ _Aktionsbereich:_
 
 Aktion              | Beschreibung
 ------------------- | ------------------
-NETZWERK            | Ausgabe der Netwerkinformationen.
+NETZWERK            | Ausgabe der Netzwerkinformationen.
 SYNC MODUL          | Ausgabe der Modulinformationen.
 SPEICHERSTATUS      | Ausgabe der Speicherinformationen.
 
@@ -110,42 +111,41 @@ CLIPS               | Versucht Aufnahmen vom lokalen USB-Medium herunterzuladen 
 ALARM               | Simuliert eine eingehende Alarmmeldung
 BEWEGUNG            | Simuliert eine Bewegung mit zufälliger Kamera-ID (zwischen 10 und 100)
 
-### 5. Statusvariablen und Darstellungen
+### 5. Statusvariablen
 
 Die Statusvariablen werden automatisch angelegt. Das Löschen einzelner kann zu Fehlfunktionen führen.
 
-#### Statusvariablen
+Name                 | Typ     | Beschreibung
+-------------------- | ------- | ------------------------------
+Aufzeichnung         | Boolean | An/Aus-Schalter für Aufzeichnungen
+Alarm                | Boolean | Indikation von Alarmmeldungen
+Herunterladen        | Boolean | Variable zum Herunterladen von Videoclips
+Letzte Bewegung      | Integer | Hinterlegung der Kamerazuordnung für Bewegungsmeldungen
 
-Ident               | Name                  | Typ     | Darstellung          | Beschreibung
-------------------- | --------------------- | ------- | -------------------- | -------------------
-circuit_snapshot    | Zeitplan Aufnahmen    | event   |                      | Wochenplan für Bewegungsmeldungen
-recording           | Aufzeichnung          | boolean | Schalter             | An/Aus-Schalter für Aufzeichnungen
-alert               | Alarm                 | boolean | Aufzählung           | Indikation von Alarmmeldungen
-download            | Herunterladen         | boolean | Schalter             | Variable zum Herunterladen von Videoclips
-last_motion         | Letzte Bewegung       | integer | Schieberegler        | Hinterlegung der Kamerazuordnung für Bewegungsmeldungen
+_Hinweis:_ Zusätzlich wird der Wochenplan _Zeitplan Aufnahme_ (Wochenplan für Bewegungsmeldungen) angelegt.
 
-#### Darstellungen
+### 6. Darstellungen
 
-Folgende Dartsellungen werden hinterlegt:
+Die Darstellungen werden direkt an den Statusvariablen hinterlegt, es werden keine Profile angelegt.
 
-Template-Name            | Typ           | Beschreibung
------------------------- | ------------- | ----------------
-\<direkte Assoziazion\>  | Schalter      | An-/Ausschalter
-\<direkte Assoziazion\>  | Aufzählung    | OK oder Alarm
-\<direkte Assoziazion\>  | Schalter      | Download-Button
-\<direkte Assoziazion\>  | Schieberegler | Dynamische Zuordnung in zehnerschritten - Nummer zu Kameraname
+Variable             | Darstellung   | Werte
+-------------------- | ------------- | ------------------------------
+Aufzeichnung         | Aufzählung    | Aus (false), An (true)
+Alarm                | Aufzählung    | OK (false), Alarm (true)
+Herunterladen        | Schalter      | An / Aus
+Letzte Bewegung      | Schieberegler | 0 – 100 (Schrittweite 10), je Zehnerschritt ein Kameraname gemäß Kamerazuordnung
 
-### 6. Visualisierung
+### 7. Visualisierung
 
 Man kann die Statusvariablen direkt in der Visualisierung verlinken.
 
-### 7. PHP-Befehlsreferenz
+### 8. Befehlsreferenz
 
 ```php
     boolean BHS_Arm(integer $InstanzID);
 ```
 
-Schaltet alle im Netwerk befindlichen Kameras scharf.
+Schaltet alle im Netzwerk befindlichen Kameras scharf.
 
 __Beispiel__: `BHS_Arm(12345);`
 
@@ -153,11 +153,11 @@ __Beispiel__: `BHS_Arm(12345);`
     boolean BHS_Disarm(integer $InstanzID);
 ```
 
-Schaltet alle im Netwerk befindlichen Kameras unscharf.
+Schaltet alle im Netzwerk befindlichen Kameras unscharf.
 
 __Beispiel__: `BHS_Disarm(12345);`
 
-### 8. Versionshistorie
+### 9. Versionshistorie
 
 v2.7.20260929
 
@@ -249,7 +249,7 @@ Ich möchte mich für die Unterstützung bei der Entwicklung dieses Moduls bedan
 
 ## Entwickler
 
-Seit nunmehr über 10 Jahren fasziniert mich das Thema Haussteuerung. In den letzten Jahren betätige ich mich auch intensiv in der IP-Symcon Community und steuere dort verschiedenste Skript und Module bei. Ihr findet mich dort unter dem Namen @pitti ;-)
+Seit nunmehr über 10 Jahren fasziniert mich das Thema Haussteuerung. In den letzten Jahren betätige ich mich auch intensiv in der Symcon Community und steuere dort verschiedenste Skript und Module bei. Ihr findet mich dort unter dem Namen @pitti ;-)
 
 [![GitHub](https://img.shields.io/badge/GitHub-@wilkware-181717.svg?style=for-the-badge&logo=github)](https://wilkware.github.io/)
 

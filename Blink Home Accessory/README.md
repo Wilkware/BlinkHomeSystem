@@ -13,11 +13,12 @@ Mit diesem Modul können Sie spezifische Funktionen des Zubehörs nutzen und ste
 1. [Funktionsumfang](#user-content-1-funktionsumfang)
 2. [Voraussetzungen](#user-content-2-voraussetzungen)
 3. [Installation](#user-content-3-installation)
-4. [Einrichten der Instanzen in IP-Symcon](#user-content-4-einrichten-der-instanzen-in-ip-symcon)
-5. [Statusvariablen und Darstellungen](#user-content-5-statusvariablen-und-darstellungen)
-6. [Visualisierung](#user-content-6-visualisierung)
-7. [PHP-Befehlsreferenz](#user-content-7-php-befehlsreferenz)
-8. [Versionshistorie](#user-content-8-versionshistorie)
+4. [Einrichtung](#user-content-4-einrichtung)
+5. [Statusvariablen](#user-content-5-statusvariablen)
+6. [Darstellungen](#user-content-6-darstellungen)
+7. [Visualisierung](#user-content-7-visualisierung)
+8. [Befehlsreferenz](#user-content-8-befehlsreferenz)
+9. [Versionshistorie](#user-content-9-versionshistorie)
 
 ### 1. Funktionsumfang
 
@@ -26,18 +27,18 @@ Es ist derzeit noch nicht absehbar, welchen Funktionsumfang das Modul endgültig
 
 ### 2. Voraussetzungen
 
-* IP-Symcon ab Version 8.1
+* Symcon ab Version 8.1
 
 ### 3. Installation
 
-* Über den Module Store das 'Blink Home System'-Modul installieren.
-* Alternativ über das Module Control folgende URL hinzufügen  
+* Über den Modul Store die Bibliothek _Blink Home System_ installieren.
+* Alternativ über das Modul Control folgende URL hinzufügen.  
 `https://github.com/Wilkware/BlinkHomeSystem` oder `git://github.com/Wilkware/BlinkHomeSystem.git`
 
-### 4. Einrichten der Instanzen in IP-Symcon
+### 4. Einrichtung
 
-* Unter "Instanz hinzufügen" ist das _'Blink Home Accessory'_-Modul unter dem Hersteller _'Amazon'_ aufgeführt.
-* Über den _'Blink Home Configurator'_ kann eine einfache Installation vorgenommen werden.  
+* Unter 'Instanz hinzufügen' ist das _Blink Home Zubehör_-Modul unter dem Hersteller 'Amazon' aufgeführt.
+* Über den _Blink Home Konfigurator_ kann eine einfache Installation vorgenommen werden.  
 Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)
 
 __Konfigurationsseite__:
@@ -51,7 +52,7 @@ Name           | Beschreibung
 Gerätetyp      | Typbezeichnung (Kamera)
 Gerätemodell   | Modellbezeichnung
 Geräte-ID      | Interne Gerätenummer (6-stellig)
-Netwerk-ID     | Interne Netwerknummer (6-stellig)
+Netzwerk-ID    | Interne Netzwerknummer (6-stellig)
 Ziel-ID        | Gerätenummer des verbundenen Endgerätes (Kamera)
 
 _Aktionsbereich:_
@@ -63,35 +64,33 @@ Aktion              | Beschreibung
 AN                  | Schaltet Flutlicht an (Blink Floodlight Mount)
 AUS                 | Schaltet Flutlicht aus (Blink Floodlight Mount)
 
-### 5. Statusvariablen und Darstellungen
+### 5. Statusvariablen
 
 Die Statusvariablen werden automatisch angelegt. Das Löschen einzelner kann zu Fehlfunktionen führen.
 
-#### Statusvariablen
+Name                 | Typ     | Beschreibung
+-------------------- | ------- | ------------------------------
+Lichtschalter        | Boolean | Variable zum An- und Ausschalten des Flutlichtes
+Batterie             | Integer | Variable zur Anzeige des Ladezustands
 
-Ident               | Name               | Typ     | Darstellung   | Beschreibung
-------------------- | ------------------ | ------- | ------------- | -------------------
-switch_light        | Lichtschalter      | boolean | Schalter      | Variable zum an- und ausschalten des Flutlichtes
-battery             | Batterie           | integer | Wertanzeige   | Variable zur Anzeige des Ladezustands
+### 6. Darstellungen
 
-#### Darstellungen
+Die Darstellungen werden direkt an den Statusvariablen hinterlegt, es werden keine Profile angelegt.
 
-Folgende Dartsellungen werden hinterlegt:
+Variable             | Darstellung   | Werte
+-------------------- | ------------- | ------------------------------
+Lichtschalter        | Schalter      | An / Aus
+Batterie             | Wertanzeige   | Unbekannt (0), Niedrig (1), Mittel (2), Gut (3)
 
-Template-Name            | Typ           | Beschreibung
------------------------- | ------------- | ----------------
-\<direkte Assoziazion\>  | Schalter      | An-/Ausschalter
-\<direkte Assoziazion\>  | Wertanzeige   | Farbliche Batterieladezustandsanzeige von 0 (Unbekannt) bis 3 (Gut)
-
-### 6. Visualisierung
+### 7. Visualisierung
 
 Man kann die Statusvariablen direkt in der Visualisierung verlinken.
 
-### 7. PHP-Befehlsreferenz
+### 8. Befehlsreferenz
 
 Ein direkter Aufruf von öffentlichen Funktionen ist nicht notwendig!
 
-### 8. Versionshistorie
+### 9. Versionshistorie
 
 v2.7.20260929
 
@@ -139,7 +138,7 @@ v1.0.20240630
 
 ## Entwickler
 
-Seit nunmehr über 10 Jahren fasziniert mich das Thema Haussteuerung. In den letzten Jahren betätige ich mich auch intensiv in der IP-Symcon Community und steuere dort verschiedenste Skript und Module bei. Ihr findet mich dort unter dem Namen @pitti ;-)
+Seit nunmehr über 10 Jahren fasziniert mich das Thema Haussteuerung. In den letzten Jahren betätige ich mich auch intensiv in der Symcon Community und steuere dort verschiedenste Skript und Module bei. Ihr findet mich dort unter dem Namen @pitti ;-)
 
 [![GitHub](https://img.shields.io/badge/GitHub-@wilkware-181717.svg?style=for-the-badge&logo=github)](https://wilkware.github.io/)
 

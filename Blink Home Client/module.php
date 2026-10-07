@@ -16,7 +16,7 @@ use Wilkware\BlinkHomeSystem\VariableHelper;
 /**
  * class BlinkHomeClient (I/O)
  *
- * Provides the communication layer between IP-Symcon
+ * Provides the communication layer between Symcon
  * and the Blink Home API.
  *
  * Responsibilities include:
@@ -90,7 +90,7 @@ class BlinkHomeClient extends IPSModuleStrict
     // -------------------------------------------------------------------------
 
     /**
-     * In contrast to Construct, this function is called only once when creating the instance and starting IP-Symcon.
+     * In contrast to Construct, this function is called only once when creating the instance and starting Symcon.
      * Therefore, status variables and module properties which the module requires permanently should be created here.
      *
      * @return void
@@ -128,7 +128,7 @@ class BlinkHomeClient extends IPSModuleStrict
 
     /**
      * This function is called when deleting the instance during operation and when updating via "Module Control".
-     * The function is not called when exiting IP-Symcon.
+     * The function is not called when exiting Symcon.
      *
      * @return void
      */
@@ -250,7 +250,7 @@ class BlinkHomeClient extends IPSModuleStrict
     }
 
     /**
-     * This function is called by IP-Symcon and processes sent data and forwards it to the parent instance.
+     * This function is called by Symcon and processes sent data and forwards it to the parent instance.
      * Data can be sent using the SendDataToParent function.
      * Further information on data forwarding can be found under Dataflow.
      *
