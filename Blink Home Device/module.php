@@ -133,7 +133,7 @@ class BlinkHomeDevice extends IPSModuleStrict
         //Never delete this line!
         parent::Create();
         // Connect to client
-        if ((float) IPS_GetKernelVersion() < 8.2) {
+        if ((float) IPS_GetKernelVersion() < 8.2 && method_exists($this, 'ConnectParent')) {
             $this->ConnectParent(self::BLINK_CLIENT_GUID);
         }
         // CommandStatus
